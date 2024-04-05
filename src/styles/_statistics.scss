@@ -1,0 +1,29 @@
+@use "variables" as *;
+.p-statistics {
+    display: grid;
+    ul {
+        overflow-y: auto;
+        accordion-element {
+            ul {
+                li {
+                    display: flex;
+                    padding: 0.05em $padding-container;
+                    cursor: default;
+                    color: rgba($color-default-fg, 0.5);
+                    user-select: text;
+                    padding-top: 1px;
+                    user-select: none;
+                    &.sticky {
+                        color: rgba($color-default-fg, 1);
+                    }
+                    &:hover {
+                        filter: brightness(120%);
+                    }
+                    :first-child {
+                        flex: 1;
+                    }
+                }
+            }
+        }
+    }
+}

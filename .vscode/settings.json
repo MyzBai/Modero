@@ -1,0 +1,10 @@
+{
+    "liveServer.settings.root": "/public",
+    "typescript.preferences.quoteStyle": "single",
+    "json.schemas": [
+        {
+            "fileMatch": [ "**.module.json", "**/*.module.jsonc" ],
+            "url": "/src/game/gameModule/module.schema.json"
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+$color-primary-inset-bg: #010409;
+$color-primary-bg: #0d1117;
+$color-primary-outset-bg: #141920;
+$color-primary-selected-bg: #20242c;
+$color-title-accent: #d6a02c;
+
+$color-border-highlight: #545e6e;
+
+$color-scroll-container-border: #2b2b2b;
+$color-default-fg: #c9d1d9;
+$color-muted-fg: #8b949e;
+
+$color-tag-life: #a12525;
+$color-tag-mana: #307da1;
+
+$color-tag-life-bg: #741818;
+$color-tag-life-fg: $color-tag-life;
+$color-tag-mana-bg: #225c7e;
+$color-tag-mana-fg: #307da1;
+
+$color-tag-valid: #54d354;
+$color-tag-invalid: #d86666;
+$color-tag-link: #58a6ff;
+$color-tag-accent: #3983f3;
+
+$color-tag-confirm: $color-tag-valid;
+$color-tag-cancel: $color-tag-invalid;
+
+$color-tag-modifier: #8392bd;
+$color-tag-attack: #be9898;
+$color-tag-physical: #a8a8a8;
+$color-tag-elemental: #72cac6;
+$color-tag-chaos: #9b72ca;
+$color-tag-critical: #63e757;
+$color-tag-mana: #3364ad;
+$color-tag-speed: #a5c748;
+$color-tag-bleed: #d64c42;
+$color-tag-burn: #d67142;
+
+//Other
+$padding-container: 0.3em;
+$default-border: 1px solid #3333334f;
+$default-gap: 0.1em;

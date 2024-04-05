@@ -1,0 +1,31 @@
+@use "variables" as *;
+.p-ascension {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: $default-gap;
+
+    .p-ascend {
+        display: grid;
+        grid-template-rows: 5em 1fr;
+        button {
+            margin: auto;
+            min-width: 10em;
+        }
+
+        .s-text-area {
+            overflow-y: auto;
+            border: $default-border;
+            white-space-collapse: break-spaces;
+        }
+    }
+
+    .p-ascensions {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: $default-gap;
+        .s-ascension-info {
+            grid-row: span 2;
+        }
+    }
+}

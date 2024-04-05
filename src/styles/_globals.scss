@@ -1,0 +1,88 @@
+@use "variables" as *;
+
+.g-list-item {
+    padding: 0.3em;
+    user-select: none;
+    list-style-type: none;
+    background-color: $color-primary-bg;
+
+    &.selected {
+        filter: brightness(70%);
+    }
+
+    &:hover {
+        filter: brightness(120%);
+    }
+}
+
+.g-field {
+    display: flex;
+    padding: 0 $padding-container;
+    padding-top: 1px;
+
+    & > :nth-child(1) {
+        flex: 1;
+        word-wrap: break-word;
+    }
+    & > :last-child {
+        padding-left: 1em;
+    }
+}
+
+.g-progress-bar-background {
+    height: 1.5em;
+    .g-progress-bar {
+        height: 100%;
+    }
+}
+
+@mixin mod-desc {
+    color: $color-tag-modifier;
+    cursor: default;
+
+    &[data-info]:hover {
+        filter: brightness(120%);
+    }
+}
+
+.g-mod-list {
+    text-align: center;
+    padding: $padding-container;
+    overflow-y: auto;
+    li {
+        @include mod-desc;
+    }
+}
+
+.g-mod-desc {
+    @include mod-desc;
+}
+
+.g-text-small {
+    font-size: 0.8em;
+}
+
+.g-text-mute {
+    color: $color-muted-fg;
+}
+
+.g-progress-bar {
+    &.small {
+        display: block;
+        width: 100%;
+        height: 5px;
+    }
+}
+
+.g-title {
+    background-color: $color-primary-bg;
+    padding: $padding-container;
+    // border-bottom: $default-border;
+    text-align: center;
+    // font-size: 1.1em;
+    color: white;
+}
+
+[data-highlight] {
+    color: $color-title-accent;
+}

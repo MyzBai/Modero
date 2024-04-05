@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "list": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [ "id", "name", "url" ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/definitions/uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z 0-9]{3,}$"
+                    },
+                    "description": {
+                        "$ref": "#/definitions/description"
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "Url to the raw json text. This url can also be a path to a file in this project",
+                        "pattern": "\\.module\\.jsonc?$"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "uuid": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{6}$"
+        },
+        "description": {
+            "type": "string",
+            "pattern": "^[A-Za-z ,.:\\-'!?\"\\\n\\\t]{0,512}$"
+        }
+    }
+}

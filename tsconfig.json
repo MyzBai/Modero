@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "target": "ESNext",
+        "lib": [ "DOM", "ESNext", "dom.iterable" ],
+        "moduleResolution": "Node",
+        "resolveJsonModule": true,
+        "verbatimModuleSyntax": true,
+        "noUncheckedIndexedAccess": true,
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "typeRoots": [ "./node_modules/@types" ],
+        "removeComments": true,
+        "noEmit": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "alwaysStrict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "types": [ "node" ]
+    }
+}

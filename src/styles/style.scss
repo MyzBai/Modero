@@ -1,0 +1,55 @@
+@forward "common";
+@use "customElements";
+@use "home";
+@use "variables" as *;
+
+:root {
+    font-size: 17px;
+    font-family: serif;
+}
+.test {
+    color: white;
+}
+body {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-columns: clamp(70vw, 70em, 100vw);
+    justify-content: center;
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-size: min(1rem, 1.7vw, 3vh);
+    background-color: $color-primary-inset-bg;
+    color: $color-default-fg;
+    overflow: hidden;
+
+    main {
+        grid-row-start: 1;
+    }
+
+    & > footer {
+        display: flex;
+        padding: $padding-container;
+        font-size: 0.8em;
+        align-items: center;
+        background-color: $color-primary-bg;
+        margin-top: 0.3em;
+        .s-links {
+            margin-left: auto;
+            a {
+                padding: 0.3em;
+            }
+        }
+
+        span {
+            color: $color-muted-fg;
+            padding: $padding-container;
+        }
+    }
+
+    @media (max-width: 1000px) {
+        grid-template-columns: 100vw;
+    }
+}

@@ -1,0 +1,20 @@
+@use "variables" as *;
+.p-artifacts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-auto-flow: column;
+    gap: $default-gap;
+
+    .s-artifact-info {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        height: 50%;
+        grid-row: 2/4;
+    }
+
+    .s-artifact-list {
+        min-height: 0;
+        overflow-y: auto;
+    }
+}

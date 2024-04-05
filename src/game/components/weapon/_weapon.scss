@@ -1,0 +1,33 @@
+@use "variables" as *;
+.p-weapon {
+    display: grid;
+    grid-template-rows: auto 0.6fr 1fr;
+    gap: $default-gap;
+
+    .s-weapon-info {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        .s-weapon-type {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            border-bottom: $default-border;
+            span:first-child {
+                grid-column: 2;
+            }
+            .change {
+                grid-column: 3;
+                padding-left: 0.5em;
+                cursor: default;
+
+                &:hover {
+                    filter: brightness(120%);
+                }
+            }
+        }
+        ul {
+            min-height: 0;
+            overflow-y: auto;
+        }
+    }
+}

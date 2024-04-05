@@ -1,0 +1,82 @@
+@forward "common";
+@use "variables" as *;
+@use "combat";
+@use "statistics";
+@use "notifications";
+@use "components/playerClasses/playerClasses";
+@use "components/skills/skills";
+@use "components/weapon/weapon";
+@use "components/artifacts/artifacts";
+@use "components/ascension/ascension";
+@use "components/achievements/achievements";
+
+.p-game {
+    display: grid;
+    grid-template-columns: minmax(10em, min-content) 1fr minmax(15em, min-content);
+    grid-template-rows: 3em 1fr;
+    gap: $default-gap;
+    margin: 0.3em;
+    min-height: 0;
+
+    .s-combat-overview {
+        border: $default-border;
+        padding: 0 $padding-container;
+
+        font-size: 0.9em;
+        .enemy-name {
+            cursor: default;
+            &:hover {
+                filter: brightness(120%);
+            }
+        }
+        .s-life-bar {
+            &::-webkit-progress-value {
+                background-color: $color-tag-life-fg;
+            }
+        }
+
+        .s-mana-bar {
+            &::-webkit-progress-value {
+                background-color: $color-tag-mana-fg;
+            }
+        }
+    }
+
+    [data-main-view] {
+        display: grid;
+        border: $default-border;
+
+        & > div {
+            padding: $padding-container;
+        }
+    }
+
+    & > .title {
+        display: flex;
+        color: $color-title-accent;
+        background-color: $color-primary-bg;
+        justify-content: center;
+        align-items: center;
+        border: $default-border;
+    }
+
+    & > .s-side {
+        display: grid;
+        grid-template-rows: 1fr 10em;
+        border: $default-border;
+
+        .sticky-stat-group-list {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            white-space: nowrap;
+            li {
+                display: flex;
+                padding-top: 1px;
+                :first-child {
+                    flex: 1;
+                }
+            }
+        }
+    }
+}

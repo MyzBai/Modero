@@ -1,0 +1,11 @@
+{
+    "$schema": "moduleList.schema.json",
+    "list": [
+        {
+            "id": "1ea84a",
+            "name": "Demo",
+            "url": "./demo.module.jsonc",
+            "description": "This module acts as a demo. \nIt's made by the developer of this game.\nThe purpose of this module is to showcase the base game and may contain a lot of missing features."
+        }
+    ]
+}

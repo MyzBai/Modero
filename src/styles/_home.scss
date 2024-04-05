@@ -1,0 +1,61 @@
+@use "common" as *;
+
+.p-home {
+    display: grid;
+    grid-template-columns: minmax(10em, min-content) 1fr;
+    grid-template-rows: 3em 1fr;
+    gap: $default-gap;
+    margin: 0.3em;
+
+    & > .title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0.3em;
+        font-size: 1.4em;
+        color: $color-title-accent;
+        border: $default-border;
+    }
+    & > .main-view {
+        display: grid;
+        border: $default-border;
+        padding: $padding-container;
+        & > div {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            grid-template-columns: 1fr 1fr;
+            gap: $default-gap;
+            .s-entry-info {
+                display: flex;
+                flex-direction: column;
+                grid-row: span 2;
+                gap: $default-gap;
+                .s-desc {
+                    padding: 1em;
+                    text-align: center;
+                    overflow-y: auto;
+                    padding-bottom: 1em;
+                    white-space: break-spaces;
+                }
+                button {
+                    width: 10em;
+                    align-self: center;
+                    &:last-child {
+                        margin-bottom: 1em;
+                    }
+                }
+            }
+        }
+        .p-load-game {
+            .entry-list {
+                li {
+                    display: flex;
+                    :first-child {
+                        flex: 1;
+                    }
+                }
+            }
+        }
+    }
+}

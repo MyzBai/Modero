@@ -1,0 +1,25 @@
+name: Prevent Push on Lint Failure
+on:
+    push:
+        paths:
+            - "**.ts"
+        branches: ["main"]
+    pull_request:
+        paths:
+            - "**.ts"
+        branches: ["main"]
+permissions:
+    checks: write
+    contents: write
+jobs:
+    run-linters:
+        name: Run linters
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4
+            - name: Install dependencies
+              run: npm install
+            - name: Lint
+              run: npm run-script eslint

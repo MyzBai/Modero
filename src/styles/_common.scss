@@ -1,0 +1,152 @@
+@forward "variables";
+@forward "globals";
+@forward "tags";
+@use "variables" as *;
+
+// *,
+// *::before,
+// *::after {
+//     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+//     -moz-box-sizing: border-box; /* Firefox, other Gecko */
+//     box-sizing: border-box; /* Opera/IE 8+ */
+// }
+// *:focus {
+//     outline: 0;
+// }
+
+div,
+ul {
+    min-height: 0;
+}
+
+i,
+var {
+    font-style: normal;
+    cursor: default;
+}
+
+a {
+    text-decoration: none;
+    color: $color-tag-link;
+    font-family: "Times New Roman", monospace;
+    cursor: pointer !important;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+table {
+    border-collapse: collapse;
+    margin: 0;
+    width: 100%;
+}
+
+[disabled] {
+    pointer-events: none;
+    filter: brightness(50%) !important;
+}
+
+button {
+    color: $color-default-fg;
+    font-size: inherit;
+    font-family: inherit;
+    border: 0;
+    background-color: $color-primary-outset-bg;
+    padding: 0.3em 1em;
+    cursor: default;
+    outline: none;
+
+    &:hover {
+        filter: brightness(120%);
+    }
+
+    &[data-role="confirm"] {
+        color: $color-tag-valid;
+    }
+    &[data-role="cancel"] {
+        color: $color-tag-invalid;
+    }
+}
+
+*.hidden {
+    display: none !important;
+}
+
+*.selected {
+    pointer-events: none;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    gap: $default-gap;
+}
+
+input {
+    background-color: $color-primary-inset-bg;
+    &[type="text"] {
+        display: block;
+        width: 100%;
+        outline: 0;
+        border: 0;
+        padding: 0.2em;
+        color: inherit;
+    }
+    &[type="submit"] {
+        border: 0;
+    }
+    &[type="checkbox"] {
+        position: relative;
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: $color-primary-inset-bg;
+        margin: 0;
+        font: inherit;
+        color: currentColor;
+        width: 1.15em;
+        height: 1.15em;
+        border: 0.1em solid $color-border-highlight;
+        display: grid;
+
+        &::before {
+            content: "";
+            position: absolute;
+            display: none;
+            inset: 20%;
+            background-color: $color-default-fg;
+        }
+        &:checked::before {
+            display: block;
+        }
+    }
+}
+
+progress[value] {
+    display: block;
+    height: 5px;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &::-webkit-progress-bar {
+        background: none;
+        border-radius: 2px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+    }
+    &::-webkit-progress-value {
+        border-radius: 2px;
+        background-color: rgb(57, 168, 57);
+        transition: width 200ms linear;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 0.6em;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #3a414ba9;
+}
+::-webkit-scrollbar-thumb:hover {
+    filter: brightness(120%);
+}

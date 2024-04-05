@@ -1,0 +1,37 @@
+name: Deploy to gh-pages
+on:
+    workflow_dispatch:
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: lts/*
+                  cache: npm
+            - name: Install dependencies
+              run: npm install
+            - name: Set environment variables
+              run: |
+                  echo "ENV_IS_REMOTE=true" >> $GITHUB_ENV
+                  echo "NODE_ENV=production" >> $GITHUB_ENV
+
+                  FILE_PATH="src/game/gameModule/GameModule.ts"
+                  GAME_MODULE_VERSION=$(grep -oP "VERSION = '\K[^']*" $FILE_PATH)
+                  echo "GAME_MODULE_VERSION=$GAME_MODULE_VERSION" >> $GITHUB_ENV
+            - name: Build
+              run: |
+                  npm run-script build
+            - name: Deploy 🚀
+              uses: JamesIves/github-pages-deploy-action@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: gh-pages
+                  folder: public
+                  clean: false
+                  single-commit: true

@@ -1,0 +1,155 @@
+@use "variables" as *;
+
+accordion-element {
+    .header {
+        display: flex;
+        position: relative;
+        background-color: $color-primary-bg;
+        padding: 0.3em;
+        margin-bottom: 1px;
+        user-select: none;
+        align-items: center;
+
+        &.has-content:hover {
+            filter: brightness(110%);
+        }
+    }
+    .content-parent {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 300ms ease-out;
+        & > .s-content {
+            overflow: hidden;
+            grid-row: 1 / span 2;
+        }
+    }
+    .header.open + .content-parent {
+        grid-template-rows: 1fr;
+    }
+}
+
+prompt-window-element {
+    position: fixed;
+    inset: 0;
+    top: 5em;
+    bottom: 5em;
+    z-index: 100;
+    margin: auto;
+    min-height: 0;
+    max-width: 80%;
+    width: fit-content;
+    justify-content: flex-start;
+    .s-content {
+        background-color: $color-primary-bg;
+        border: $default-border;
+        min-width: 15em;
+        display: grid;
+        padding: 2em;
+        .title {
+            padding-bottom: 1em;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .s-body {
+            white-space: pre-wrap;
+            overflow-y: auto;
+            border-top: $default-border;
+            // border-bottom: $default-border;
+            padding: $padding-container;
+            text-align: center;
+        }
+
+        .s-buttons {
+            display: flex;
+            flex-direction: column;
+            justify-self: center;
+            gap: $default-gap;
+            padding-top: 0.7em;
+            button {
+                min-width: 8em;
+                padding-left: 2em;
+                padding-right: 2em;
+            }
+        }
+        footer {
+            padding-top: $padding-container;
+            small {
+                display: block;
+                font-size: 0.75em;
+                color: $color-muted-fg;
+            }
+        }
+    }
+
+    .backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        backdrop-filter: blur(1px);
+        background-color: rgba(0, 0, 0, 0.589);
+    }
+}
+
+craft-table-element {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: $default-gap;
+    min-height: 0;
+    .s-toolbar {
+        display: flex;
+        padding: $padding-container;
+        border-bottom: $default-border;
+    }
+
+    .s-craft-container {
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        .craft-button {
+            justify-self: center;
+            width: 7em;
+        }
+        .craft-msg {
+            padding: 0.3em 0;
+            text-align: center;
+        }
+        .s-craft-list {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            li {
+                padding: $padding-container;
+            }
+        }
+    }
+
+    .s-compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5em;
+        // & > * {
+        //     flex: 1;
+        // }
+    }
+}
+
+tab-menu-element {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    gap: 1px;
+    border: $default-border;
+    text-align: center;
+
+    &[data-direction="vertical"] {
+        flex-direction: column;
+    }
+    &[data-direction="horizontal"] {
+        flex-direction: row;
+    }
+
+    li {
+        min-width: 4em;
+    }
+}

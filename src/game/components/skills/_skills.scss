@@ -1,0 +1,133 @@
+@use "variables" as *;
+
+.p-skills {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: $default-gap;
+
+    & > .s-menu {
+        display: flex;
+        text-align: center;
+        li {
+            min-width: 4em;
+        }
+    }
+
+    .s-skill-info {
+        display: grid;
+        align-content: baseline;
+        grid-row: 1/5;
+        .g-mod-list {
+            ul {
+                overflow-y: auto;
+                min-height: 15em;
+            }
+        }
+    }
+
+    .p-attack-skills {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto 1fr;
+        grid-auto-flow: column;
+        gap: $default-gap;
+
+        .s-skill-list {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .p-aura-skills {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto max(40%) auto 1fr;
+        grid-auto-flow: column;
+        gap: $default-gap;
+
+        .s-skill-slot-list {
+            overflow-y: auto;
+            border: $default-border;
+            .skill-slot {
+                position: relative;
+                display: block;
+                cursor: default;
+                padding: $padding-container;
+                border: $default-border;
+                background-color: $color-primary-inset-bg;
+
+                &:hover {
+                    filter: brightness(120%);
+                }
+                &:not(:first-child) {
+                    margin-top: 0.1em;
+                }
+                .s-title {
+                    display: flex;
+                    align-items: center;
+                    .rank {
+                        opacity: 0.6;
+                        margin-left: auto;
+                        display: block;
+                    }
+                }
+                progress {
+                    display: block;
+                    width: 100%;
+                    height: 5px;
+                }
+
+                &.selected {
+                    filter: brightness(80%);
+                    border: 1px solid $color-border-highlight;
+                    pointer-events: all;
+                }
+
+                &:not(.m-has-skill) {
+                    progress {
+                        visibility: hidden;
+                    }
+                }
+            }
+        }
+
+        .s-skill-list {
+            display: flex;
+            flex-direction: column;
+            border: $default-border;
+            overflow-y: auto;
+            .equipped {
+                color: $color-tag-accent;
+            }
+        }
+    }
+
+    .p-passive-skills {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto 1fr;
+        gap: $default-gap;
+        .s-toolbar {
+            grid-row-start: 1;
+            display: flex;
+            gap: 1em;
+            .s-insight-counter {
+                align-self: center;
+            }
+        }
+
+        .s-skill-list {
+            display: flex;
+            flex-direction: column;
+            grid-row-start: 2;
+            overflow-y: auto;
+            li {
+                position: relative;
+            }
+        }
+
+        .s-skill-info {
+            grid-row-start: 1;
+        }
+    }
+}

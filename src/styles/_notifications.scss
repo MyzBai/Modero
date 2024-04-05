@@ -1,0 +1,29 @@
+@use "variables" as *;
+
+.p-notifications {
+    display: grid;
+    grid-template-rows: auto 1fr;
+
+    .s-toolbar {
+        padding: $padding-container;
+    }
+    .s-notifications-list {
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: flex-end;
+        overflow-y: auto;
+        li {
+            white-space-collapse: break-spaces;
+            border: $default-border;
+            padding: $padding-container;
+
+            .title {
+                display: flex;
+                justify-content: space-between;
+            }
+            .date {
+                align-self: center;
+            }
+        }
+    }
+}

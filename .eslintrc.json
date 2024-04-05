@@ -1,0 +1,64 @@
+{
+    "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/eslintrc.json",
+    "env": {
+        "browser": true,
+        "es6": true,
+        "es2021": true
+    },
+    "root": true,
+    "extends": [ "eslint:recommended", "plugin:@typescript-eslint/recommended" ],
+    "overrides": [ ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": [ "./tsconfig.json" ]
+    },
+    "plugins": [ "@typescript-eslint" ],
+    "rules": {
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "variable",
+                "format": [ "camelCase", "UPPER_CASE", "PascalCase" ]
+            }
+        ],
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_"
+            }
+        ],
+        "@typescript-eslint/member-delimiter-style": [
+            "warn",
+            {
+                "multiline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                },
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                }
+            }
+        ],
+        "@typescript-eslint/no-non-null-assertion": "error",
+        "@typescript-eslint/no-floating-promises": "error",
+        "indent": [ "error", 4, { "SwitchCase": 1 } ],
+        "semi": [ "error", "always" ],
+
+        "array-bracket-newline": [ "error", "consistent" ],
+        "no-useless-concat": "error",
+        "brace-style": "error",
+        "space-before-blocks": [ "error", "always" ],
+        "keyword-spacing": "error",
+        "no-trailing-spaces": "error",
+        "dot-notation": "error",
+        "no-tabs": "error",
+        "array-bracket-spacing": [ "error", "never" ],
+        "quotes": [ "warn", "single", { "allowTemplateLiterals": true } ]
+    },
+    "ignorePatterns": [ ".eslintrc.json" ]
+}
