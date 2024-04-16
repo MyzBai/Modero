@@ -100,7 +100,7 @@ export function calcPlayerStats(player: PlayerOptions) {
     let attackDps = 0;
     {
         const baseDamageResult = calcBaseAttackDamage(config, avg);
-        const critDamageMultiplier = 1 + (clampedCritChance * stats.criticalHitMultiplier);
+        const critDamageMultiplier = 1 + (clampedCritChance * (stats.criticalHitMultiplier - 1));
         attackDps = baseDamageResult.totalBaseDamage * clampedHitChance * stats.attackSpeed * critDamageMultiplier * reducedDamage;
 
         stats.minPhysicalDamage = baseDamageResult.minPhysicalDamage * reducedDamage * critDamageMultiplier;
