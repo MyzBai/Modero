@@ -58,7 +58,7 @@ export class Notifications {
     addNotification(entry: NotificationEntry) {
         const seen = !this.page.classList.contains('hidden');
         const element = this.createNotificationElement({ ...entry });
-        this.notificationListElement.appendChild(element);
+        this.notificationListElement.insertBefore(element, this.notificationListElement.firstElementChild);
         const notification: Notification = {
             ...entry,
             seen,

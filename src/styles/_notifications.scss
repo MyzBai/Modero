@@ -9,8 +9,7 @@
     }
     .s-notifications-list {
         display: flex;
-        flex-direction: column-reverse;
-        justify-content: flex-end;
+        flex-direction: column;
         overflow-y: auto;
         li {
             white-space-collapse: break-spaces;
