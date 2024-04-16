@@ -268,7 +268,6 @@ export class AuraSkills {
 
         notifications.addNotification({
             title: `New Aura: ${skill.name}`,
-            addHighlight: true,
             elementId: skill.data.id,
         });
     }

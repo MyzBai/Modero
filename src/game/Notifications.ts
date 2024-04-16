@@ -6,8 +6,8 @@ export interface NotificationEntry {
     title: string;
     description?: string;
     time?: number;
-    addHighlight?: boolean;
     elementId?: string | null | undefined;
+    seen?: boolean;
 }
 
 interface Notification extends NotificationEntry {
@@ -38,10 +38,15 @@ export class Notifications {
         game.addPage(this.page, 'Notifications', 'notifications', 200);
 
         new MutationObserver(() => {
-            if (!this.page.classList.contains('hidden')) {
-                this.notificationList.filter(x => !x.elementId).forEach(x => x.seen = true);
-                this.updateMenuName();
+            if (this.page.classList.contains('hidden')) {
+                this.notificationList.forEach(x => x.element.classList.remove('outline'));
+                return;
             }
+            for (const notification of this.notificationList.filter(x => !x.elementId && !x.seen)) {
+                notification.element.classList.add('outline');
+                notification.seen = true;
+            }
+            this.updateMenuName();
         }).observe(this.page, { attributes: true, attributeFilter: ['class'] });
 
         this.page.querySelectorStrict('[data-mark-all-as-seen]').addEventListener('click', () => {
@@ -66,7 +71,7 @@ export class Notifications {
             element
         };
         this.notificationList.push(notification);
-        if (entry.addHighlight && entry.elementId) {
+        if (entry.elementId && !entry.seen) {
             game.addElementHighlight(entry.elementId, () => {
                 notification.seen = true;
                 this.updateMenuName();
@@ -112,6 +117,7 @@ export class Notifications {
         return formattedDate;
     }
 
+
     reset() {
         this.notificationList.splice(0);
         this.notificationListElement.replaceChildren();
@@ -131,7 +137,6 @@ export class Notifications {
             const entry: NotificationEntry = {
                 title: serializedNotification.title,
                 description: serializedNotification.description,
-                addHighlight: !serializedNotification.seen,
                 elementId: serializedNotification.elementSourceId,
                 time: serializedNotification.time
             };

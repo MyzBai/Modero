@@ -130,7 +130,6 @@ export class AttackSkills {
         notifications.addNotification({
             title: `New Attack Skill: ${skill.name}`,
             description: 'wow, a new attack skill. That\'s amazing!',
-            addHighlight: true,
             elementId: skill.data.id,
         });
         // game.addElementHighlight(skill.element);

@@ -15,7 +15,7 @@
             white-space-collapse: break-spaces;
             border: $default-border;
             padding: $padding-container;
-
+            margin: 1px;
             .title {
                 display: flex;
                 justify-content: space-between;
@@ -23,6 +23,20 @@
             .date {
                 align-self: center;
             }
+
+            &.outline {
+                animation: seen 10s 1;
+                animation-iteration-count: 1;
+            }
         }
+    }
+}
+
+@keyframes seen {
+    0% {
+        outline: 1px solid rgba($color-title-accent, 1);
+    }
+    100% {
+        outline: 1px solid rgba($color-title-accent, 0);
     }
 }

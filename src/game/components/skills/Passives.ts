@@ -181,7 +181,6 @@ export class Passives {
 
         notifications.addNotification({
             title: `New Passive: ${skill.name}`,
-            addHighlight: true,
             elementId: skill.data.id,
         });
     }

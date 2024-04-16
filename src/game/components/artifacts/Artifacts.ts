@@ -133,7 +133,6 @@ export class Artifacts extends Component {
         this.unlockArtifact(artifact);
         notifications.addNotification({
             title: `New Artifact: ${artifact.name}`,
-            addHighlight: true,
             elementId: artifact.data.id
         });
     }
