@@ -23,15 +23,13 @@ export class Ascend {
         button.textContent = 'Begin Ascend';
         button.setAttribute('data-ascend-button', '');
         button.addEventListener('click', () => {
-            void Promise.resolve(() => {
-                switch (this._state) {
-                    case 'pendingText': return this.executeState('text'); break;
-                    case 'pendingCombat': return this.executeState('combat'); break;
-                    case 'combat': return this.executeState('cancelCombat'); break;
-                    case 'pendingAscend': return this.executeState('ascend'); break;
-                    default: throw `${this._state} is an invalid state here`;
-                }
-            });
+            switch (this._state) {
+                case 'pendingText': return this.executeState('text');
+                case 'pendingCombat': return this.executeState('combat');
+                case 'combat': return this.executeState('cancelCombat');
+                case 'pendingAscend': return this.executeState('ascend');
+                default: throw `${this._state} is an invalid state here`;
+            }
         });
         this.page.appendChild(button);
 
