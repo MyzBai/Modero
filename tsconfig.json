@@ -28,5 +28,6 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "types": [ "node" ]
-    }
+    },
+    "exclude": [ "public" ]
 }
