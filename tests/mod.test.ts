@@ -1,9 +1,8 @@
-import 'src/global';
-import { calcModBase, calcModInc, calcModMore, type Configuration, type Source } from "src/game/calc/calcMod";
-import { ModDB } from "src/game/mods/ModDB";
-import { Modifier } from "src/game/mods/Modifier";
-import { modTemplates, type ModDescription } from "src/game/mods/modTemplates";
-import { assertDefined } from "src/shared/utils/assert";
+import { calcModBase, calcModInc, calcModMore, type Configuration, type Source } from 'src/game/calc/calcMod';
+import { ModDB } from 'src/game/mods/ModDB';
+import { Modifier } from 'src/game/mods/Modifier';
+import { modTemplateList, type ModDescription } from 'src/game/mods/modTemplates';
+import { assertDefined } from 'src/shared/utils/assert';
 import { ModifierFlags } from 'src/game/mods/types';
 
 //npm run test -S -F -M for list of successful, failure and missing respectively
@@ -11,7 +10,7 @@ import { ModifierFlags } from 'src/game/mods/types';
 interface ModTest {
     mod: ModDescription | ReplaceAll<ModDescription, '#', `{${number}}`>;
     expect: number[];
-    config?: Omit<Configuration, 'source'> & { source?: Partial<Source> };
+    config?: Omit<Configuration, 'source'> & { source?: Partial<Source>; };
 }
 interface TestResult {
     mod: string;
@@ -57,7 +56,7 @@ export function test() {
     }
     if (listMissing) {
         const modTexts = testResults.map(x => x.mod);
-        const missing = modTemplates.map(x => x.desc).filter(x => !modTexts.includes(x));
+        const missing = modTemplateList.map(x => x.desc).filter(x => !modTexts.includes(x));
         for (const mod of missing) {
             logMessage(`Missing: ${mod}`);
         }
@@ -90,13 +89,13 @@ function runTests() {
 }
 
 function addTest(test: ModTest) {
-    const modTemplate = modTemplates.find(x => x.desc === test.mod.replace(/{[0-9]+}/g, '#'));
+    const modTemplate = modTemplateList.find(x => x.desc === test.mod.replace(/{[0-9]+}/g, '#'));
     assertDefined(modTemplate, `invalid mod description: ${test.mod}`);
 
     const mod = Modifier.modFromText(test.mod);
 
     const modDB = new ModDB();
-    modDB.add('test', mod.extractStatModifiers());
+    modDB.add('test', Modifier.extractStatModifierList(mod));
 
     let stats = {};
     stats = test.config?.source?.stats || stats;
@@ -112,7 +111,7 @@ function addTest(test: ModTest) {
     config.target = { ...config.target, modDB, stats: config.target?.stats || {} };
     try {
         let success = false;
-        let errorMessages: string[] = [];
+        const errorMessages: string[] = [];
         for (let i = 0; i < modTemplate.stats.length; i++) {
             let value = 0;
             const templateStat = modTemplate.stats[i];

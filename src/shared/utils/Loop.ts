@@ -1,4 +1,4 @@
-import { uuid } from './helpers';
+import { uuid } from './utils';
 import { LoopWorker } from './LoopWorker';
 
 export type LoopType = 'Default' | 'WebWorker' | 'Animation';
@@ -27,8 +27,12 @@ const DELTA_TIME_SECONDS = TARGET_TICK_RATE / 1000;
 export class Loop {
     private _state: LoopState = 'Stopped';
     private loop: BaseLoop;
-    constructor() {
-        this.loop = new DefaultLoop();
+    constructor(type: LoopType = 'Default') {
+        switch (type) {
+            case 'Default': this.loop = new DefaultLoop(); break;
+            case 'WebWorker': this.loop = new WebWorkerLoop(); break;
+            case 'Animation': this.loop = new AnimationLoop(); break;
+        }
     }
 
     get state() {

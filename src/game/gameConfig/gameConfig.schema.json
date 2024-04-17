@@ -1,0 +1,1396 @@
+{
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "v0"
+    },
+    "playerStartModList": {
+      "items": {
+        "$ref": "#/definitions/PlayerStartMod"
+      },
+      "type": "array"
+    },
+    "enemyBaseLifeList": {
+      "description": "Enemy life for each level starting at level 1. This will determine the max level. Max Level == array.length + 1.",
+      "items": {
+        "$ref": "#/definitions/EnemyBaseLife"
+      },
+      "type": "array"
+    },
+    "enemyBaseCountList": {
+      "description": "Number of enemies for each level starting at level 1",
+      "items": {
+        "$ref": "#/definitions/EnemyBaseCount"
+      },
+      "type": "array"
+    },
+    "enemyList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Enemy"
+      }
+    },
+    "ascension": {
+      "$ref": "#/definitions/Ascension"
+    },
+    "components": {
+      "type": "object",
+      "properties": {
+        "playerClasses": {
+          "$ref": "#/definitions/PlayerClasses"
+        },
+        "skills": {
+          "$ref": "#/definitions/Skills"
+        },
+        "weapon": {
+          "$ref": "#/definitions/Weapon"
+        },
+        "artifacts": {
+          "$ref": "#/definitions/Artifacts"
+        },
+        "achievements": {
+          "$ref": "#/definitions/Achievements"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ascension",
+    "enemyBaseCountList",
+    "enemyBaseLifeList",
+    "enemyList",
+    "playerStartModList",
+    "version"
+  ],
+  "definitions": {
+    "Enemy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "pattern": "^[A-Za-z 0-9]{3,32}$",
+          "type": "string"
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 100
+        },
+        "modList": {
+          "items": {
+            "$ref": "#/definitions/EnemyMod"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{6}$",
+      "defaultSnippets": [
+        {
+          "body": "${RANDOM_HEX}"
+        }
+      ]
+    },
+    "Ascension": {
+      "type": "object",
+      "properties": {
+        "trial": {
+          "$ref": "#/definitions/AscensionTrial"
+        },
+        "ascensionInstanceList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AscensionInstance"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "trial"
+      ]
+    },
+    "AscensionTrial": {
+      "type": "object",
+      "properties": {
+        "enemyCount": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "enemyList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AscensionEnemy"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "enemyCount",
+        "enemyList"
+      ]
+    },
+    "AscensionEnemy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "pattern": "^[A-Za-z 0-9]{3,32}$",
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 100
+        },
+        "modList": {
+          "items": {
+            "$ref": "#/definitions/EnemyMod"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "AscensionInstance": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "modList": {
+          "description": "these modifiers will be applied upon ascending",
+          "items": {
+            "$ref": "#/definitions/AscensionMod"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "modList"
+      ]
+    },
+    "PlayerClasses": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "$ref": "#/definitions/Requirements"
+        },
+        "tokenProbability": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 100,
+          "description": "Percent = 1/Probability"
+        },
+        "startTokenCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "classList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/Id"
+              },
+              "name": {
+                "pattern": "^[A-Za-z 0-9]{3,32}$",
+                "type": "string"
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/PlayerMod"
+                },
+                "type": "array"
+              },
+              "tokenCost": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "modList",
+              "name",
+              "tokenCost"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "classList",
+        "tokenProbability"
+      ]
+    },
+    "Requirements": {
+      "type": "object",
+      "properties": {
+        "curLevel": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "maxLevel": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "ascensionCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "Skills": {
+      "type": "object",
+      "properties": {
+        "attackSkills": {
+          "type": "object",
+          "properties": {
+            "attackSkillList": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AttackSkill"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "attackSkillList"
+          ]
+        },
+        "auraSkills": {
+          "type": "object",
+          "properties": {
+            "requirements": {
+              "$ref": "#/definitions/Requirements"
+            },
+            "auraSkillList": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AuraSkill"
+              }
+            },
+            "auraSkillSlotList": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AuraSkillSlot"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "auraSkillList",
+            "auraSkillSlotList"
+          ]
+        },
+        "passiveSkills": {
+          "type": "object",
+          "properties": {
+            "insightCapacityEnhancerList": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "pattern": "^[A-Za-z 0-9]{3,32}$",
+                    "type": "string"
+                  },
+                  "insight": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "probabilities": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "flavourText": {
+                    "pattern": "^[A-Za-z .,!?0-9]{3,128}$",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "insight",
+                  "name",
+                  "probabilities"
+                ]
+              }
+            },
+            "passiveSkillList": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PassiveSkill"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "insightCapacityEnhancerList",
+            "passiveSkillList"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "AttackSkill": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "pattern": "^[A-Za-z 0-9]{3,32}$",
+          "type": "string"
+        },
+        "manaCost": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "attackSpeed": {
+          "default": 1,
+          "minimum": 0.1,
+          "type": "number"
+        },
+        "attackEffectiveness": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 100
+        },
+        "modList": {
+          "items": {
+            "$ref": "#/definitions/PlayerMod"
+          },
+          "type": "array"
+        },
+        "probability": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 100,
+          "description": "Percent = 1/Probability"
+        },
+        "exp": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 0,
+          "description": "1 exp gained per attack"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "attackEffectiveness",
+        "attackSpeed",
+        "id",
+        "manaCost",
+        "modList",
+        "name"
+      ]
+    },
+    "AuraSkill": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "pattern": "^[A-Za-z 0-9]{3,32}$",
+          "type": "string"
+        },
+        "manaCost": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "baseDuration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "modList": {
+          "items": {
+            "$ref": "#/definitions/PlayerMod"
+          },
+          "type": "array"
+        },
+        "probability": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 100,
+          "description": "Percent = 1/Probability"
+        },
+        "exp": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "baseDuration",
+        "id",
+        "manaCost",
+        "modList",
+        "name"
+      ]
+    },
+    "AuraSkillSlot": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "$ref": "#/definitions/Requirements"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PassiveSkill": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "pattern": "^[A-Za-z 0-9]{3,32}$",
+          "type": "string"
+        },
+        "insight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "modList": {
+          "items": {
+            "$ref": "#/definitions/PlayerMod"
+          },
+          "type": "array"
+        },
+        "probability": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 100,
+          "description": "Percent = 1/Probability"
+        },
+        "exp": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "insight",
+        "modList",
+        "name"
+      ]
+    },
+    "Weapon": {
+      "type": "object",
+      "properties": {
+        "weaponTypeList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/WeaponType"
+          }
+        },
+        "modLists": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/WeaponMod"
+            }
+          }
+        },
+        "crafting": {
+          "type": "object",
+          "properties": {
+            "advReforgeRequirements": {
+              "$ref": "#/definitions/Requirements"
+            },
+            "craftList": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/WeaponCraft"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "craftList"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "crafting",
+        "modLists"
+      ]
+    },
+    "WeaponType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "$ref": "#/definitions/WeaponTypeName"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "WeaponTypeName": {
+      "enum": [
+        "One Handed Sword",
+        "Staff",
+        "Two Handed Axe",
+        "Wand"
+      ],
+      "type": "string"
+    },
+    "WeaponMod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 100
+        },
+        "mod": {
+          "$ref": "#/definitions/PlayerMod"
+        },
+        "weaponTypes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "One Handed Sword",
+              "Staff",
+              "Two Handed Axe",
+              "Wand"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "level",
+        "mod",
+        "weight"
+      ]
+    },
+    "PlayerMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% Increased Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Physical Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Speed"
+        },
+        {
+          "body": "{${1:#}}% Increased Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Mana Regeneration"
+        },
+        {
+          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Aura Duration"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Bleed"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% More Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Bleed Stack"
+        },
+        {
+          "body": "+{${1:#}}% Bleed Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Burn"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% More Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Burn Stack"
+        },
+        {
+          "body": "+{${1:#}}% Burn Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Multiplier"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance"
+        },
+        {
+          "body": "{${1:#}}% Increased Ailment Duration"
+        },
+        {
+          "body": "{${1:#}}% More Damage Over Time"
+        },
+        {
+          "body": "+{${1:#}} To All Attributes"
+        },
+        {
+          "body": "+{${1:#}} Strength"
+        },
+        {
+          "body": "{${1:#}}% Increased Strength"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
+        },
+        {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "{${1:#}}% Increased Dexterity"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Increased Intelligence"
+        },
+        {
+          "body": "{${1:#}}% More Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Reduced Mana Cost Of Skills"
+        },
+        {
+          "body": "+{${1:#}}% Damage Over Time Multiplier"
+        },
+        {
+          "body": "Burn Lingers"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Physical Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Speed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\} Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Mana Regeneration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\}% Of Maximum Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Bleed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Bleed Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Bleed Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Burn$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Burn Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Burn Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Multiplier$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Ailment Duration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage Over Time$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} To All Attributes$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Mana Cost Of Skills$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Damage Over Time Multiplier$"
+        },
+        {
+          "pattern": "Burn Lingers"
+        }
+      ]
+    },
+    "WeaponCraft": {
+      "type": "object",
+      "properties": {
+        "desc": {
+          "$ref": "#/definitions/WeaponCraftDescription"
+        },
+        "probability": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 100,
+          "description": "Percent = 1/Probability"
+        },
+        "startCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "successRates": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "max",
+            "min"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "desc",
+        "probability",
+        "successRates"
+      ]
+    },
+    "WeaponCraftDescription": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "Reforge item with new random modifiers"
+        },
+        {
+          "body": "Add new modifier"
+        },
+        {
+          "body": "Remove modifier"
+        },
+        {
+          "body": "Upgrade modifier"
+        },
+        {
+          "body": "Randomize numerical values"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "Reforge item with new random modifiers"
+        },
+        {
+          "pattern": "Add new modifier"
+        },
+        {
+          "pattern": "Remove modifier"
+        },
+        {
+          "pattern": "Upgrade modifier"
+        },
+        {
+          "pattern": "Randomize numerical values"
+        }
+      ]
+    },
+    "Artifacts": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "$ref": "#/definitions/Requirements"
+        },
+        "artifactList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Artifact"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "artifactList"
+      ]
+    },
+    "Artifact": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "pattern": "^[A-Za-z 0-9]{3,32}$",
+          "type": "string"
+        },
+        "modList": {
+          "items": {
+            "$ref": "#/definitions/PlayerMod"
+          },
+          "type": "array"
+        },
+        "probability": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 100,
+          "description": "Percent = 1/Probability"
+        },
+        "exp": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "modList",
+        "name"
+      ]
+    },
+    "Achievements": {
+      "type": "object",
+      "properties": {
+        "achievementList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Achievement"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "achievementList"
+      ]
+    },
+    "Achievement": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/AchievementDescription"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "description"
+      ]
+    },
+    "AchievementDescription": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "Reach Level {${1:#}}"
+        },
+        {
+          "body": "Ascend {${1:#}} Times"
+        },
+        {
+          "body": "Deal {${1:#}} Total Physical Attack Damage"
+        },
+        {
+          "body": "Deal {${1:#}} Total Elemental Attack Damage"
+        },
+        {
+          "body": "Deal {${1:#}} Total Physical Damage"
+        },
+        {
+          "body": "Deal {${1:#}} Total Elemental Damage"
+        },
+        {
+          "body": "Deal {${1:#}} Total Bleed Damage"
+        },
+        {
+          "body": "Deal {${1:#}} Total Burn Damage"
+        },
+        {
+          "body": "Perform {${1:#}} Critical Hits"
+        },
+        {
+          "body": "Regenerate {${1:#}} Mana"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^Reach Level \\{(([0-9]+)([-]([0-9]+))?)\\}$"
+        },
+        {
+          "pattern": "^Ascend \\{(([0-9]+)([-]([0-9]+))?)\\} Times?$"
+        },
+        {
+          "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Physical Attack Damage$"
+        },
+        {
+          "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Physical Damage$"
+        },
+        {
+          "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Elemental Damage$"
+        },
+        {
+          "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Bleed Damage$"
+        },
+        {
+          "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Burn Damage$"
+        },
+        {
+          "pattern": "^Perform \\{(([0-9]+)([-]([0-9]+))?)\\} Critical Hits$"
+        },
+        {
+          "pattern": "^Regenerate \\{(([0-9]+)([-]([0-9]+))?)\\} Mana$"
+        }
+      ]
+    },
+    "PlayerStartMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% Base Bleed Damage Multiplier"
+        },
+        {
+          "body": "{${1:#}}% Base Burn Damage Multiplier"
+        },
+        {
+          "body": "{${1:#}} Base Bleed Duration"
+        },
+        {
+          "body": "{${1:#}} Base Burn Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Artifacts"
+        },
+        {
+          "body": "+{${1:#}} Maximum Insight"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Physical Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Elemental Damage"
+        },
+        {
+          "body": "+{${1:#}} Maximum Bleed Stack"
+        },
+        {
+          "body": "+{${1:#}} Maximum Burn Stack"
+        },
+        {
+          "body": "+{${1:#}} Strength"
+        },
+        {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Mana Regeneration"
+        },
+        {
+          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Base Bleed Damage Multiplier$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Base Burn Damage Multiplier$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\} Base Bleed Duration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\} Base Burn Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Physical Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Elemental Damage$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Bleed Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Burn Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\} Mana Regeneration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\}% Of Maximum Mana Regeneration$"
+        }
+      ]
+    },
+    "AscensionMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% More Enemy Life"
+        },
+        {
+          "body": "{${1:#}}% More Enemies"
+        },
+        {
+          "body": "+{${1:#}} Maximum Artifacts"
+        },
+        {
+          "body": "+{${1:#}} Maximum Insight"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemy Life$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemies$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
+        }
+      ]
+    },
+    "EnemyMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% Reduced Damage Taken"
+        },
+        {
+          "body": "+{${1:#}}% Evade Chance"
+        },
+        {
+          "body": "{${1:#}}% Increased Life"
+        },
+        {
+          "body": "{${1:#}}% Reduced Life"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Damage Taken$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Evade Chance$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Life$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Life$"
+        }
+      ]
+    },
+    "EnemyBaseLife": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "EnemyBaseCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

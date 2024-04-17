@@ -1,5 +1,5 @@
-import { assertType } from './shared/utils/assert';
-import { isString } from './shared/utils/helpers';
+import { assertType } from '../shared/utils/assert';
+import { isString } from '../shared/utils/utils';
 
 
 if (typeof Document !== 'undefined') {

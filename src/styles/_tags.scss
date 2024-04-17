@@ -1,53 +1,29 @@
-@use "variables" as *;
+@use 'variables' as *;
 
-[data-tag="life"] {
-    color: $color-tag-life;
-}
-[data-tag="mana"] {
-    color: $color-tag-mana;
-}
+$data-tags: (
+    'life': $color-tag-life,
+    'mana': $color-tag-mana,
 
-[data-tag="modifier"] {
-    color: $color-tag-modifier;
-}
-[data-tag="attack"] {
-    color: $color-tag-attack;
-}
-[data-tag="physical"] {
-    color: $color-tag-physical;
-}
-[data-tag="elemental"] {
-    color: $color-tag-elemental;
-}
-[data-tag="chaos"] {
-    color: $color-tag-chaos;
-}
-[data-tag="critical"] {
-    color: $color-tag-critical;
-}
-[data-tag="mana"] {
-    color: $color-tag-mana;
-}
-[data-tag="speed"] {
-    color: $color-tag-speed;
-}
-[data-tag="bleed"] {
-    color: $color-tag-bleed;
-}
-[data-tag="burn"] {
-    color: $color-tag-burn;
-}
+    'valid': $color-tag-valid,
+    'invalid': $color-tag-invalid,
 
-[data-tag="valid"] {
-    color: $color-tag-valid;
-}
-[data-tag="invalid"] {
-    color: $color-tag-invalid;
-}
-[data-tag="link"] {
-    color: $color-tag-link;
-}
+    'link': $color-tag-link,
+    'mute': $color-muted-fg,
 
-[data-tag="mute"] {
-    color: $color-muted-fg;
+    'modifier': $color-tag-modifier,
+
+    'attack': $color-tag-attack,
+    'physical': $color-tag-physical,
+    'elemental': $color-tag-elemental,
+    'chaos': $color-tag-chaos,
+    'bleed': $color-tag-bleed,
+    'burn': $color-tag-burn,
+    'speed': $color-tag-speed,
+    'critical': $color-tag-critical
+);
+
+@each $name, $color in $data-tags {
+    [data-tag='#{$name}'] {
+        color: $color !important;
+    }
 }

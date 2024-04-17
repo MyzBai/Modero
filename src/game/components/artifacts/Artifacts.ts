@@ -1,56 +1,66 @@
-import type * as GameModule from 'src/game/gameModule/GameModule';
+import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Component } from '../Component';
 import { Modifier } from 'src/game/mods/Modifier';
-import { calcItemProbability, isDefined } from 'src/shared/utils/helpers';
+import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
 import { combat, notifications, player } from 'src/game/game';
-import type { Serialization, UnsafeSerialization } from 'src/game/serialization/serialization';
-import { compareNamesWithNumerals, textContainsRankNumerals } from 'src/shared/utils/textParsing';
+import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
+import { compareNamesWithNumerals } from 'src/shared/utils/textParsing';
+import { createItemListElement, type Item, getNextRankItem, createItem, getItemRankNumeral, getRankItemBaseName, createItemInfoElements } from 'src/game/utils/itemUtils';
+import { EventEmitter } from 'src/shared/utils/EventEmitter';
+import { ROMAN_NUMERALS } from 'src/shared/utils/constants';
+import { assertDefined } from 'src/shared/utils/assert';
+import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 
-interface Artifact {
+interface Artifact extends Item {
     name: string;
-    data: GameModule.Artifact;
-    pickProbability: number;
+    data: GameConfig.Artifact;
     unlocked: boolean;
     assigned: boolean;
     element: HTMLElement;
 }
 
 export class Artifacts extends Component {
-    private selectedArtifact: Artifact | null = null;
+    private onArtifactFound = new EventEmitter<Artifact>();
+    private selectedArtifact?: Artifact;
     private artifactList: Artifact[];
-    constructor(data: GameModule.Artifacts) {
+    constructor(data: GameConfig.Artifacts) {
         super('artifacts');
 
-        this.page.insertAdjacentHTML('beforeend', '<div class="s-artifact-counter" data-artifacts-counter><span>Artifacts: <var data-cur>0</var>/<var data-max></var></span></div>');
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-toolbar" data-artifacts-counter><span>Artifacts: <var data-cur>0</var>/<var data-max></var></span></div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Artifact List</div>');
-        this.page.insertAdjacentHTML('beforeend', '<ul class="s-artifact-list" data-artifact-list></ul>');
-        this.page.insertAdjacentHTML('beforeend', '<div class="s-artifact-info" data-artifact-info></div>');
+        this.page.insertAdjacentHTML('beforeend', '<ul class="artifact-list g-scroll-list-v" data-artifact-list></ul>');
+        this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
 
         this.artifactList = data.artifactList.map(data => {
-            const element = document.createElement('li');
-            element.classList.add('g-list-item');
-            element.setAttribute('data-id', data.id);
-            element.toggleAttribute('disabled');
-            element.textContent = '?????';
-            element.addEventListener('click', () => this.selectArtifactByName(data.name));
-            return { name: data.name, data, pickProbability: data.pickProbability, unlocked: data.pickProbability === 0, assigned: false, element };
+            const element = createItemListElement(data);
+            element.addEventListener('click', this.selectArtifactByName.bind(this, data.name));
+            return { data, ...createItem(data), assigned: false, element };
         });
-        this.artifactList.forEach(x => x.element.classList.toggle('hidden', textContainsRankNumerals(x.name)));
         this.page.querySelectorStrict('[data-artifact-list]').append(...this.artifactList.map(x => x.element));
-        this.artifactList.filter(x => x.data.pickProbability === 0).forEach(x => this.unlockArtifact(x));
+        this.artifactList.filter(x => x.unlocked).forEach(x => this.unlockArtifact(x));
 
         this.artifactList.find(x => x.unlocked)?.element.click();
 
         this.updateArtifactsCounter();
 
-        combat.enemyDeathEvent.listen((_, instance) => {
-            this.processArtifactUnlock();
-            if (this.artifactList.every(x => x.unlocked)) {
-                instance.removeListener();
-            }
+        combat.events.enemyDeath.listen(() => {
+            this.tryUnlockArtifact();
         });
 
         player.stats.maxArtifacts.addListener('change', this.updateArtifactsCounter.bind(this));
+
+        this.onArtifactFound.listen(artifact => {
+            const rankItems = this.artifactList.filter(x => x.unlocked && getRankItemBaseName(x.name) === getRankItemBaseName(artifact.name));
+            const rankItem = rankItems.sort((a, b) => ROMAN_NUMERALS.indexOf(getItemRankNumeral(b.name) ?? 'I') - ROMAN_NUMERALS.indexOf(getItemRankNumeral(a.name) ?? 'I'))[0];
+            assertDefined(rankItem);
+            if (rankItem.maxExp && rankItem.exp < rankItem.maxExp) {
+                rankItem.exp++;
+                this.updateArtifactInfo();
+                if (rankItem.exp >= rankItem.maxExp) {
+                    this.tryUnlockNextArtifactRank(artifact);
+                }
+            }
+        });
     }
 
     get artifactCount() {
@@ -72,7 +82,7 @@ export class Artifacts extends Component {
 
     private assignArtifact(artifact: Artifact) {
         artifact.assigned = true;
-        player.modDB.add(`Artifact/${artifact.data.name}`, Modifier.modsFromTexts(artifact.data.modList).flatMap(x => x.extractStatModifiers()));
+        player.modDB.add(`Artifact/${artifact.data.name}`, Modifier.extractStatModifierList(...Modifier.modListFromTexts(artifact.data.modList)));
         this.updateArtifactsCounter();
 
         artifact.element.setAttribute('data-tag', 'valid');
@@ -86,24 +96,15 @@ export class Artifacts extends Component {
         artifact.element.removeAttribute('data-tag');
     }
 
-    private unlockArtifact(artifact: Artifact) {
-        artifact.unlocked = true;
-        artifact.element.textContent = artifact.data.name;
-        artifact.element.removeAttribute('disabled');
-        artifact.element.classList.remove('hidden');
-    }
-
-    private showArtifact(artifact: Artifact) {
-        const element = this.page.querySelectorStrict('[data-artifact-info]');
-        element.replaceChildren();
-        element.insertAdjacentHTML('beforeend', `<div class="g-title">${artifact.data.name}</div>`);
-
-        const modListElement = document.createElement('ul');
-        modListElement.classList.add('g-mod-list');
-        for (const mod of artifact.data.modList) {
-            modListElement.insertAdjacentHTML('beforeend', `<li>${Modifier.toDescription(mod)}</li>`);
+    private showArtifact(artifact?: Artifact) {
+        const element = this.page.querySelector('[data-item-info]');
+        element?.replaceChildren();
+        if (!artifact) {
+            return;
         }
-        element.appendChild(modListElement);
+
+        const itemInfoElements = createItemInfoElements({ item: artifact, modList: artifact.data.modList });
+        this.page.querySelector('[data-item-info]')?.replaceWith(itemInfoElements.element) ?? this.page.appendChild(itemInfoElements.element);
 
         const button = document.createElement('button');
         const updateButton = () => {
@@ -112,6 +113,7 @@ export class Artifacts extends Component {
             const disabled = conditions.some(x => x);
             button.textContent = artifact.assigned ? 'Unassign' : 'Assign';
             button.toggleAttribute('disabled', disabled && !artifact.assigned);
+            button.setAttribute('data-button', !artifact.assigned ? 'valid' : '');
         };
         button.addEventListener('click', () => {
             if (artifact.assigned) {
@@ -122,24 +124,59 @@ export class Artifacts extends Component {
             updateButton();
         });
         updateButton();
-        element.appendChild(button);
+        itemInfoElements.contentElement.appendChild(button);
     }
 
-    private processArtifactUnlock() {
-        const artifact = calcItemProbability(this.artifactList);
+    private updateArtifactInfo() {
+        if (!this.selectedArtifact) {
+            return;
+        }
+        const expbar = this.page.querySelector<ProgressElement>(`[data-skill-info] ${ProgressElement.name}`);
+        if (expbar) {
+            expbar.value = this.selectedArtifact.exp / this.selectedArtifact.maxExp;
+        }
+    }
+
+
+    private tryUnlockArtifact() {
+        const candidates = this.artifactList.filter(x => (getItemRankNumeral(x.name) ?? 'I') === 'I');
+        const artifact = pickOneFromPickProbability(candidates);
         if (!artifact) {
             return;
         }
-        this.unlockArtifact(artifact);
+        if (!artifact.unlocked) {
+            this.unlockArtifact(artifact);
+            notifications.addNotification({
+                title: `New Artifact: ${artifact.name}`,
+                elementId: artifact.data.id
+            });
+        }
+        this.onArtifactFound.invoke(artifact);
+    }
+
+    private tryUnlockNextArtifactRank(artifact: Artifact) {
+        const nextArtifact = getNextRankItem(artifact, this.artifactList);
+        if (!nextArtifact) {
+            return;
+        }
+        this.unlockArtifact(nextArtifact);
         notifications.addNotification({
-            title: `New Artifact: ${artifact.name}`,
-            elementId: artifact.data.id
+            title: `New Artifact: ${nextArtifact.name}`,
+            elementId: nextArtifact.data.id,
         });
     }
 
+    private unlockArtifact(artifact: Artifact) {
+        artifact.unlocked = true;
+        artifact.element.textContent = artifact.data.name;
+        artifact.element.removeAttribute('disabled');
+        artifact.element.classList.remove('hidden');
+    }
+
+
     serialize(save: Serialization) {
         save.artifacts = {
-            artifactNameList: this.artifactList.filter(x => x.unlocked).map(x => ({ name: x.data.name, assigned: x.assigned }))
+            artifactNameList: this.artifactList.filter(x => x.unlocked).map(x => ({ name: x.data.name, assigned: x.assigned, expFac: x.exp / x.maxExp }))
         };
     }
 
@@ -149,6 +186,7 @@ export class Artifacts extends Component {
             if (!artifact) {
                 continue;
             }
+            artifact.exp = artifact.maxExp * (data.expFac ?? 0);
             this.unlockArtifact(artifact);
             if (data.assigned) {
                 this.assignArtifact(artifact);

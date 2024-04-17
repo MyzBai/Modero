@@ -1,4 +1,3 @@
-import { DamageTypes } from 'src/shared/types/types';
 import type { DamageType } from '../calc/calcDamage';
 import type { AilmentType, EffectType } from '../effects/Effects';
 import type { PlayerStatCollection, StatCollection } from '../statistics/stats';
@@ -20,10 +19,9 @@ export type StatName =
     | `${EffectType}Chance`
     | `${EffectType}Duration`
     | Attributes
-    | 'AilmentDuration' | 'LingeringAilments'
+    | 'AilmentDuration' | 'LingeringBurn'
     | 'AuraDuration'
     | 'AttackSkillCost'
-    | 'Resource'
     | 'Artifact' | 'Insight'
     | EnemyStatNames
     | ZoneStatNames;
@@ -34,23 +32,20 @@ export type DamageStatName =
     | `Min${DamageType}Damage` | `Max${DamageType}Damage`
     | `${DamageType}Damage`
     | 'DamageOverTimeMultiplier'
-    | ConversionStatName | GainAsStatName;
+    | DamageConvertion | DamageAsExtra;
 
-export const Test = [
-    ...(DamageTypes.map(x => `Min${x}Damage` as const)),
-    ...(DamageTypes.map(x => `Max${x}Damage` as const))
-] as const;
 
-export type ConversionStatName =
+
+export type DamageConvertion =
     | 'PhysicalConvertedToElemental'
     | 'ElementalConvertedToPhysical'
     | 'PhysicalConvertedToChaos'
     | 'ElementalConvertedToChaos';
 
-export type GainAsStatName =
-    | 'PhysicalGainAsElemental'
-    | 'ElementalGainAsChaos'
-    | 'PhysicalGainAsChaos';
+export type DamageAsExtra =
+    | 'PhysicalAsExtraElemental'
+    | 'ElementalAsExtraChaos'
+    | 'PhysicalAsExtraChaos';
 
 export type Attributes = 'Attribute' | 'Strength' | 'Dexterity' | 'Intelligence';
 
@@ -93,14 +88,12 @@ export interface ModTemplateStat {
     override?: boolean;
     modFlagsAny?: number;
     modFlagsAll?: number;
-    tags?: ReadonlyArray<StatModTag>;
+    extends?: ReadonlyArray<StatModTag>;
 }
 export type ModTemplateTarget = 'Player' | 'Enemy';
 export interface ModTemplate {
     desc: string;
     stats: ReadonlyArray<ModTemplateStat>;
-    tags?: ReadonlyArray<ModifierTag>;
-    target?: 'Player' | 'Enemy' | 'Area';
     id: string;
 }
 
@@ -125,11 +118,11 @@ export enum ConditionFlags {
     DOT = ConditionFlags.Bleed | ConditionFlags.Burn
 }
 
-export type ModifierTag = typeof ModifierTags[number];
-export const ModifierTags = [
+export type ModifierTag = typeof ModifierTagList[number];
+export const ModifierTagList = [
     'Global',
-    'Resource',
     'Damage',
+    'DamageOverTime',
     'Attack',
     'Physical',
     'Elemental',

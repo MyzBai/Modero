@@ -73,7 +73,6 @@ export class Task {
         const references = this.textData.references.map(x => x.value);
         const pct = template.progress({
             gameStats: game.stats,
-            resourceStats: game.resources,
             playerStats: player.stats,
             value: values[0] ?? 0,
             values,

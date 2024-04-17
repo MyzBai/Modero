@@ -1,13 +1,11 @@
-import { clamp, avg, isNumber, isDefined } from 'src/shared/utils/helpers';
+import { clamp, avg, isNumber, isDefined } from 'src/shared/utils/utils';
 import { calcBaseAttackDamage, calcAilmentBaseDamage } from './calcDamage';
 import { calcModBase, calcModFlag, calcModIncMore, calcModTotal, type Configuration, type EnemyConfiguration, type PlayerConfiguration } from './calcMod';
 import { ModifierFlags } from '../mods/types';
 import type { EnemyStatCollection, PlayerStatCollection, StatCollection } from '../statistics/stats';
-import { Statistic } from '../statistics/Statistic';
-import { compareValueTypes } from '../utils';
+import type { Statistic } from '../statistics/Statistic';
+import { compareValueTypes } from '../utils/utils';
 import type { ModDB } from '../mods/ModDB';
-import type { ZoneStats } from '../combat/Zone';
-import type * as GameModule from 'src/game/gameModule/GameModule';
 
 export interface PlayerOptions {
     stats: Record<keyof PlayerStatCollection, number>;
@@ -19,10 +17,9 @@ export interface EnemyOptions {
     stats?: EnemyStatCollection;
     conditionFlags?: number;
     modDB?: ModDB;
-    localRewards?: GameModule.Rewards;
 }
 export interface ZoneOptions {
-    stats: Record<keyof ZoneStats, number>;
+    stats: Record<'baseEnemyCount', number>;
     modDB?: ModDB;
 }
 
@@ -132,7 +129,7 @@ export function calcPlayerStats(player: PlayerOptions) {
     {
         config.flags = ModifierFlags.Elemental | ModifierFlags.Burn;
         stats.burnChanceOnHit = calcModBase('BurnChance', config) / 100;
-        stats.burnDuration = calcModBase('BurnDuration', config);
+        stats.burnDuration = calcModTotal(['BurnDuration', 'AilmentDuration'], config);
         stats.maxBurnStackCount = calcModBase('BurnStack', config);
         const { min, max } = calcAilmentBaseDamage('Elemental', config);
         const stacksPerSecond = clampedHitChance * stats.burnChanceOnHit * stats.attackSpeed * stats.burnDuration;
@@ -143,7 +140,7 @@ export function calcPlayerStats(player: PlayerOptions) {
         stats.maxBurnDamage = max * reducedDamage * stats.baseBurnDamageMultiplier * stats.burnDamageMultiplier;
 
         const baseDamage = avg(stats.minBurnDamage, stats.maxBurnDamage);
-        burnDps = baseDamage * maxStacks * stats.baseBurnDamageMultiplier;
+        burnDps = baseDamage * maxStacks;
     }
 
     const ailmentDps = bleedDps + burnDps;
@@ -153,7 +150,7 @@ export function calcPlayerStats(player: PlayerOptions) {
     config.flags = 0;
     stats.auraDurationMultiplier = calcModIncMore('AuraDuration', 1, config);
 
-    stats.lingeringAilments = calcModFlag('LingeringAilments', config);
+    stats.lingeringBurn = calcModFlag('LingeringBurn', config);
 
     //Other
     stats.maxArtifacts = calcModBase('Artifact', config);
@@ -168,8 +165,10 @@ export function calcZoneStats(zone: ZoneOptions) {
         source: { modDB: zone.modDB, stats: zone.stats }
     };
 
-    const baseEnemyCount = zone.stats.maxEnemyCount + calcModBase('EnemyCount', config);
-    zone.stats.maxEnemyCount = calcModIncMore('EnemyCount', baseEnemyCount, config);
+    const baseEnemyCount = zone.stats.baseEnemyCount + calcModBase('EnemyCount', config);
+    const maxEnemyCount = calcModIncMore('EnemyCount', baseEnemyCount, config);
+
+    return { maxEnemyCount };
 }
 
 export function calcEnemyStats(enemy: EnemyOptions) {
@@ -186,36 +185,4 @@ export function calcEnemyStats(enemy: EnemyOptions) {
     stats.reducedDamageTaken = calcModIncMore('DamageTaken', 1, config);
 
     applyStatValues(enemy.stats || {} as StatCollection, stats);
-}
-
-export interface RewardsOptions {
-    player?: PlayerOptions;
-    enemy?: EnemyOptions;
-    globalEnemyRewards: GameModule.Rewards;
-}
-
-export function rewardsToList(rewards: GameModule.Rewards): GameModule.EnemyReward[] {
-    return Array.isArray(rewards) ? rewards : Object.entries(rewards).flatMap(([_, arr]) => arr);
-}
-
-export function calcEnemyRewards(_opts: RewardsOptions) {
-    // const localEnemyRewardsList = rewardsToList(opts.enemy?.localRewards || []);
-
-    // const globalEnemyRewardsList = rewardsToList(opts.globalEnemyRewards);
-
-    // const enemyRewardsList = localEnemyRewardsList.concat(globalEnemyRewardsList.filter(x => localEnemyRewardsList.length === 0 || localEnemyRewardsList.every(y => y.name !== x.name)));
-
-    // const item = getRandomWeightedItem(enemyRewardsList);
-    // assertDefined(item);
-    // let quantity = 1;
-    // if ('quantity' in item) {
-    //     const [min, max] = item.quantity;
-    //     quantity = randomRangeInt(min, max ?? min);
-    // }
-
-    // return {
-    //     type: item.type,
-    //     name: item.name,
-    //     quantity
-    // };
 }

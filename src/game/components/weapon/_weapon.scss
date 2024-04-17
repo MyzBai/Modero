@@ -1,12 +1,15 @@
-@use "variables" as *;
+@use 'variables' as *;
 .p-weapon {
+    position: relative;
     display: grid;
     grid-template-rows: auto 0.6fr 1fr;
     gap: $default-gap;
+    z-index: 1;
+    .s-weapon {
+        position: relative;
+        display: flex;
+        flex-direction: column;
 
-    .s-weapon-info {
-        display: grid;
-        grid-template-rows: auto 1fr;
         .s-weapon-type {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -25,9 +28,104 @@
                 }
             }
         }
-        ul {
-            min-height: 0;
-            overflow-y: auto;
+
+        .s-mod-list {
+            flex: 1;
+
+            &[data-craft-area] {
+                z-index: 2;
+
+                outline: 1px solid $color-title-accent;
+                user-select: none;
+
+                &[data-craft] {
+                    &:hover {
+                        box-shadow: 0 0 5px 1px $color-title-accent inset;
+                        user-select: none;
+                    }
+                    * {
+                        pointer-events: none;
+                    }
+                }
+            }
+        }
+        &[data-success-rate]:has([data-craft]:hover)::after {
+            position: absolute;
+            content: 'Success Rate: ' attr(data-success-rate) '%';
+            color: $color-title-accent;
+            top: 0;
+            transform: translateY(-100%);
+            z-index: 3;
+        }
+        [data-craft='false'] {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            backdrop-filter: blur(1px) !important;
+            background-color: rgba(0, 0, 0, 0.589);
+        }
+    }
+
+    .craft-table {
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        gap: $default-gap;
+
+        .s-toolbar {
+            background-color: $color-primary-bg;
+            padding: 0;
+            .advanced {
+                margin-left: auto;
+            }
+        }
+
+        .s-craft-list {
+            li {
+                padding: $padding-container;
+                &.selected {
+                    z-index: 2;
+                }
+            }
+        }
+
+        .adv-reforge-modal {
+            .s-adv-reforge {
+                min-width: 30em;
+                overflow-x: hidden;
+
+                .max-reforge-count-input {
+                    max-width: 3em;
+                    &::-webkit-inner-spin-button {
+                        appearance: none;
+                    }
+                }
+                .max-reforge-count-label {
+                    display: inline-block;
+                    padding-right: 1em;
+                }
+                .s-conditions {
+                    padding-top: 0.5em;
+                    .s-row {
+                        display: grid;
+                        grid-template-columns: 1fr auto;
+
+                        text-input-dropdown-element:last-child {
+                            max-width: 4em;
+                        }
+                    }
+                }
+            }
+        }
+
+        .s-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5em;
         }
     }
 }

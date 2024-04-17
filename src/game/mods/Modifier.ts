@@ -1,9 +1,9 @@
 import { assertType } from 'src/shared/utils/assert';
 import { type ModTemplate } from './types';
-import { modTemplates } from './modTemplates';
+import { modTemplateList } from './modTemplates';
 import { parseTextValues } from 'src/shared/utils/textParsing';
 import type { StatModifier } from './ModDB';
-import { isNumber, randomRangeInt, toDecimals } from 'src/shared/utils/helpers';
+import { isNumber, randomRangeInt, toDecimals } from 'src/shared/utils/utils';
 
 export interface PopupOptions {
     title?: string;
@@ -19,13 +19,12 @@ export interface GroupModOptions {
 export interface ModValueRange {
     min: number;
     max: number;
-    decimals: number;
+    decimalCount: number;
     value: number;
 }
 
 export interface SerializedModifier {
-    id: string;
-    text: string;
+    srcId: string;//template id or id in GameConfig
     values: number[];
 }
 
@@ -36,18 +35,6 @@ export class Modifier {
         readonly template: ModTemplate,
         readonly rangeValues: ModValueRange[]) { }
 
-    get id() {
-        return this.template.id;
-    }
-
-    get tags() {
-        return this.template.tags;
-    }
-
-    get templateDesc() {
-        return this.template.desc;
-    }
-
     get desc() {
         return Modifier.parseDescription(this.template.desc, this.rangeValues.map(x => x.value));
     }
@@ -56,7 +43,11 @@ export class Modifier {
         return this.text.replace(/\{([^}]+)\}/g, '($1)');
     }
 
-    extractStatModifiers() {
+    get values() {
+        return this.rangeValues.map(x => x.value);
+    }
+
+    private extractStatModifiers() {
         const stats: StatModifier[] = [];
         for (const [index, stat] of this.template.stats.entries()) {
             const value = stat.valueType === 'Flag' ? { value: 1, min: 1, max: 1, decimals: 0 } : this.rangeValues[index];
@@ -64,7 +55,7 @@ export class Modifier {
                 continue;
             }
             const newStat: StatModifier = { ...stat, ...value };
-            for (const tag of newStat.tags || []) {
+            for (const tag of newStat.extends || []) {
                 if (tag.type === 'PerStat') {
                     const value = this.rangeValues[tag.index || -1]?.value;
                     tag.value = value;
@@ -94,7 +85,7 @@ export class Modifier {
         });
     }
 
-    static modsFromTexts(texts: string[]) {
+    static modListFromTexts(texts: string[]) {
         return texts.map(text => Modifier.modFromText(text)).filter((x): x is Modifier => x instanceof Modifier);
     }
 
@@ -106,17 +97,17 @@ export class Modifier {
             return Modifier.empty();
         }
         const values = parseTextValues(text);
-        const ranges: ModValueRange[] = values.map((x, i) => ({ min: x.min, max: x.max, value: x.min, decimals: Math.max(0, (template.desc.match(/#+/g)?.[i]?.length || 0) - 1) }));
+        const ranges: ModValueRange[] = values.map((x, i) => ({ min: x.min, max: x.max, value: x.min, decimalCount: Math.max(0, (template.desc.match(/#+/g)?.[i]?.length || 0) - 1) }));
         return new Modifier(text, template, ranges);
     }
 
     static getTemplate(text: string) {
         const desc = text.replace(/{[^}]+}/g, '#');
-        return modTemplates.find(x => x.desc.replace(/#+/g, '#') === desc);
+        return modTemplateList.find(x => x.desc.replace(/#+/g, '#') === desc);
     }
 
     sort(other: Modifier) {
-        return modTemplates.findIndex(x => x.desc === this.templateDesc) - modTemplates.findIndex(x => x.desc === other.templateDesc);
+        return modTemplateList.findIndex(x => x.desc === this.template.desc) - modTemplateList.findIndex(x => x.desc === other.template.desc);
     }
 
     static sort(a: Modifier, b: Modifier) {
@@ -124,7 +115,7 @@ export class Modifier {
     }
 
     compare(other: Modifier) {
-        return this.templateDesc === other.templateDesc;
+        return this.template.desc === other.template.desc;
     }
 
     static compare(a: Modifier, b: Modifier) {
@@ -133,7 +124,7 @@ export class Modifier {
 
     copy() {
         const copy = Modifier.modFromText(this.text);
-        copy.setValues(this.rangeValues.map(x => x.value));
+        copy.setValues(this.values);
         return copy;
     }
 
@@ -147,7 +138,7 @@ export class Modifier {
 
     setValues(values: number[]) {
         if (values.length !== this.rangeValues.length) {
-            console.error(`${this.templateDesc} has incompatible stats`);
+            console.error(`${this.template.desc} has incompatible stats`);
             return;
         }
         for (let i = 0; i < this.rangeValues.length; i++) {
@@ -160,15 +151,11 @@ export class Modifier {
 
     randomizeValues() {
         for (const rangeValue of this.rangeValues) {
-            const pow = Math.pow(10, rangeValue.decimals + 1);
+            const pow = Math.pow(10, rangeValue.decimalCount + 1);
             const min = rangeValue.min * pow;
-            const max = rangeValue.max * pow;
-            rangeValue.value = (randomRangeInt(min, max + 1)) / pow;
+            const max = rangeValue.min === rangeValue.max ? min : rangeValue.max * pow + 1 * pow;
+            rangeValue.value = (Math.floor(randomRangeInt(min, max))) / pow;
         }
-    }
-
-    serialize() {
-        return { text: this.text, id: this.template.id, values: this.rangeValues.map(x => x.value) };
     }
 
     static empty() {

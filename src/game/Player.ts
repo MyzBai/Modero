@@ -3,18 +3,19 @@ import { applyStatValues, calcPlayerStats, extractStats, type PlayerOptions } fr
 import { Modifier } from './mods/Modifier';
 import { createPlayerStats, deserializeStats, serializeStats } from './statistics/stats';
 import { ModDB } from './mods/ModDB';
-import type * as GameSerialization from './serialization/serialization';
+import type * as GameSerialization from './serialization';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ENVIRONMENT } from 'src/config';
+import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
 
 export class Player {
     readonly onStatsChange = new EventEmitter();
     readonly modDB = new ModDB();
     readonly stats = createPlayerStats(game.stats);
-    private readonly manaBar: HTMLProgressElement;
+    private readonly manaBar: ProgressElement;
     private statUpdatePending = false;
     constructor() {
-        this.manaBar = game.page.querySelectorStrict('[data-combat-overview] [data-mana-bar]');
+        this.manaBar = game.page.querySelectorStrict<ProgressElement>('[data-combat-overview] [data-mana-bar]');
     }
 
     get level() {
@@ -26,9 +27,9 @@ export class Player {
 
         this.modDB.onChange.listen(this.updateStats.bind(this));
 
-        if (game.module?.player) {
-            const startMods = game.module.player.modList.flatMap(x => Modifier.modFromText(x).extractStatModifiers());
-            this.modDB.add('Player', startMods);
+        if (game.gameConfig.playerStartModList) {
+            const statModifiers = Modifier.extractStatModifierList(...Modifier.modListFromTexts(game.gameConfig.playerStartModList));
+            this.modDB.add('Player', statModifiers);
         }
 
         this.stats.mana.addListener('change', (mana) => {

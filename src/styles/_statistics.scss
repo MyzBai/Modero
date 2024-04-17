@@ -1,8 +1,9 @@
-@use "variables" as *;
+@use 'variables' as *;
 .p-statistics {
     display: grid;
     ul {
         overflow-y: auto;
+        border-bottom: $default-border;
         accordion-element {
             ul {
                 li {
@@ -13,6 +14,7 @@
                     user-select: text;
                     padding-top: 1px;
                     user-select: none;
+
                     &.sticky {
                         color: rgba($color-default-fg, 1);
                     }

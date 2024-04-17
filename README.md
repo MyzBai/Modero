@@ -1,34 +1,22 @@
-# Idle Ascension
+# Idle Ascension - An Idle RPG Game
 
-Play the game [here](https://myzbai.github.io/IdleAscension)
+## Play: [Idle Ascension](https://myzbai.github.io/IdleAscension)
 
-#### Note
+### Create Your Own Game Module
 
-The game is initialized with a _GameModule_ file.
-A _GameModule_ file is a json file containing properties and values used in the game.
-It controls anything from balancing to features available.
+-   Create a new branch from main
+-   Create a \*.module.json file in [public](public/) (.module.json extension enables schema).
+-   Include your module at [src/game/gameModule/moduleList.json](src/game/gameModule/moduleList.json) (use local path)
+-   When done, commit and push to origin
+-   You're now ready to publish your game module
 
-## Creating your own _GameModule_ with NodeJS and Git
+### Publish Your Game Module
 
-#### Contributing
-
--   Fork this repository
--   Clone the forked repository
-
--   Run `npm install`
--   Run `npm run build`
-
-#### Game Module Development
-
--   Create a new branch
--   Create a new json file and add `"$schema": "<filepath>/src/gameModule/gameModule.schema.json"`
--   Include file at [src/gameModule/moduleList.json](src/gameModule/moduleList.json) _(use local url during development)_
--   Run `npm run build` or `npm run build-watch` see [package.json](package.json) for scripts
-
-### Game Module Publish
-
--   Create a new branch
--   Include file at [src/gameModule/moduleList.json](src/gameModule/moduleList.json) _(url should point to your fork's raw file. e.g. `github.com/<username>/<repository>/raw/<branch>/path/to/file.json`)_
--   Go to Pull requests and click on 'New pull request'
+-   Create a new branch from main
+-   Include your module at [src/game/gameModule/moduleList.json](src/game/gameModule/moduleList.json) _(url should point to your fork's raw file. e.g. `raw.githubusercontent.com/<username>/<repository>/raw/<branch>/path/to/module.json`)_
+-   Commit and push to origin
+-   Go to [https://github.com/{{site.github.repository_owner}}/{{site.github.repository_name}}/pulls]() Pull requests and click on 'New pull request'
 -   Select the branch that contains your commits from the `compare: main` dropdown
 -   Click 'Create pull request'
+
+After being marged, your module will be available for others to use.

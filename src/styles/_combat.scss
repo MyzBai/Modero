@@ -1,15 +1,12 @@
-@use "variables" as *;
+@use 'variables' as *;
 .p-combat {
     overflow-y: auto;
-
     .s-effects {
-        min-height: 10em;
         .s-effect {
             display: grid;
             grid-template-rows: auto 1fr;
-            progress {
-                display: block;
-                width: 100%;
+            padding: $padding-container;
+            .progress-bar {
                 height: 5px;
             }
         }

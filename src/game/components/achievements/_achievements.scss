@@ -1,27 +1,17 @@
-@use "variables" as *;
+@use 'variables' as *;
 .p-achievements {
     display: grid;
     ul {
         overflow-y: auto;
 
         .s-achievement {
-            .title-content {
-                width: 100%;
-                display: grid;
-                grid-template-columns: 1fr auto;
-
-                .additional-info {
-                    display: flex;
-                    & > * {
-                        padding: 0 0.2em;
-                    }
-                }
-
-                var {
-                    color: $color-tag-invalid;
-                    &[data-valid] {
-                        color: $color-tag-valid;
-                    }
+            background-color: $color-primary-bg;
+            padding: $padding-container;
+            border-bottom: $default-border;
+            var {
+                color: $color-tag-invalid;
+                &[data-valid] {
+                    color: $color-tag-valid;
                 }
             }
         }

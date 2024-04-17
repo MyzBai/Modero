@@ -1,38 +1,36 @@
 import { type BuildOptions } from 'esbuild';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs/promises';
-import { ENVIRONMENT, IS_REMOTE } from 'src/config';
-import { GAME_MODULE_VERSION } from 'src/game/gameModule/GameModule';
-
-//NOTE: changing GAME_MODULE_VERSION requires esbuild watch to be restarted
+import { ENVIRONMENT } from 'src/config';
+import { GAME_CONFIG_VERSION } from 'src/game/gameConfig/GameConfig';
 
 const developmentOptions: BuildOptions = {
-    sourcemap: true,
+    minify: false,
     logLevel: 'info',
 };
 
 const productionOptions: BuildOptions = {
-    sourcemap: false,
+    minify: true
 };
 
 const defaultOptions: BuildOptions = {
     ...(process.env.NODE_ENV === 'production' ? productionOptions : developmentOptions),
+    sourcemap: true,
     bundle: true,
-    minify: true,
     format: 'esm',
     treeShaking: true,
     plugins: [configPlugin()]
 };
-build({
+void build({
     ...defaultOptions,
     entryPoints: ['src/main.ts'],
     outfile: 'public/dist/main.js'
 });
-build({
+void build({
     ...defaultOptions,
     minify: false,
     entryPoints: ['src/game/game.ts'],
-    outfile: `public/dist/game_${GAME_MODULE_VERSION}/game.js`
+    outfile: `public/dist/game_${GAME_CONFIG_VERSION}/game.js`
 });
 
 
@@ -42,7 +40,7 @@ async function build(buildOptions: BuildOptions) {
         await ctx.watch();
     } else {
         await ctx.rebuild();
-        ctx.dispose();
+        void ctx.dispose();
     }
 }
 
@@ -53,9 +51,8 @@ function configPlugin(): esbuild.Plugin {
             build.onLoad({ filter: /config.ts/ }, async (args) => {
                 let contents = await fs.readFile(args.path, 'utf8');
                 contents = contents.replace(`export const ENVIRONMENT: EnvironmentMode = '${ENVIRONMENT}';`, `export const ENVIRONMENT: EnvironmentMode = '${process.env.NODE_ENV ?? ENVIRONMENT}';`);
-                contents = contents.replace(`export const IS_REMOTE = ${IS_REMOTE};`, `export const IS_REMOTE = ${process.env.ENV_IS_REMOTE};`);
                 return { contents, loader: 'ts' };
             });
         }
-    }
+    };
 }

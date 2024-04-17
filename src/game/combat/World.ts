@@ -1,55 +1,34 @@
-import { assertDefined } from 'src/shared/utils/assert';
 import { game, combat, player } from '../game';
-import { Zone } from './Zone';
-import type * as GameSerialization from '../serialization/serialization';
-
+import { CombatArea } from './CombatArea';
+import type * as GameSerialization from '../serialization';
 
 export class World {
-    private _zone?: Zone;
-    private createZoneAtSetup?: () => Zone;
+    private _zone?: CombatArea;
+
     get zone() {
         return this._zone;
     }
 
     get baseEnemyCount() {
-        return game.module?.enemyBaseCountList[player.level - 1] ?? Infinity;
+        return game.gameConfig.enemyBaseCountList[player.level - 1] ?? Infinity;
     }
 
     setup() {
         player.stats.level.addListener('change', () => {
-            if (combat.zone?.name === 'World') {
+            if (combat.zone === this._zone) {
                 this._zone = this.createZone();
                 combat.startZone(this._zone);
             }
         });
-        if (!this.createZoneAtSetup) {
-            this._zone = this.createZone();
-            this._zone.active = true;
-        } else {
-            this._zone = this.createZoneAtSetup();
-        }
-        if (this._zone.active) {
-            combat.startZone(this._zone);
-        }
-    }
 
-    restart() {
-        this.reset();
-        player.stats.level.set(1);
         if (!this._zone) {
-            return;
-        }
-        const active = this._zone.active;
-        this._zone = this.createZone();
-        if (active) {
+            this._zone = this.createZone();
             combat.startZone(this._zone);
         }
     }
 
     reset() {
-        combat.effectHandler.removeAllEffects();
         this._zone = undefined;
-        this.createZoneAtSetup = undefined;
     }
 
     private processZoneCompletion() {
@@ -61,9 +40,8 @@ export class World {
     }
 
     private createZone() {
-        assertDefined(game.module, 'no game module defined');
-        const enemyList = game.module.enemyList;
-        const zone = new Zone({
+        const enemyList = game.gameConfig.enemyList;
+        const zone = new CombatArea({
             name: 'World',
             enemyBaseCount: this.baseEnemyCount,
             enemyBaseLife: combat.enemyBaseLife,
@@ -86,16 +64,12 @@ export class World {
     }
 
     deserialize({ world: save }: GameSerialization.UnsafeSerialization) {
-        if (!save) {
+        const serializedZone = save?.zone;
+        if (!serializedZone) {
             return;
         }
-        const serializedZone = save.zone;
-        if (serializedZone) {
-            this.createZoneAtSetup = () => {
-                const zone = this.createZone();
-                zone.deserialize(serializedZone);
-                return zone;
-            };
-        }
+
+        this._zone = this.createZone();
+        this._zone.deserialize(serializedZone);
     }
 }

@@ -29,5 +29,5 @@
         "forceConsistentCasingInFileNames": true,
         "types": [ "node" ]
     },
-    "exclude": [ "public" ]
+    "exclude": [ "public", "node_modules" ]
 }

@@ -4,33 +4,37 @@ import { createCustomElement } from 'src/shared/customElements/customElements';
 import { TabMenuElement } from 'src/shared/customElements/TabMenuElement';
 
 export class Home {
-    private readonly page = document.querySelectorStrict<HTMLElement>('[data-page-content="home"]');
+    private readonly page: HTMLElement;
     private loadGame: LoadGame;
     constructor() {
+
+        this.page = document.createElement('main');
+        this.page.classList.add('p-home');
+        this.page.setAttribute('data-page-content', 'home');
+
+        this.page.insertAdjacentHTML('beforeend', '<span class="title" data-game-title>Idle Ascension</span>');
+
         const menu = createCustomElement(TabMenuElement);
 
         this.page.appendChild(menu);
-
-        const mainView = document.createElement('div');
-        mainView.classList.add('main-view');
-        mainView.setAttribute('data-main-view', '');
-        this.page.appendChild(mainView);
 
         const newGameMenuButton = document.createElement('li');
         newGameMenuButton.textContent = 'New Game';
         const newGame = new NewGame();
         menu.addMenuItem('New', 'new');
         menu.registerPageElement(newGame.page, 'new');
-        mainView.appendChild(newGame.page);
+        this.page.appendChild(newGame.page);
 
         const loadGameMenuButton = document.createElement('li');
         loadGameMenuButton.textContent = 'Load Game';
         this.loadGame = new LoadGame();
         menu.addMenuItem('Load', 'load');
         menu.registerPageElement(this.loadGame.page, 'load');
-        mainView.appendChild(this.loadGame.page);
+        this.page.appendChild(this.loadGame.page);
 
         newGameMenuButton.click();
+
+        document.body.insertAdjacentElement('afterbegin', this.page);
     }
 
     async init() {

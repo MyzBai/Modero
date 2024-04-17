@@ -1,4 +1,6 @@
-@use "variables" as *;
+@use 'variables' as *;
+@use 'mixins' as *;
+
 .p-artifacts {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -6,15 +8,27 @@
     grid-auto-flow: column;
     gap: $default-gap;
 
-    .s-artifact-info {
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-        height: 50%;
-        grid-row: 2/4;
+    .artifact-list {
+        border: $default-border;
     }
 
-    .s-artifact-list {
-        min-height: 0;
-        overflow-y: auto;
+    [data-item-info] {
+        justify-content: center;
+        grid-row: span 3;
+
+        .s-content {
+            border: $default-border;
+        }
+
+        progress-element {
+            @include progress-multi-bar;
+        }
+
+        [data-button] {
+            color: $color-tag-invalid;
+            &[data-button='valid'] {
+                color: $color-tag-valid;
+            }
+        }
     }
 }

@@ -1,26 +1,32 @@
-import { Zone } from './Zone';
+import { CombatArea } from './CombatArea';
 import { game, gameLoop, gameLoopAnim, player, statistics, world } from '../game';
 import type { Enemy } from './Enemy';
-import { Effects, type DOTEffect } from '../effects/Effects';
-import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';
+import { Effects, effectTypes, type DOTEffect } from '../effects/Effects';
+import { assertDefined } from 'src/shared/utils/assert';
 import { calcAttack } from '../calc/calcDamage';
 import { createCombatStats } from '../statistics/stats';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
-import { clamp } from 'src/shared/utils/helpers';
+import { clamp } from 'src/shared/utils/utils';
 import { createCustomElement } from 'src/shared/customElements/customElements';
-import { PromptWindowElement } from 'src/shared/customElements/PromptWindowElement';
+import { ModalElement } from 'src/shared/customElements/ModalElement';
+import { Modifier } from '../mods/Modifier';
+import { playerModTemplateList } from '../mods/playerModTemplates';
+import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
 
-interface EnemyDeathArgs {
-    zone: Zone;
+interface CombatEventData {
+    zone: CombatArea;
     enemy: Enemy;
 }
 
 export class Combat {
-    readonly enemyDeathEvent = new EventEmitter<EnemyDeathArgs>();
+    readonly events = {
+        enemyHit: new EventEmitter<CombatEventData>(),
+        enemyDeath: new EventEmitter<CombatEventData>()
+    };
     readonly stats = createCombatStats();
     readonly page: HTMLElement;
-    private lifebarElement: HTMLProgressElement;
-    private _zone?: Zone;
+    private lifebarElement: ProgressElement;
+    private _zone?: CombatArea;
 
     readonly effectHandler: Effects;
 
@@ -37,10 +43,10 @@ export class Combat {
             for (const mod of this._zone?.enemy.modList ?? []) {
                 body.insertAdjacentHTML('beforeend', `<li>${mod.desc}</li>`);
             }
-            const prompt = createCustomElement(PromptWindowElement);
-            prompt.minWidth = '15em';
-            prompt.setTitle('Enemy Modifiers');
-            prompt.setBodyElement(body);
+            const modal = createCustomElement(ModalElement);
+            modal.minWidth = '15em';
+            modal.setTitle('Enemy Modifiers');
+            modal.setBodyElement(body);
         });
 
         const effectsElement = document.createElement('div');
@@ -59,7 +65,7 @@ export class Combat {
         //effects relies on
         this.effectHandler = new Effects();
 
-        game.addPage(this.page, 'Combat', 'combat', -10);
+        game.addPage(this.page, 'Combat', 'combat');
     }
 
     get zone() {
@@ -71,7 +77,7 @@ export class Combat {
     }
 
     get enemyBaseLife() {
-        const enemyBaseLifeList = game.module?.enemyBaseLifeList ?? [];
+        const enemyBaseLifeList = game.gameConfig.enemyBaseLifeList ?? [];
         const index = clamp(player.level - 1, 0, enemyBaseLifeList.length - 1);
         return enemyBaseLifeList[index] ?? Infinity;
     }
@@ -87,19 +93,17 @@ export class Combat {
         this.beginAutoAttack();
     }
 
-    startZone(zone: Zone | null) {
-        if (this._zone) {
-            this._zone.active = false;
+    startZone(zone: CombatArea | null) {
+        if (this._zone && this._zone.name !== zone?.name) {
+            this.stopZone();
         }
-        if (!zone) {
-            zone = world.zone ?? null;
-            assertNonNullable(zone);
-        }
-        this._zone = zone;
-        this._zone.active = true;
+        this._zone = zone ?? world.zone;
+        assertDefined(this._zone);
 
-        this.stats.maxEnemyCount.set(zone.stats.maxEnemyCount);
-        this.stats.enemyCount.set(Number.isFinite(zone.stats.maxEnemyCount) ? zone.stats.enemyCount : Infinity);
+        player.modDB.replace('Zone', Modifier.extractStatModifierList(...this._zone.modList.filter(x => playerModTemplateList.some(y => y.id === x.template.id))));
+
+        this.stats.maxEnemyCount.set(this._zone.maxEnemyCount);
+        this.stats.enemyCount.set(this._zone.enemyCount);
 
         this.updateLifebarName();
         this.updateElements();
@@ -107,21 +111,25 @@ export class Combat {
         statistics.updateStats('Combat');
     }
 
-    stopZone(zone: Zone) {
-        zone.active = false;
-        assertDefined(world.zone);
+    stopZone() {
+        this._zone = undefined;
         this.effectHandler.removeAllEffects();
-        this.startZone(world.zone);
+        if (world.zone) {
+            this.startZone(world.zone);
+        }
     }
 
     private processEnemyDeath(enemy: Enemy) {
         assertDefined(this._zone);
 
-        if (player.stats.lingeringAilments.value === 0) {
-            this.effectHandler.removeAllEffects();
+        const removeBurn = player.stats.lingeringBurn.value === 0;
+        const effectTypesToRemove = [...effectTypes];
+        if (!removeBurn) {
+            effectTypesToRemove.remove('Burn');
         }
+        this.effectHandler.clearEffectsByType(effectTypesToRemove);
 
-        this.enemyDeathEvent.invoke({ zone: this._zone, enemy });
+        this.events.enemyDeath.invoke({ zone: this._zone, enemy });
 
         this._zone.next();
         if (this._zone.completed) {
@@ -132,7 +140,7 @@ export class Combat {
 
         player.updateStats();
 
-        this.stats.enemyCount.set(this._zone.stats.enemyCount);
+        this.stats.enemyCount.set(this._zone.enemyCount);
 
         this.updateElements();
         statistics.updateStats('Combat');
@@ -169,6 +177,7 @@ export class Combat {
     }
 
     private performAttack() {
+        assertDefined(this._zone);
         const enemy = this.enemy;
         assertDefined(enemy, 'enemy is undefined');
 
@@ -176,6 +185,8 @@ export class Combat {
         if (!result) {
             return;
         }
+
+        this.events.enemyHit.invoke({ enemy, zone: this._zone });
 
         game.stats.totalPhysicalAttackDamage.add(result.physicalDamage);
         game.stats.totalElementalAttackDamage.add(result.elementalDamage);
@@ -219,7 +230,7 @@ export class Combat {
         const maxLife = this._zone?.enemy?.stats.maxLife.value ?? 0;
 
         const value = life / maxLife;
-        this.lifebarElement.value = (Number.isFinite(value) ? value : 1);
+        this.lifebarElement.value = value;
     }
 
     private updateLifebarName() {
@@ -243,9 +254,9 @@ export class Combat {
     }
 
     reset() {
-        this._zone = undefined;
+        this.stopZone();
         this.effectHandler.reset();
-        this.enemyDeathEvent.removeAllListeners();
-        Zone.GlobalAreaModList.clear();
+        Object.values(this.events).forEach(x => x.removeAllListeners());
+        CombatArea.clearGlobalAreaModList();
     }
 }

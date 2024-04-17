@@ -16,8 +16,14 @@
 	// 	"description": "Log output to console"
 	// }
 	"Random_Hex": {
+		"scope": "typescript",
 		"prefix": "random_hex",
 		"body": "${RANDOM_HEX}",
 		"description": "Generates 6 random Base-16 digits"
+	},
+	"Id": {
+		"scope": "typescript",
+		"prefix": "id",
+		"body": "id: '${RANDOM_HEX}'"
 	}
 }

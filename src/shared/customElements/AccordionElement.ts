@@ -1,5 +1,5 @@
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
-import { isDefined } from 'src/shared/utils/helpers';
+import { isDefined } from 'src/shared/utils/utils';
 import { CustomElement } from './CustomElement';
 
 export class AccordionElement extends CustomElement {
@@ -15,12 +15,7 @@ export class AccordionElement extends CustomElement {
         this.header.classList.add('header');
         this.header.setAttribute('data-header', '');
         this.header.insertAdjacentHTML('beforeend', '<div class="title" data-title></div>');
-        this.header.addEventListener('click', () => {
-            if (!this.content.firstChild?.hasChildNodes()) {
-                return;
-            }
-            this.toggle(!this.open);
-        });
+        this.header.addEventListener('click', this.open.bind(this));
 
         this.contentParent = document.createElement('div');
         this.contentParent.classList.add('content-parent');
@@ -31,12 +26,24 @@ export class AccordionElement extends CustomElement {
         this.contentParent.appendChild(this.content);
     }
 
+    get isOpen() {
+        return this._isOpen;
+    }
+
+    disconnectedCallback(): void {
+        super.disconnectedCallback();
+        this.header.removeEventListener('click', this.open.bind(this));
+    }
+
     init() {
         this.replaceChildren(this.header, this.contentParent);
     }
 
-    get open() {
-        return this._isOpen;
+    open() {
+        if (!this.content.firstChild?.hasChildNodes()) {
+            return;
+        }
+        this.toggle(!this.isOpen);
     }
 
     setTitle(title: string) {
@@ -54,7 +61,7 @@ export class AccordionElement extends CustomElement {
 
     toggle(open?: boolean) {
         this._isOpen = isDefined(open) ? open : !this._isOpen;
-        this.header.classList.toggle('open', this.open);
-        this.onToggle.invoke(this.open);
+        this.header.classList.toggle('open', this.isOpen);
+        this.onToggle.invoke(this.isOpen);
     }
 }

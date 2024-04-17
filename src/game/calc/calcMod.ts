@@ -1,7 +1,7 @@
-import { ConditionFlags, type ModifierFlags, type StatModConditionTag, type StatModifierValueType, type StatModTag, type StatName } from '../mods/types';
+import type { ConditionFlags, ModifierFlags, StatModConditionTag, StatModifierValueType, StatModTag, StatName } from '../mods/types';
 import type { ModDB, StatModifier } from '../mods/ModDB';
 import { assertDefined } from 'src/shared/utils/assert';
-import { isDefined, hasAnyFlag, hasAllFlags } from 'src/shared/utils/helpers';
+import { isDefined, hasAnyFlag, hasAllFlags } from 'src/shared/utils/utils';
 import type { EnemyStatCollection, PlayerStatCollection } from '../statistics/stats';
 
 export type CalcMinMax = (min: number, max: number) => number;
@@ -98,13 +98,13 @@ function evalMod(mod: StatModifier, config: Configuration) {
     if (!hasAnyFlag(config.flags || 0, mod.modFlagsAny || 0)) {
         return 0;
     }
-    const conditionsPassed = evalConditions(mod.tags?.filter(isConditionTag) || [], config);
+    const conditionsPassed = evalConditions(mod.extends?.filter(isConditionTag) || [], config);
     if (!conditionsPassed) {
         return 0;
     }
 
     let value = mod.negate ? -mod.value : mod.value;
-    for (const tag of mod.tags || []) {
+    for (const tag of mod.extends || []) {
         if (tag.type === 'Multiplier') {
             const multiplier = config.source?.stats?.[tag.statName as keyof typeof config.source.stats] || 1;
             value *= multiplier;

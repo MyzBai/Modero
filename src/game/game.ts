@@ -1,103 +1,170 @@
-import '../arrayExtensions';
-import '../DOMExtensions';
+import '../extensions/arrayExtensions';
+import '../extensions/DOMExtensions';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
-import moduleList from './gameModule/moduleList.json';
+import gameModRegistry from './gameConfig/gameModRegistry.json';
 import { World } from './combat/World';
 import { Combat } from './combat/Combat';
 import { Components } from './components/Components';
 import { Player } from './Player';
 import { Statistics } from './statistics/Statistics';
-import type { Serialization, UnsafeSerialization } from './serialization/serialization';
-import { createGameStats, createResourceStats, deserializeStats, serializeStats, type ResourceStatCollection } from './statistics/stats';
-import { GAME_MODULE_VERSION, type GameModule } from './gameModule/GameModule';
+import type { Serialization, UnsafeSerialization } from './serialization';
+import { createGameStats, deserializeStats, serializeStats } from './statistics/stats';
+import { GAME_CONFIG_VERSION, type GameConfig } from './gameConfig/GameConfig';
 import { Loop } from '../shared/utils/Loop';
 import { TabMenuElement } from 'src/shared/customElements/TabMenuElement';
-import { isNonNullable } from 'src/shared/utils/helpers';
+import { isNonNullable } from 'src/shared/utils/utils';
 import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';
 import { ENVIRONMENT, resolveGamePathFromVersion } from 'src/config';
 import { createCustomElement } from 'src/shared/customElements/customElements';
-import type { TS } from 'src/global';
+import { initDevTools } from 'src/game/dev';
 import { loadGame, saveGame } from 'src/shared/utils/saveManager';
 import { Notifications } from './Notifications';
+import { Ascension } from './components/ascension/Ascension';
+import { ProgressElement } from 'src/shared/customElements/ProgressElement';
+import { ModalElement } from 'src/shared/customElements/ModalElement';
+import { createModEntryInfoElement } from 'src/home/dom';
 
-const DOCUMENT_TITLE = 'Idle Ascension';
-const updateDocumentTitle = () => document.title = `${DOCUMENT_TITLE} (${gameLoop.state})`;
+export const mainMenuNames = ['combat', 'skills', 'weapon', 'artifacts', 'playerClasses', 'ascension', 'achievements', 'statistics', 'notifications'] as const;
+
+export const enum GameInitializationStage {
+    None = 0,
+    Init = 1,
+    Deserialize = 2,
+    Setup = 3,
+    Done = 4
+}
 
 export class Game {
+    readonly pageShadowHost: HTMLElement;
     readonly page: HTMLElement;
     readonly components = new Components();
     readonly tickSecondsEvent = new EventEmitter<undefined>();
-    private _module: GameModule | null = null;
-    private _moduleId?: string;
+    private _gameConfig: GameConfig | null = null;
+    private _gameConfigId?: string;
     readonly stats = createGameStats();
-    private _resources: ResourceStatCollection = {};
-
+    private _initializationStage = GameInitializationStage.None;
     constructor() {
-        this.page = this.createPage();
+
+        this.pageShadowHost = document.createElement('div');
+        this.pageShadowHost.classList.add('game-page-shadow-host');
+        this.pageShadowHost.setAttribute('data-page-content', 'game');
+        this.pageShadowHost.setAttribute('data-game-page-shadow-host', '');
+        const shadowRoot = this.pageShadowHost.attachShadow({ mode: 'open' });
+        this.page = document.createElement('main');
+        this.page.classList.add('p-game');
+        shadowRoot.appendChild(this.page);
+        document.body.appendChild(this.pageShadowHost);
+
+        this.page.insertAdjacentHTML('beforeend', '<span class="title" onclick="location.hash = \'home\'">Idle Ascension</span>');
+
+        //combat overview
+        const combatOverview = document.createElement('div');
+        combatOverview.classList.add('s-combat-overview');
+        combatOverview.setAttribute('data-combat-overview', '');
+        combatOverview.insertAdjacentHTML('beforeend', '<span class="player-name" data-player-name>Player</span>');
+        const manabar = createCustomElement(ProgressElement);
+        manabar.classList.add('s-mana-bar');
+        manabar.setAttribute('data-mana-bar', '');
+        combatOverview.appendChild(manabar);
+
+        combatOverview.insertAdjacentHTML('beforeend', '<span class="enemy-name" data-enemy-name></span>');
+        const lifebar = createCustomElement(ProgressElement);
+        lifebar.classList.add('s-life-bar');
+        lifebar.setAttribute('data-life-bar', '');
+        combatOverview.appendChild(lifebar);
+
+        this.page.appendChild(combatOverview);
+
+
+        const modTitleElement = document.createElement('span');
+        modTitleElement.classList.add('title');
+        modTitleElement.setAttribute('data-mod-title', '');
+        modTitleElement.addEventListener('click', () => {
+            const modEntry = gameModRegistry.list.findStrict(x => x.id === this.gameConfigId);
+            const modal = createCustomElement(ModalElement);
+            modal.setTitle(this.gameConfigName ?? 'undefined');
+            modal.setBodyElement(createModEntryInfoElement(modEntry).contentElement);
+            modal.style.textAlign = 'center';
+        });
+        this.page.appendChild(modTitleElement);
+
+        //menu
+        const menu = createCustomElement(TabMenuElement);
+        menu.classList.add('s-menu');
+        menu.setAttribute('data-main-menu', '');
+        this.page.appendChild(menu);
+
+        //stats
+        this.page.insertAdjacentHTML('beforeend', '<ul class="sticky-stat-group-list g-scroll-list-v" data-sticky-stat-group-list></ul>');
+
     }
 
     get menu() {
-        return this.page.querySelectorStrict<TabMenuElement>('[data-main-menu]');
+        return this.page.querySelectorStrict<TabMenuElement>(TabMenuElement.name);
     }
 
-    get module() {
-        return this._module;
+    get gameConfig() {
+        assertDefined(this._gameConfig, 'gameConfig is not available');
+        return this._gameConfig;
     }
 
-    get hasModule() {
-        return !!this._module;
+    get hasGameConfig() {
+        return !!this._gameConfig;
     }
 
-    get moduleId() {
-        return this._moduleId;
+    get gameConfigId() {
+        return this._gameConfigId;
     }
 
-    get resources() {
-        return this._resources;
+    get gameConfigName() {
+        return gameModRegistry.list.find(x => x.id === this.gameConfigId)?.name;
+    }
+
+    get initializationStage() {
+        return this._initializationStage;
     }
 
     get maxLevel() {
-        assertDefined(this._module);
-        return this._module.enemyBaseLifeList.length + 1;
+        assertDefined(this._gameConfig);
+        return this._gameConfig.enemyBaseLifeList.length + 1;
     }
 
-    async init(module: GameModule, moduleId: string, save?: UnsafeSerialization) {
-        if (this._module) {
+    async init(gameConfig: GameConfig, gameConfigId: string, save?: UnsafeSerialization) {
+
+        if (this._gameConfig) {
             this.reset();
         }
 
-        this._moduleId = moduleId;
-        const moduleName = moduleList.list.findStrict(x => x.id === moduleId).name;
-        this._module = module;
+        this._gameConfigId = gameConfigId;
+        this._gameConfig = gameConfig;
 
         statistics.createGroup('General', this.stats);
-        if (module.resourceList) {
-            this._resources = createResourceStats(module.resourceList);
-            statistics.createGroup('Resources', this.resources);
-        }
 
+        this._initializationStage = GameInitializationStage.Init;
         //Init
         statistics.init();
         combat.init();
         player.init();
+        ascension.init();
         this.components.init();
 
         //UI
-        this.page.querySelectorStrict('[data-module-name]').textContent = moduleName;
         this.page.querySelectorStrict<HTMLElement>('[data-page-target="combat"]').click();
 
         //Deserialize
         if (save) {
+            this._initializationStage = GameInitializationStage.Deserialize;
             this.deserialize(save);
         }
 
+        this._initializationStage = GameInitializationStage.Setup;
         //Setup
         player.setup();
         world.setup();
         combat.effectHandler.setup();
         this.components.setup();
 
-        await this.saveGame();
+        this.saveGame();
 
         statistics.updateAll();
 
@@ -112,11 +179,10 @@ export class Game {
         //time played
         this.tickSecondsEvent.listen(() => {
             this.stats.timePlayed.add(1);
-            // document.title = `${combat.stats.enemyCount.value.toFixed()}/${combat.stats.maxEnemyCount.value.toFixed()}`;
         });
 
-        gameLoop.registerCallback(async () => {
-            await this.saveGame();
+        gameLoop.registerCallback(() => {
+            this.saveGame();
         }, { delay: 1000 * 10 });
 
         if (ENVIRONMENT !== 'development') {
@@ -124,55 +190,22 @@ export class Game {
             gameLoopAnim.start();
         }
 
-        document.body.appendChild(this.page);
-        await this.createStyle();
+        const configName = gameModRegistry.list.find(x => x.id === gameConfigId)?.name ?? 'undefined';
+        this.page.querySelectorStrict('[data-mod-title]').textContent = configName;
+        await this.loadPage();
+        this._initializationStage = GameInitializationStage.Done;
     }
 
-    private createPage() {
-        const element = document.createElement('main');
-        element.classList.add('p-game', 'hidden');
-        element.setAttribute('data-page-content', 'game');
-
-        //home button
-        const homeButton = document.createElement('button');
-        homeButton.textContent = 'Home';
-        homeButton.addEventListener('click', () => location.hash = '#home');
-        element.appendChild(homeButton);
-        //combat overview
-        const combatOverview = document.createElement('div');
-        combatOverview.classList.add('s-combat-overview');
-        combatOverview.setAttribute('data-combat-overview', '');
-        combatOverview.insertAdjacentHTML('beforeend', '<span class="enemy-name" data-enemy-name></span>');
-        combatOverview.insertAdjacentHTML('beforeend', '<progress class="s-life-bar" data-life-bar value="1" max="1"></progress>');
-        combatOverview.insertAdjacentHTML('beforeend', '<span class="player-name" data-player-name>Player</span>');
-        combatOverview.insertAdjacentHTML('beforeend', '<progress class="s-mana-bar" data-mana-bar value="1" max="1"></progress>');
-        element.appendChild(combatOverview);
-        //title
-        element.insertAdjacentHTML('beforeend', '<span class="title" data-module-name>Idle Ascension</span>');
-        //menu
-        const menu = createCustomElement(TabMenuElement);
-        menu.classList.add('s-menu');
-        menu.setAttribute('data-main-menu', '');
-        element.appendChild(menu);
-        //main view
-        element.insertAdjacentHTML('beforeend', '<div data-main-view></div>');
-
-        //stats
-        element.insertAdjacentHTML('beforeend', '<ul class="sticky-stat-group-list" data-sticky-stat-group-list></ul>');
-
-        return element;
-    }
-
-    private createStyle(): Promise<void> {
-        this.page.querySelector('[data-game-style]')?.remove();
+    private async loadPage(): Promise<void> {
+        document.body.appendChild(this.pageShadowHost);
+        this.pageShadowHost.shadowRoot?.querySelector('link[rel="stylesheet"]')?.remove();
         return new Promise((resolve, error) => {
             const linkElement = document.createElement('link');
-            linkElement.setAttribute('data-game-style', '');
             linkElement.setAttribute('rel', 'stylesheet');
             linkElement.setAttribute('type', 'text/css');
-            linkElement.setAttribute('href', resolveGamePathFromVersion(GAME_MODULE_VERSION, 'style.css'));
-            linkElement.addEventListener('error', () => error());
-            linkElement.addEventListener('load', () => resolve());
+            linkElement.setAttribute('href', resolveGamePathFromVersion(GAME_CONFIG_VERSION, 'style.css'));
+            linkElement.addEventListener('error', () => error(), { once: true });
+            linkElement.addEventListener('load', () => resolve(), { once: true });
             this.page.appendChild(linkElement);
         });
     }
@@ -183,22 +216,19 @@ export class Game {
         gameLoop.reset();
         gameLoopAnim.reset();
         Object.values(this.stats).forEach(x => x.reset());
-        Object.values(this.resources).forEach(x => x.reset());
-        world.restart();
+        world.reset();
         combat.reset();
         player.reset();
+        ascension.reset();
         statistics.reset();
         notifications.reset();
-        updateDocumentTitle();
-
-        game.page.remove();
     }
 
-    async resetAscension() {
-        assertNonNullable(game.module);
-        assertDefined(game.moduleId);
+    async resetForAscension() {
+        assertNonNullable(game.gameConfig);
+        assertDefined(game.gameConfigId);
 
-        const save = loadGame(game.moduleId) as UnsafeSerialization;
+        const save = loadGame(game.gameConfigId) as UnsafeSerialization;
         assertDefined(save);
 
         const newSave: UnsafeSerialization = {
@@ -207,15 +237,14 @@ export class Game {
             game: { stats: save.game?.stats }
         };
 
-        void await game.init(game.module, game.moduleId, newSave);
+        void await game.init(game.gameConfig, game.gameConfigId, newSave);
     }
 
-    addPage(pageElement: HTMLElement, label: string, id: string, menuIndex: number) {
-        const menuItem = this.menu.addMenuItem(label, id, menuIndex);
+    addPage(pageElement: HTMLElement, label: string, id: typeof mainMenuNames[number]) {
+        const menuItem = this.menu.addMenuItem(label, id, mainMenuNames.indexOf(id));
         this.menu.registerPageElement(pageElement, id);
-        this.page.querySelectorStrict('[data-main-view]').appendChild(pageElement);
-        const comparer = (a: HTMLElement, b: HTMLElement) => (a.getAttribute('data-index')?.localeCompare(b.getAttribute('data-index') || '', undefined, { numeric: true }) || 0);
-        this.menu.sort(comparer);
+        this.menu.after(pageElement);
+        this.menu.sort();
         return { menuItem };
     }
 
@@ -253,47 +282,47 @@ export class Game {
         this.updateHighlightMenuItems(element);
     }
 
+    clearHighlights() {
+        this.page.querySelectorAll('[data-highlight]').forEach(x => x.removeAttribute('data-highlight'));
+    }
+
     private updateHighlightMenuItems(element: HTMLElement) {
-        for (const menuItem of this.menu.generateTabMenuAncestorList(element)) {
+        for (const [menuItem, pageElement] of this.menu.generateTabMenuAnectors(element)) {
             const pageId = menuItem.getAttribute('data-page-target');
-            const page = menuItem.closest('[data-page-content]');
-            const highlightedElementsCount = page?.querySelector(`[data-page-content="${pageId}"]`)?.querySelectorAll('[data-highlight]').length ?? 0;
+            const highlightedElementsCount = pageElement.querySelector(`[data-page-content="${pageId}"]`)?.querySelectorAll('[data-highlight]').length ?? 0;
             menuItem.toggleAttribute('data-highlight', highlightedElementsCount > 0);
         }
     }
 
-    async saveGame() {
-        assertDefined(this._moduleId);
+    saveGame() {
+        assertDefined(this._gameConfigId);
         const saves = loadGame();
 
-        const oldSave = saves.get(this._moduleId);
+        const oldSave = saves.get(this._gameConfigId);
 
         const serialization: Serialization = {
-            meta: { moduleId: this._moduleId, createdAt: oldSave?.meta?.createdAt || Date.now(), lastSavedAt: Date.now() }
+            meta: { gameConfigId: this._gameConfigId, createdAt: oldSave?.meta?.createdAt || Date.now(), lastSavedAt: Date.now() }
         };
 
         this.serialize(serialization);
 
-        saves.set(this._moduleId, serialization);
+        saves.set(this._gameConfigId, serialization);
 
         saveGame(saves);
     }
 
     dispose() {
-        this.page.remove();
+        this.pageShadowHost.remove();
     }
 
     serialize(save: Serialization) {
-        save.game = { stats: serializeStats(this.stats), resources: serializeStats(this.resources) };
+        save.game = { stats: serializeStats(this.stats) };
         world.serialize(save);
         statistics.serialize(save);
-
         player.serialize(save);
-
+        ascension.serialize(save);
         combat.effectHandler.serialize(save);
-
         notifications.serialize(save);
-
         this.components.serialize(save);
 
         const name = this.menu.querySelectorStrict('.selected')?.getAttribute('data-page-target');
@@ -309,23 +338,24 @@ export class Game {
             }
         }
 
-        statistics.deserialize(save);
         deserializeStats(game.stats, save.game?.stats || {});
-        deserializeStats(game.resources, save.game?.resources || {});
+        statistics.deserialize(save);
         player.deserialize(save);
-        world.deserialize(save);
-        this.components.deserialize(save);
-        combat.effectHandler.deserialize(save);
 
+        this.components.deserialize(save);
+
+        ascension.deserialize(save);
+        world.deserialize(save);
+
+        combat.effectHandler.deserialize(save);
         notifications.deserialize(save);
 
         this.menu.querySelector<HTMLElement>(`[data-page-target="${sessionStorage.getItem('main-menu')}"]`)?.click();
     }
 }
 
-export const gameLoop = new Loop();
-export const gameLoopAnim = new Loop();
-gameLoopAnim.setLoopType('Animation');
+export const gameLoop = new Loop('Default');
+export const gameLoopAnim = new Loop('Animation');
 
 export const game = new Game();
 export const statistics = new Statistics();
@@ -333,50 +363,25 @@ export const combat = new Combat();
 export const world = new World();
 export const player = new Player();
 export const notifications = new Notifications();
+export const ascension = new Ascension();
 
-export async function init(args: [...Parameters<typeof game['init']>, TS]) {
+export async function init(args: [...Parameters<typeof game['init']>]) {
     await game.init(args[0], args[1], args[2]);
 
-    setupGlobalScope(args[3]);
-}
-
-
-export function dispose(globalScope: TS) {
-    game.page.remove();
-
-    delete globalScope.game;
-
-    document.body.removeEventListener('keydown', toggleLoop);
-}
-
-function setupGlobalScope(globalScope: TS) {
     document.addEventListener('visibilitychange', toggleLoopType);
 
     if (ENVIRONMENT === 'development') {
-        console.log('Press Space to toggle GameLoop');
-        document.body.addEventListener('keydown', toggleLoop);
-        globalScope.game = {
-            save: () => game.moduleId && game.saveGame(),
-            printSave: () => game.moduleId && loadGame(game.moduleId),
-            game,
-            player,
-            getEnemy: () => combat.enemy,
-            setLevel: (level: number) => player.stats.level.set(level),
-            addResource: (type: string, value: number) => {
-                game.resources[type]?.add(value);
-            },
-            skipTime: (time, units: 'ms' | 'sec' | 'min' = 'ms') => {
-                switch (units) {
-                    case 'sec': time *= 1000; break;
-                    case 'min': time *= 1000 * 60; break;
-                }
-                console.time('Skip Time');
-                gameLoop.skipTime(time);
-                console.timeEnd('Skip Time');
-            }
-        };
+        window.idleAscension = { ...window.idleAscension, ...initDevTools() };
+    } else {
+        document.querySelector('[data-live-server-proxy]')?.remove();
     }
+}
 
+export function dispose() {
+    game.dispose();
+    if (ENVIRONMENT === 'development') {
+        window.idleAscension.dispose();
+    }
 }
 
 function toggleLoopType() {
@@ -385,14 +390,4 @@ function toggleLoopType() {
     } else {
         gameLoop.setLoopType('Default');
     }
-}
-
-function toggleLoop(e: KeyboardEvent) {
-    if (e.code !== 'Space') {
-        return;
-    }
-    e.preventDefault();
-    gameLoop.toggleState();
-    gameLoopAnim.toggleState();
-    updateDocumentTitle();
 }

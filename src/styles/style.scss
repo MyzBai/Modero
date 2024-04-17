@@ -1,15 +1,13 @@
-@forward "common";
-@use "customElements";
-@use "home";
-@use "variables" as *;
+@forward 'common';
+@use 'customElements';
+@use 'home';
+@use 'variables' as *;
 
 :root {
     font-size: 17px;
     font-family: serif;
 }
-.test {
-    color: white;
-}
+
 body {
     display: grid;
     grid-template-rows: 1fr auto;
@@ -29,13 +27,14 @@ body {
         grid-row-start: 1;
     }
 
-    & > footer {
+    footer {
         display: flex;
         padding: $padding-container;
         font-size: 0.8em;
         align-items: center;
         background-color: $color-primary-bg;
-        margin-top: 0.3em;
+        grid-row: 2;
+        border: $default-border;
         .s-links {
             margin-left: auto;
             a {
@@ -52,4 +51,8 @@ body {
     @media (max-width: 1000px) {
         grid-template-columns: 100vw;
     }
+}
+
+.game-page-shadow-host {
+    display: grid;
 }

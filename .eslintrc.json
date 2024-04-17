@@ -1,13 +1,12 @@
 {
     "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/eslintrc.json",
+    "root": true,
     "env": {
         "browser": true,
         "es6": true,
         "es2021": true
     },
-    "root": true,
     "extends": [ "eslint:recommended", "plugin:@typescript-eslint/recommended" ],
-    "overrides": [ ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -23,9 +22,11 @@
                 "format": [ "camelCase", "UPPER_CASE", "PascalCase" ]
             }
         ],
+        "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": [
             "error",
             {
+                "vars": "local",
                 "argsIgnorePattern": "^_",
                 "varsIgnorePattern": "^_",
                 "caughtErrorsIgnorePattern": "^_"
@@ -46,19 +47,24 @@
         ],
         "@typescript-eslint/no-non-null-assertion": "error",
         "@typescript-eslint/no-floating-promises": "error",
+        "@typescript-eslint/no-misused-promises": [ "error", { "checksVoidReturn": { "arguments": false, "attributes": false } } ],
+        "@typescript-eslint/await-thenable": "error",
+        "@typescript-eslint/require-await": "error",
+        "@typescript-eslint/ban-types": "error",
+        "@typescript-eslint/consistent-type-imports": [ "error", { "prefer": "type-imports", "fixStyle": "separate-type-imports" } ],
+        "dot-notation": "off",
+        "@typescript-eslint/dot-notation": [ "error", { "allowIndexSignaturePropertyAccess": true } ],
         "indent": [ "error", 4, { "SwitchCase": 1 } ],
         "semi": [ "error", "always" ],
-
         "array-bracket-newline": [ "error", "consistent" ],
         "no-useless-concat": "error",
         "brace-style": "error",
         "space-before-blocks": [ "error", "always" ],
         "keyword-spacing": "error",
         "no-trailing-spaces": "error",
-        "dot-notation": "error",
         "no-tabs": "error",
         "array-bracket-spacing": [ "error", "never" ],
-        "quotes": [ "warn", "single", { "allowTemplateLiterals": true } ]
-    },
-    "ignorePatterns": [ ".eslintrc.json" ]
+        "quotes": [ "warn", "single", { "allowTemplateLiterals": true } ],
+        "no-duplicate-imports": "error"
+    }
 }

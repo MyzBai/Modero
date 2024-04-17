@@ -4,11 +4,11 @@ export interface ButtonArgs {
     text: string;
     type?: 'confirm' | 'utility' | 'cancel';
     waitId?: string;
-    callback?: () => void | Promise<void>;
+    callback?: () => Promise<void>;
 }
 
-export class PromptWindowElement extends CustomElement {
-    static readonly name = 'prompt-window-element';
+export class ModalElement extends CustomElement {
+    static readonly name = 'modal-element';
     set minWidth(v: string) {
         this.querySelectorStrict<HTMLElement>('[data-body]').style.minWidth = v;
     }
@@ -18,22 +18,22 @@ export class PromptWindowElement extends CustomElement {
         content.classList.add('s-content');
         this.appendChild(content);
 
-        content.insertAdjacentHTML('beforeend', '<div class="title" data-title></div>');
+        content.insertAdjacentHTML('beforeend', '<div class="title hidden" data-title></div>');
         content.insertAdjacentHTML('beforeend', '<div class="s-body" data-body></div>');
         content.insertAdjacentHTML('beforeend', '<div class="s-buttons" data-buttons></div>');
 
         const backdrop = document.createElement('div');
         backdrop.classList.add('backdrop');
-        backdrop.addEventListener('click', () => {
-            this.remove();
-        });
+        backdrop.addEventListener('mousedown', this.remove.bind(this));
         this.appendChild(backdrop);
 
         document.body.appendChild(this);
     }
 
     setTitle(text: string) {
-        this.querySelectorStrict<HTMLElement>('[data-title]').textContent = text;
+        const titleElement = this.querySelectorStrict<HTMLElement>('[data-title]');
+        titleElement.textContent = text;
+        titleElement.classList.toggle('hidden', text.length === 0);
     }
 
     setBodyText(text: string) {

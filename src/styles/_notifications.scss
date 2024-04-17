@@ -1,16 +1,15 @@
-@use "variables" as *;
+@use 'variables' as *;
 
 .p-notifications {
     display: grid;
     grid-template-rows: auto 1fr;
 
     .s-toolbar {
-        padding: $padding-container;
+        background-color: $color-primary-bg;
     }
+
     .s-notifications-list {
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
+        padding-top: $padding-container;
         li {
             white-space-collapse: break-spaces;
             border: $default-border;
@@ -20,23 +19,23 @@
                 display: flex;
                 justify-content: space-between;
             }
-            .date {
+            .time {
                 align-self: center;
             }
 
             &.outline {
-                animation: seen 10s 1;
-                animation-iteration-count: 1;
+                outline: 1px solid rgba($color-title-accent, 1);
+                animation: seen 8s forwards;
             }
         }
     }
 }
 
 @keyframes seen {
-    0% {
-        outline: 1px solid rgba($color-title-accent, 1);
+    from {
+        outline-color: rgba($color-title-accent, 1);
     }
-    100% {
-        outline: 1px solid rgba($color-title-accent, 0);
+    to {
+        outline-color: rgba($color-title-accent, 0);
     }
 }

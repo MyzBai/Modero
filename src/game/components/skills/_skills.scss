@@ -1,4 +1,5 @@
-@use "variables" as *;
+@use 'variables' as *;
+@use 'mixins' as *;
 
 .p-skills {
     display: grid;
@@ -6,36 +7,34 @@
     gap: $default-gap;
 
     & > .s-menu {
-        display: flex;
-        text-align: center;
-        li {
-            min-width: 4em;
-        }
+        position: relative;
     }
 
-    .s-skill-info {
-        display: grid;
-        align-content: baseline;
-        grid-row: 1/5;
-        .g-mod-list {
-            ul {
-                overflow-y: auto;
-                min-height: 15em;
+    .s-skill-list {
+        border: $default-border;
+    }
+
+    [data-item-info] {
+        grid-row: 1 / -1;
+        grid-column: 2;
+
+        progress-element {
+            @include progress-multi-bar;
+        }
+
+        [data-button] {
+            color: $color-tag-invalid;
+            &[data-button='valid'] {
+                color: $color-tag-valid;
             }
         }
     }
 
     .p-attack-skills {
         display: grid;
+        grid-template-rows: auto 1fr;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto 1fr;
-        grid-auto-flow: column;
         gap: $default-gap;
-
-        .s-skill-list {
-            display: flex;
-            flex-direction: column;
-        }
     }
 
     .p-aura-skills {
@@ -54,7 +53,6 @@
                 cursor: default;
                 padding: $padding-container;
                 border: $default-border;
-                background-color: $color-primary-inset-bg;
 
                 &:hover {
                     filter: brightness(120%);
@@ -71,29 +69,18 @@
                         display: block;
                     }
                 }
-                progress {
-                    display: block;
-                    width: 100%;
+                .progress-bar {
                     height: 5px;
                 }
 
                 &.selected {
-                    filter: brightness(80%);
                     border: 1px solid $color-border-highlight;
                     pointer-events: all;
-                }
-
-                &:not(.m-has-skill) {
-                    progress {
-                        visibility: hidden;
-                    }
                 }
             }
         }
 
         .s-skill-list {
-            display: flex;
-            flex-direction: column;
             border: $default-border;
             overflow-y: auto;
             .equipped {
@@ -106,21 +93,17 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto 1fr;
+        grid-auto-flow: column;
         gap: $default-gap;
         .s-toolbar {
-            grid-row-start: 1;
-            display: flex;
-            gap: 1em;
+            justify-content: space-between;
             .s-insight-counter {
+                padding-left: $padding-container;
                 align-self: center;
             }
         }
 
         .s-skill-list {
-            display: flex;
-            flex-direction: column;
-            grid-row-start: 2;
-            overflow-y: auto;
             li {
                 position: relative;
             }

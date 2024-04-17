@@ -1,6 +1,6 @@
-import type { EffectType } from '../effects/Effects';
-import type { SerializedModifier } from '../mods/Modifier';
-import type { GameStatCollection, PlayerStatCollection } from '../statistics/stats';
+import type { EffectType } from './effects/Effects';
+import type { SerializedModifier } from './mods/Modifier';
+import type { GameStatCollection, PlayerStatCollection } from './statistics/stats';
 
 export type UnsafeSerialization = DeepPartial<Serialization>;
 
@@ -10,7 +10,7 @@ export interface Serialization {
     player?: Player;
     world?: World;
     statistics?: Statistics;
-    effects?: Effect[];
+    effects?: Effects;
     notifications?: Notifications;
     //components
     playerClasses?: PlayerClasses;
@@ -22,14 +22,13 @@ export interface Serialization {
 }
 
 export interface Meta {
-    moduleId: string;
+    gameConfigId: string;
     createdAt?: number;
     lastSavedAt?: number;
 }
 
 export interface Game {
     stats: Record<keyof GameStatCollection, Statistic>;
-    resources: Record<string, Statistic>;
 }
 
 export interface Player {
@@ -75,9 +74,13 @@ export interface Notifications {
         title: string;
         description?: string;
         time: number;
-        elementSourceId?: string | null | undefined;
+        elementId: string | null | undefined;
         seen: boolean;
     }[];
+}
+
+export interface Effects {
+    effectList: Effect[];
 }
 
 export interface Effect {
@@ -94,42 +97,53 @@ export interface PlayerClasses {
 }
 
 export interface Weapon {
-    activeWeaponInstance: WeaponInstance;
-    tempWeaponInstance: WeaponInstance | undefined;
-    craftList: {
-        id: string;
-        craftCount: number;
-    }[];
-}
-export interface WeaponInstance {
     weaponTypeId?: string;
-    weaponModList: (SerializedModifier & { groupIndex: number; })[];
+    modList: SerializedModifier[];
+    crafting: WeaponCrafting;
+}
+export interface WeaponCrafting {
+    craftList: { id: string; count: number; }[];
+    modList?: SerializedModifier[];
 }
 
 export interface Skills {
     attackSkills?: {
         skillName: string;
-        skillNameList: string[];
+        skillList: {
+            name: string;
+            expFac: number;
+        }[];
     };
     auraSkills?: {
         skillSlotList: ({
             skillName: string;
             timePct: number;
         } | undefined)[];
-        skillNameList: string[];
+        skillList: {
+            name: string;
+            expFac: number;
+        }[];
     };
     passiveSkills?: {
         insightCapacityEnhancerList: { name: string; count: number; }[];
-        passiveList: { name: string; allocated: boolean; }[];
+        passiveList: {
+            name: string;
+            allocated: boolean;
+            expFac: number;
+        }[];
     };
 }
 
 export interface Artifacts {
-    artifactNameList: { name: string; assigned: boolean; }[];
+    artifactNameList: {
+        name: string;
+        assigned: boolean;
+        expFac: number;
+    }[];
 }
 
 export interface Ascension {
-    id?: string; //this points to most recent ascension
-    ascendState: string;
+    ascensionInstanceId?: string;
+    state?: string;
     zone?: Zone;
 }

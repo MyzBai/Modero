@@ -14,18 +14,35 @@
 </head>
 
 <body class="dark hidden">
-    <main class="p-home" data-page-content="home">
-        <button class="game-button" data-return-to-game-button onclick="location.hash = '#game'"
-            style="visibility: hidden;">Return</button>
-        <div class="title">Idle Ascension</div>
-    </main>
     <footer>
         <span class="copyright">© 2024 Idle Ascension</span>
         <div class="s-links">
             <a href="https://github.com/MyzBai/IdleAscension" target="_blank">Github</a>
         </div>
     </footer>
-
+    <script data-live-server-proxy>
+        const tempWebSocket = window.WebSocket;
+        window.WebSocket = function (url, protocols) {
+            const socket = new tempWebSocket(url, protocols);
+            return new Proxy(socket, {
+                set(target, property, value) {
+                    if (property !== 'onmessage') {
+                        return Reflect.set(target, property, value);
+                    }
+                    return Reflect.set(target, property, function (event) {
+                        if (event.data === 'refreshcss') {
+                            const link = document.querySelector('[data-game-page-shadow-host]').shadowRoot?.querySelector('link[rel="stylesheet"]');
+                            const href = link.getAttribute('href')?.split('?')[0];
+                            link?.setAttribute('href', `${href}?${Date.now()}`);
+                        }
+                        if (typeof value === 'function') {
+                            value.call(target, event);
+                        }
+                    });
+                }
+            })
+        };
+    </script>
     <script type="module" src="./dist/main.js"></script>
 </body>
 

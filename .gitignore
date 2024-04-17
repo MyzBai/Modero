@@ -1,6 +1,5 @@
 node_modules/
 .vscode/*
 !.vscode/snippets.code-snippets
-!.vscode/tasks.json
 !.vscode/settings.json
 /public/dist

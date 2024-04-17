@@ -1,3 +1,21 @@
+
+interface ParentNode extends Node {
+    querySelectorStrict<E extends Element = Element>(selectors: string): E;
+}
+interface Element extends Node {
+    getAttributeStrict(selectors: string): string;
+}
+
+interface Array<T> {
+    remove(item: T): boolean;
+    clear(): void;
+    random(): T;
+    findStrict(predicate: (value: T, index: number, obj: readonly T[]) => unknown, thisArg?: unknown): T;
+}
+interface ReadonlyArray<T> {
+    findStrict(predicate: (value: T, index: number, obj: readonly T[]) => unknown, thisArg?: unknown): T;
+}
+
 type ExtractStrict<T, U extends T> = Extract<T, U>;
 type PickStrict<T, U extends keyof T> = {
     [P in U as T[P] extends Value | undefined ? P : never]: T[P]

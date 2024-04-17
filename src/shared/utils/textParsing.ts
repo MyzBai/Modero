@@ -1,6 +1,5 @@
 import { assertDefined } from './assert';
-
-const numerals = ['II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+import { ROMAN_NUMERALS } from './constants';
 
 export const numberRangeRegex = /((?<min>[0-9]+(\.[0-9]+)?)([-](?<max>[0-9]+(\.[0-9]+)?))?)/;
 export const integerRangeRegex = /((?<min>[0-9]+)([-](?<max>[0-9]+))?)/;
@@ -9,7 +8,7 @@ export const integerRegex = /([0]|[1-9][0-9]+)/;
 export const symbolsRegex = /([-+])/;
 export const referenceRegex = /(@\{(?<name>\w+)\})/;
 export const costRegex = new RegExp(`(?<value>${integerRegex.source}) (?<name>\\w+)`);
-export const rankNumeralsRegex = new RegExp(` (?<rank>${numerals.join('|')})$`);
+export const rankNumeralsRegex = new RegExp(`\\b(?<rank>${ROMAN_NUMERALS.join('|')})$`);
 export const strToPascal = (str: string) => str[0]?.toLowerCase() + str.replace(/(\w)(\w*)/g, (_, g1: string, g2: string) => `${g1.toUpperCase()}${g2.toLowerCase()}`).replaceAll(' ', '').substring(1);
 export const strToKebab = (str: string) => str.split(' ').join('-').toLowerCase();
 
@@ -32,19 +31,6 @@ export function parseTextValues(text: string) {
     }
     return values;
 }
-
-// export function extractCost(cost: Cost) {
-//     const match = cost.match(`^${costRegex.source}$`);
-//     assertDefined(match, `invalid syntax: ${cost}. expected: <number> <string>`);
-//     assertDefined(match.groups);
-//     const { value, name } = match.groups;
-//     assertDefined(value);
-//     assertDefined(name);
-//     return { value: parseInt(value), label: name, propertyName: strToKebab(name) };
-// }
-// export function extractCosts(costs: Cost[]): ReturnType<typeof extractCost>[] {
-//     return costs.map(x => extractCost(x));
-// }
 
 export function pluralizeWords(text: string) {
     text = text.replace(/\b(time)\b/gi, '$1s');

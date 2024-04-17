@@ -1,6 +1,6 @@
 import type { ColorTag } from 'src/shared/types/types';
 import { Value } from 'src/shared/utils/Value';
-import { isString } from 'src/shared/utils/helpers';
+import { isString } from 'src/shared/utils/utils';
 
 export interface StatisticOptions {
     type?: 'number' | 'text' | 'boolean';

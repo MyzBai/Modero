@@ -1,4 +1,9 @@
-@use "variables" as *;
+@use 'mixins' as *;
+@use 'variables' as *;
+
+.g-scroll-list-v {
+    @include scroll-list-v;
+}
 
 .g-list-item {
     padding: 0.3em;
@@ -7,7 +12,7 @@
     background-color: $color-primary-bg;
 
     &.selected {
-        filter: brightness(70%);
+        filter: brightness(70%) !important;
     }
 
     &:hover {
@@ -29,13 +34,6 @@
     }
 }
 
-.g-progress-bar-background {
-    height: 1.5em;
-    .g-progress-bar {
-        height: 100%;
-    }
-}
-
 @mixin mod-desc {
     color: $color-tag-modifier;
     cursor: default;
@@ -49,8 +47,10 @@
     text-align: center;
     padding: $padding-container;
     overflow-y: auto;
+    @include scroll-list-v;
     li {
         @include mod-desc;
+        border: 0;
     }
 }
 
@@ -66,23 +66,62 @@
     color: $color-muted-fg;
 }
 
-.g-progress-bar {
-    &.small {
-        display: block;
-        width: 100%;
-        height: 5px;
-    }
-}
-
 .g-title {
     background-color: $color-primary-bg;
     padding: $padding-container;
-    // border-bottom: $default-border;
     text-align: center;
-    // font-size: 1.1em;
     color: white;
+    border: $default-border;
+}
+
+.g-toolbar {
+    background-color: $color-primary-bg;
+    border: $default-border;
+    padding: $padding-container;
+    display: flex;
+    gap: $default-gap;
 }
 
 [data-highlight] {
     color: $color-title-accent;
+}
+
+.g-help-icon {
+    position: absolute;
+    top: calc($padding-container);
+    right: calc($padding-container);
+    cursor: default;
+    outline: $default-border;
+    width: 1.3em;
+    text-align: center;
+    font-weight: 600;
+    &:hover {
+        filter: brightness(130%);
+    }
+}
+
+.g-clickable-text {
+    cursor: default;
+    &:hover {
+        filter: brightness(120%);
+    }
+}
+
+.g-item-info {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    gap: $default-gap;
+
+    .s-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        border: $default-border;
+        padding: $padding-container;
+        button {
+            margin-top: $padding-container;
+            align-self: center;
+        }
+    }
 }

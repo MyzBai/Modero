@@ -1,5 +1,5 @@
-import { assertDefined } from './shared/utils/assert';
-import { randomRangeInt } from './shared/utils/helpers';
+import { assertDefined } from '../shared/utils/assert';
+import { randomRangeInt } from '../shared/utils/utils';
 
 Array.prototype.remove = function <T>(this: T[], item: T) {
     const index = this.indexOf(item);

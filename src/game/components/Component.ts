@@ -1,18 +1,19 @@
 
-import type * as GameModule from 'src/game/gameModule/GameModule';
+import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { game } from '../game';
-import type { Serialization, UnsafeSerialization } from '../serialization/serialization';
+import type { Serialization, UnsafeSerialization } from '../serialization';
 
 export abstract class Component {
     readonly page: HTMLElement;
-    constructor(readonly name: GameModule.ComponentName) {
+    constructor(readonly name: GameConfig.ComponentName) {
         this.page = document.createElement('div');
         this.page.classList.add(`p-${name}`, 'hidden');
-        game.page.querySelectorStrict('[data-main-view]').appendChild(this.page);
+        game.page.appendChild(this.page);
         this.page.setAttribute('data-page-content', name);
     }
 
     setup?(): void;
+    dispose?(): void;
     serialize?(save: Serialization): void;
     deserialize?(save: UnsafeSerialization): void;
 }

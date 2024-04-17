@@ -1,20 +1,17 @@
 import { Component } from '../Component';
-import { game, player } from '../../game';
+import { game } from '../../game';
 import { Task } from '../../tasks/Task';
-import { Modifier } from '../../mods/Modifier';
 import { parseTextValues } from 'src/shared/utils/textParsing';
 import { assertDefined } from 'src/shared/utils/assert';
-import type * as GameModule from 'src/game/gameModule/GameModule';
-import { AccordionElement } from 'src/shared/customElements/AccordionElement';
-import { createCustomElement } from 'src/shared/customElements/customElements';
+import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 
 
 export class Achievements extends Component {
     readonly achievements: Achievement[] = [];
-    constructor(readonly data: GameModule.Achievements) {
+    constructor(readonly data: GameConfig.Achievements) {
         super('achievements');
 
-        this.page.insertAdjacentHTML('beforeend', '<ul data-achievement-list></ul>');
+        this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v" data-achievement-list></ul>');
 
         const container = this.page.querySelectorStrict('[data-achievement-list]');
         for (const achievementData of data.achievementList) {
@@ -46,9 +43,9 @@ export class Achievements extends Component {
 
 class Achievement {
     readonly task: Task;
-    readonly element: AccordionElement;
+    readonly element: HTMLElement;
     private completed = false;
-    constructor(readonly achievements: Achievements, readonly data: GameModule.Achievement) {
+    constructor(readonly achievements: Achievements, readonly data: GameConfig.Achievement) {
         this.task = new Task(data.description);
         this.element = this.createElement();
     }
@@ -60,11 +57,6 @@ class Achievement {
             return;
         }
 
-        if (this.data.modList) {
-            const modifiers = this.data.modList.flatMap(x => Modifier.modFromText(x)?.extractStatModifiers() || []);
-            const source = `Achievement/${this.data.description}`;
-            player.modDB.add(source, modifiers);
-        }
         this.updateLabel();
         this.completed = true;
 
@@ -79,32 +71,15 @@ class Achievement {
     }
 
     private createElement() {
-        const accordion = createCustomElement(AccordionElement);
-        accordion.classList.add('s-achievement');
+        const element = document.createElement('div');
+        element.classList.add('s-achievement', 'g-field');
 
         const textData = parseTextValues(this.task.text)[0];
         assertDefined(textData);
 
-        const titleElement = document.createElement('div');
-        titleElement.classList.add('title-content');
-        const descHTML = this.task.createHTML();
+        element.insertAdjacentHTML('beforeend', this.task.createHTML());
+        element.insertAdjacentHTML('beforeend', '<var data-pct></var>');
 
-        const progressElement = document.createElement('div');
-        progressElement.insertAdjacentHTML('beforeend', '<var data-pct></var>');
-
-        titleElement.insertAdjacentHTML('beforeend', descHTML);
-        titleElement.insertAdjacentElement('beforeend', progressElement);
-
-        accordion.setTitleElement(titleElement);
-
-        if (this.data.modList) {
-            const content = document.createElement('div');
-            for (const modText of this.data.modList) {
-                const mod = Modifier.modFromText(modText);
-                content.insertAdjacentHTML('beforeend', `<li class="g-mod-desc">${mod.desc}</li>`);
-            }
-            accordion.setContentElements(content);
-        }
-        return accordion;
+        return element;
     }
 }

@@ -1,7 +1,7 @@
-import { Statistic, type StatisticOptions } from './Statistic';
-import { isNumber, isString, toDecimals } from 'src/shared/utils/helpers';
+import type { Statistic, StatisticOptions } from './Statistic';
+import { isNumber, isString, toDecimals } from 'src/shared/utils/utils';
 import { game, gameLoopAnim, player } from '../game';
-import * as GameSerialization from '../serialization/serialization';
+import type * as GameSerialization from '../serialization';
 import { type StatCollection } from './stats';
 import { assertDefined } from 'src/shared/utils/assert';
 import { createCustomElement } from 'src/shared/customElements/customElements';
@@ -22,9 +22,9 @@ export class Statistics {
         this.page.classList.add('p-statistics', 'hidden');
         this.page.setAttribute('data-page-content', 'statistics');
 
-        this.page.insertAdjacentHTML('beforeend', '<ul data-stat-group-list></ul>');
+        this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v" data-stat-group-list></ul>');
 
-        game.addPage(this.page, 'Statistics', 'statistics', 100);
+        game.addPage(this.page, 'Statistics', 'statistics');
     }
 
     init() {
@@ -132,7 +132,7 @@ export class Statistics {
 
 
     private updateGroup(group: StatisticsGroup, statCollection?: Record<string, Statistic>) {
-        if (!group.pageGroup.open && !group.stickyGroup.open) {
+        if (!group.pageGroup.isOpen && !group.stickyGroup.isOpen) {
             return;
         }
         statCollection = statCollection ?? group.statCollection;
@@ -234,8 +234,8 @@ export class Statistics {
         const groups: GameSerialization.Statistics['groups'] = {};
         for (const [key, group] of this.statisticsGroups.entries()) {
             groups[key] = {
-                pageHeaderOpenState: group.pageGroup.open,
-                sideHeaderOpenState: group.stickyGroup.open,
+                pageHeaderOpenState: group.pageGroup.isOpen,
+                sideHeaderOpenState: group.stickyGroup.isOpen,
             };
         }
         save.statistics = { groups };

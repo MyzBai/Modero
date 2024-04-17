@@ -1,7 +1,8 @@
-import { getRandomWeightedIndex, getRandomWeightedItem, randomRange, randomRangeInt } from 'src/shared/utils/helpers';
+import { getRandomWeightedIndex, getRandomWeightedItem, randomRange, randomRangeInt } from 'src/shared/utils/utils';
 import { Modifier } from '../mods/Modifier';
-import type { ModifierTag, ModTemplate } from '../mods/types';
+import { ModifierTagList, type ModifierTag, type ModTemplate } from '../mods/types';
 import { assertDefined } from 'src/shared/utils/assert';
+import { createModTags } from '../mods/utils';
 
 export interface ModifierCandidate {
     text: string;
@@ -63,7 +64,7 @@ export class CraftManager {
             return 'Item has maximum number of modifiers';
         }
         if (tag) {
-            candidateModList = candidateModList.filter(x => x.template.tags?.includes(tag));
+            candidateModList = candidateModList.filter(x => createModTags(x.template.stats).includes(tag));
             if (candidateModList.length === 0) {
                 return `No modifier with tag: ${tag} available`;
             }
@@ -78,7 +79,7 @@ export class CraftManager {
     removeOne(itemModList: readonly Modifier[], tag?: ModifierTag): ModListCraftResult | string {
         let modList = [...itemModList];
         if (tag) {
-            modList = modList.filter(x => x.tags?.includes(tag));
+            modList = modList.filter(x => [...createModTags(x.template.stats)].includes(tag));
         }
         const index = randomRangeInt(0, modList.length);
         const target = modList[index];
@@ -128,6 +129,13 @@ export class CraftManager {
     }
 
     private generateModList(itemModList: readonly Modifier[], candidateModList: readonly ModifierCandidate[], count: number) {
+        const tagWeightMultiplier = 1.2;
+        const tagWeights = ModifierTagList.reduce((a, c) => {
+            a[c] = 1;
+            return a;
+        }, {} as Record<ModifierTag, number>);
+        const addTagWeight = (mod: Modifier) => createModTags(mod.template.stats).forEach(x => tagWeights[x] *= tagWeightMultiplier);
+        itemModList.forEach(x => addTagWeight(x));
         const newModList: Modifier[] = [];
         for (let i = 0; i < count; i++) {
             candidateModList = candidateModList.filter(x => !itemModList.concat(newModList).some(y => x.template.desc === y.template.desc));
@@ -135,13 +143,19 @@ export class CraftManager {
                 console.warn(`failed to generate the expected amount of modifiers of (${count})`);
                 return [];
             }
-            const candidate = getRandomWeightedItem(candidateModList);
+            const candidateCopyList = candidateModList.map(x => {
+                const tags = createModTags(x.template.stats);
+                const weight = tags.reduce((a, c) => a *= tagWeights[c], x.weight);
+                return { ...x, weight };
+            });
+            const candidate = getRandomWeightedItem(candidateCopyList);
             if (!candidate) {
                 continue;
             }
 
             const mod = Modifier.modFromText(candidate.text);
             mod.randomizeValues();
+            addTagWeight(mod);
             newModList.push(mod);
         }
         return newModList;

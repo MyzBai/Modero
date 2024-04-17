@@ -3,8 +3,9 @@
     "typescript.preferences.quoteStyle": "single",
     "json.schemas": [
         {
-            "fileMatch": [ "**.module.json", "**/*.module.jsonc" ],
-            "url": "/src/game/gameModule/module.schema.json"
+            "fileMatch": [ "public/gameMods/**/*.jsonc" ],
+            "url": "/src/game/gameConfig/gameConfig.schema.json"
         }
-    ]
+    ],
+    "scssFormatter.singleQuote": true
 }

@@ -1,14 +1,11 @@
-import type * as GameModule from 'src/game/gameModule/GameModule';
 import { Statistic } from './Statistic';
 import { assertDefined } from 'src/shared/utils/assert';
-import { strToKebab } from 'src/shared/utils/textParsing';
-import type * as GameSerialization from '../serialization/serialization';
-import { isDefined } from 'src/shared/utils/helpers';
-import { compareValueTypes } from '../utils';
+import type * as GameSerialization from '../serialization';
+import { isDefined } from 'src/shared/utils/utils';
+import { compareValueTypes } from '../utils/utils';
 
 export type StatCollection = Readonly<Record<string, Statistic>>;
 export type GameStatCollection = ReturnType<typeof createGameStats>;
-export type ResourceStatCollection = ReturnType<typeof createResourceStats>;
 export type PlayerStatCollection = ReturnType<typeof createPlayerStats>;
 export type EnemyStatCollection = ReturnType<typeof createEnemyStats>;
 
@@ -16,7 +13,7 @@ export type EnemyStatCollection = ReturnType<typeof createEnemyStats>;
 export function createGameStats(parent?: StatCollection) {
     const statList = {
         timePlayed: new Statistic({ label: 'Time Played', isTime: true }),
-        maxLevel: new Statistic({ label: 'Max Level', defaultValue: 1 }),
+        maxLevel: new Statistic(),
         ascensionCount: new Statistic({ label: 'Ascensions', defaultValue: 0, hiddenBeforeMutation: true }),
         totalDamage: new Statistic(),
         totalAttackDamage: new Statistic(),
@@ -41,15 +38,6 @@ export function createGameStats(parent?: StatCollection) {
     return statList;
 }
 
-export function createResourceStats(resourceList: GameModule.Resource[]) {
-    return resourceList.reduce((a, c) => {
-        const propertyName = strToKebab(c.name);
-        const total = a[`total-${propertyName}`] = new Statistic();
-        a[propertyName] = new Statistic({ label: c.name, hiddenBeforeMutation: c.hiddenBeforeMutation, sticky: c.stickyByDefault, accumulators: [total] });
-        return a;
-    }, {} as Record<string, Statistic>);
-}
-
 export function createCombatStats() {
     // const area = new Statistic({ label: 'Area', sticky: true, computed: true, type: 'text' });
     const maxEnemyCount = new Statistic({ computed: true });
@@ -72,7 +60,7 @@ export function createPlayerStats(gameStats: GameStatCollection) {
         attackSpeed: new Statistic({ label: 'Attack Speed', sticky: true, computed: true, decimals: 2, hoverTip: 'Attacks Per Second' }),
         attackManaCost: new Statistic({ label: 'Attack Mana Cost', computed: true }),
         attackEffectiveness: new Statistic({ computed: true }),
-        attackTime: new Statistic({ computed: true }),
+        attackTime: new Statistic(),
         //Mana
         maxMana,
         mana: new Statistic({ label: 'Mana', sticky: true, defaultValue: Infinity, statFormat: (self) => [self, '/', maxMana], accumulators: [gameStats.totalMana] }),
@@ -101,7 +89,7 @@ export function createPlayerStats(gameStats: GameStatCollection) {
         burnChanceOnHit: new Statistic({ label: 'Burn Chance', computed: true, multiplier: 100, suffix: '%' }),
         burnDuration: new Statistic({ label: 'Burn Duration', computed: true, decimals: 1, suffix: 's', }),
         maxBurnStackCount: new Statistic({ label: 'Maximum Burn Stacks', computed: true }),
-        baseBurnDamageMultiplier: new Statistic(),
+        baseBurnDamageMultiplier: new Statistic({ computed: true }),
         burnDamageMultiplier: new Statistic({ computed: true }),
         minBurnDamage: new Statistic({ computed: true }),
         maxBurnDamage: new Statistic({ computed: true }),
@@ -115,8 +103,9 @@ export function createPlayerStats(gameStats: GameStatCollection) {
         auraDurationMultiplier: new Statistic({ computed: true }),
         insightCapacity: new Statistic({ computed: true }),
         maxArtifacts: new Statistic({ computed: true }),
+        playerClassTokenCount: new Statistic(),
 
-        lingeringAilments: new Statistic({ computed: true, type: 'boolean' })
+        lingeringBurn: new Statistic({ computed: true, type: 'boolean' })
     } as const;
 }
 
@@ -142,7 +131,7 @@ export function copyStats<T extends StatCollection>(stats: T): Readonly<Record<k
 export function serializeStats<T extends StatCollection, U extends keyof T>(stats: T): Record<U, GameSerialization.Statistic> {
     const obj: Record<U, GameSerialization.Statistic> = Object.create({});
     for (const [key, stat] of Object.entries(stats)) {
-        const hasChanged = [stat.options.sticky || false !== stat.sticky, stat.value !== stat.defaultValue, !stat.options.computed && stat.mutated].some(x => x);
+        const hasChanged = [(stat.options.sticky || false) !== stat.sticky, !stat.options.computed && stat.mutated].some(x => x);
         if (!hasChanged) {
             continue;
         }

@@ -1,6 +1,6 @@
 import { type CalcMinMax, calcModBase, calcModIncMore, type OffenceConfiguration, type PlayerConfiguration } from './calcMod';
 import { ModifierFlags, type DamageStatName, type StatName } from '../mods/types';
-import { randomRange, lerp } from 'src/shared/utils/helpers';
+import { randomRange, lerp } from 'src/shared/utils/utils';
 import { assertDefined } from 'src/shared/utils/assert';
 import type { ModDB } from '../mods/ModDB';
 import { extractStats } from './calcStats';
@@ -20,7 +20,7 @@ interface Enemy {
 type ConversionValues = Partial<Record<keyof typeof DamageTypeFlags | 'multi', number>>;
 export type ConversionTable = Partial<Record<keyof typeof DamageTypeFlags, ConversionValues>>;
 
-const DamageTypes = ['Physical', 'Elemental'] as const;
+export const DamageTypes = ['Physical', 'Elemental'] as const;
 export type DamageType = typeof DamageTypes[number];
 type DamageFlag = number;
 export const DamageTypeFlags: Record<DamageType, DamageFlag> = {

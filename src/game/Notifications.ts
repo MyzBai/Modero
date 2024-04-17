@@ -1,6 +1,7 @@
-import { isString } from 'src/shared/utils/helpers';
+import { isString } from 'src/shared/utils/utils';
 import { game } from './game';
-import type { Serialization, UnsafeSerialization } from './serialization/serialization';
+import type { Serialization, UnsafeSerialization } from './serialization';
+import { getFormattedTimeSince } from 'src/shared/utils/date';
 
 export interface NotificationEntry {
     title: string;
@@ -12,8 +13,9 @@ export interface NotificationEntry {
 
 interface Notification extends NotificationEntry {
     time: number;
-    seen: boolean;
     element: HTMLElement;
+    elementId: string | null | undefined;
+    seen: boolean;
 }
 
 export class Notifications {
@@ -26,47 +28,97 @@ export class Notifications {
         this.page.classList.add('p-notifications', 'hidden');
         this.page.setAttribute('data-page-content', 'notifications');
 
-        this.page.insertAdjacentHTML('beforeend', '<div class="s-toolbar"><button data-mark-all-as-seen>Mark all as Seen</button></div>');
+        const toolbarElement = this.createToolbarElement();
+        this.page.appendChild(toolbarElement);
 
         this.notificationListElement = document.createElement('ul');
-        this.notificationListElement.classList.add('s-notifications-list');
+        this.notificationListElement.classList.add('s-notifications-list', 'g-scroll-list-v');
         this.notificationListElement.setAttribute('data-notifications-list', '');
         this.page.appendChild(this.notificationListElement);
 
         game.page.appendChild(this.page);
 
-        game.addPage(this.page, 'Notifications', 'notifications', 200);
+        game.addPage(this.page, 'Notifications', 'notifications');
 
         new MutationObserver(() => {
-            if (this.page.classList.contains('hidden')) {
+            if (!this.pageVisible) {
                 this.notificationList.forEach(x => x.element.classList.remove('outline'));
                 return;
             }
-            for (const notification of this.notificationList.filter(x => !x.elementId && !x.seen)) {
-                notification.element.classList.add('outline');
-                notification.seen = true;
+            for (const notification of this.notificationList.filter(x => !x.seen)) {
+                this.triggerNotificationOutline(notification);
             }
             this.updateMenuName();
+            this.updateNotificationTimes();
         }).observe(this.page, { attributes: true, attributeFilter: ['class'] });
+    }
 
-        this.page.querySelectorStrict('[data-mark-all-as-seen]').addEventListener('click', () => {
+    get pageVisible() {
+        return !this.page.classList.contains('hidden');
+    }
+
+    private createToolbarElement() {
+        const element = document.createElement('div');
+        element.classList.add('s-toolbar', 'g-toolbar');
+        const markAllAsSeen = document.createElement('button');
+        markAllAsSeen.textContent = 'Mark all as seen';
+        markAllAsSeen.addEventListener('click', () => {
             for (const notification of this.notificationList) {
-                if (notification.elementId) {
-                    game.removeHighlightElement(notification.elementId);
-                }
-                notification.seen = true;
+                this.seeNotification(notification);
             }
             this.updateMenuName();
         });
+        element.appendChild(markAllAsSeen);
+        return element;
+    }
+
+    private seeNotification(notification: Notification) {
+        notification.seen = true;
+        if (notification.elementId) {
+            game.removeHighlightElement(notification.elementId);
+        }
+        notification.element.classList.remove('outline');
+    }
+
+    private triggerNotificationOutline(notification: Notification) {
+        notification.element.classList.add('outline');
+        if (!notification.elementId) {
+            notification.seen = true;
+        }
+    }
+
+    private updateMenuName() {
+        const unseenNotificationCount = this.notificationList.filter(x => !x.seen).length;
+        const menuItem = game.menu.getMenuItemById('notifications');
+        if (menuItem) {
+            menuItem.textContent = `Notifications${unseenNotificationCount > 0 ? ` (${unseenNotificationCount})` : ''}`;
+        }
+    }
+
+    private updateNotificationTimes() {
+        for (const notification of this.notificationList) {
+            const timeElement = notification.element.querySelectorStrict('[data-time]');
+            timeElement.textContent = getFormattedTimeSince(notification.time);
+        }
+    }
+
+    private createNotificationElement(entry: NotificationEntry) {
+        const formattedTime = getFormattedTimeSince(entry.time || Date.now());
+        const element = document.createElement('li');
+        element.insertAdjacentHTML('beforeend', `<div class="title"><span>${entry.title}</span><span class="time g-text-small g-text-mute" data-time>${formattedTime}</span></div>`);
+        if (entry.description) {
+            element.insertAdjacentHTML('beforeend', `<div class="description g-text-small">${entry.description}</div>`);
+        }
+        return element;
     }
 
     addNotification(entry: NotificationEntry) {
-        const seen = !this.page.classList.contains('hidden');
         const element = this.createNotificationElement({ ...entry });
         this.notificationListElement.insertBefore(element, this.notificationListElement.firstElementChild);
         const notification: Notification = {
+            elementId: undefined,
             ...entry,
-            seen,
+            seen: entry.seen ?? false,
             time: entry.time ?? Date.now(),
             element
         };
@@ -77,55 +129,28 @@ export class Notifications {
                 this.updateMenuName();
             });
         }
+        if (this.pageVisible && !notification.seen) {
+            this.triggerNotificationOutline(notification);
+        }
+
         this.updateMenuName();
-        return notification;
     }
-
-    private updateMenuName() {
-        const unseenNotificationCount = this.notificationList.filter(x => !x.seen).length;
-        const menuItem = game.menu.querySelectorStrict('[data-page-target="notifications"]');
-        menuItem.textContent = `Notifications${unseenNotificationCount > 0 ? ` (${unseenNotificationCount})` : ''}`;
-    }
-
-    private createNotificationElement(entry: NotificationEntry) {
-        const formattedDate = this.getFormattedDate(entry.time ?? Date.now());
-        const element = document.createElement('li');
-        element.insertAdjacentHTML('beforeend', `<div class="title"><span>${entry.title}</span><span class="date g-text-small g-text-mute">${formattedDate}</span></div>`);
-        if (entry.description) {
-            element.insertAdjacentHTML('beforeend', `<div class="description g-text-small">${entry.description}</div>`);
-        }
-        return element;
-    }
-
-    private getFormattedDate(time: number) {
-        const oldDate = new Date(time);
-        const newDate = new Date();
-        let formattedDate = '';
-        //Year
-        if (newDate.getFullYear() - oldDate.getFullYear() >= 1) {
-            formattedDate = `${oldDate.getFullYear().toString()}, `;
-        }
-        //Month Day
-        if (newDate.getTime() - oldDate.getTime() >= 1000 * 60 * 60 * 24) {
-            const monthName = oldDate.toLocaleString('en-us', { month: 'long' });
-            const dateFormatter = new Intl.DateTimeFormat(navigator.language, { day: '2-digit', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
-            formattedDate += `${monthName} ${dateFormatter.format(oldDate)}, `;
-        }
-        //Hour:Minute
-        const timeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
-        formattedDate += `${timeFormatter.format(oldDate)}`;
-        return formattedDate;
-    }
-
 
     reset() {
         this.notificationList.splice(0);
         this.notificationListElement.replaceChildren();
+        this.updateMenuName();
     }
 
     serialize(save: Serialization) {
         save.notifications = {
-            notificationList: this.notificationList
+            notificationList: this.notificationList.map(x => ({
+                title: x.title,
+                description: x.description,
+                elementId: x.elementId,
+                seen: x.seen,
+                time: x.time
+            }))
         };
     }
 
@@ -137,11 +162,11 @@ export class Notifications {
             const entry: NotificationEntry = {
                 title: serializedNotification.title,
                 description: serializedNotification.description,
-                elementId: serializedNotification.elementSourceId,
-                time: serializedNotification.time
+                elementId: serializedNotification.elementId,
+                time: serializedNotification.time,
+                seen: serializedNotification.seen
             };
-            const notification = this.addNotification(entry);
-            notification.seen = serializedNotification.seen ?? false;
+            this.addNotification(entry);
         }
         this.updateMenuName();
     }

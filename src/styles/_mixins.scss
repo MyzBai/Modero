@@ -1,0 +1,16 @@
+@use 'variables' as *;
+
+@mixin scroll-list-v {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    li {
+        position: relative;
+        border-bottom: $default-border;
+    }
+}
+
+@mixin progress-multi-bar {
+    mask: linear-gradient(90deg, #000 98%, #0000 0) 0/10%;
+}

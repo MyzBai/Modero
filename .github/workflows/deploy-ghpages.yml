@@ -18,12 +18,7 @@ jobs:
               run: npm install
             - name: Set environment variables
               run: |
-                  echo "ENV_IS_REMOTE=true" >> $GITHUB_ENV
                   echo "NODE_ENV=production" >> $GITHUB_ENV
-
-                  FILE_PATH="src/game/gameModule/GameModule.ts"
-                  GAME_MODULE_VERSION=$(grep -oP "VERSION = '\K[^']*" $FILE_PATH)
-                  echo "GAME_MODULE_VERSION=$GAME_MODULE_VERSION" >> $GITHUB_ENV
             - name: Build
               run: |
                   npm run-script build

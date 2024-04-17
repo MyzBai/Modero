@@ -8,16 +8,16 @@
         "node": ">=20.9.0"
     },
     "scripts": {
-        "build": "npm-run-all -s \"build:esbuild\" -p \"build:sass\" \"build:gameModule\"",
-        "build-watch": "run-p \"build:esbuild-watch\" \"build:sass-watch\" ",
+        "build": "run-p build:esbuild build:sass build:gameConfig",
+        "build-watch": "run-p \"build:esbuild --watch\" \"build:sass --watch\"",
         "build:esbuild": "tsx scripts/esbuild.ts",
-        "build:esbuild-watch": "tsx scripts/esbuild.ts --watch",
         "build:sass": "tsx scripts/sass.ts",
-        "build:sass-watch": "run-s \"build:sass --watch\"",
-        "build:gameModule": "run-s build:gameModuleSchema build:gameModuleSchemaValidator",
-        "build:gameModuleSchema": "tsx scripts/generateGameModuleSchema.ts",
-        "build:gameModuleSchemaValidator": "tsx scripts/generateGameModuleSchemaValidator.ts",
-        "eslint": "eslint --ext ts src"
+        "build:gameConfig": "run-s build:gameConfigSchema build:gameConfigSchemaValidator",
+        "build:gameConfigSchema": "tsx scripts/generateGameConfigSchema.ts",
+        "build:gameConfigSchemaValidator": "tsx scripts/generateGameConfigSchemaValidator.ts",
+        "eslint": "npx eslint --ext ts .",
+        "tests": "tsx tests/statMod.test.ts",
+        "validate": "run-p \"eslint\" \"tests\""
     },
     "repository": {
         "type": "git",
@@ -44,8 +44,8 @@
         "eslint": "^8.53.0",
         "npm-run-all": "^4.1.5",
         "sass": "^1.56.1",
-        "tsx": "^3.14.0",
-        "typescript": "^5.4.4",
-        "typescript-json-schema": "^0.62.0"
+        "tsx": "^4.7.2",
+        "typescript": "^5.4.5",
+        "typescript-json-schema": "^0.63.0"
     }
 }

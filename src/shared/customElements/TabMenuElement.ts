@@ -1,13 +1,14 @@
 import { CustomElement } from './CustomElement';
 
-type SortComparer = (a: HTMLElement, b: HTMLElement) => number;
+type MenuItem = Element;
+type PageElement = Element;
 
 export class TabMenuElement extends CustomElement {
     static readonly name = 'tab-menu-element';
     private pageList: HTMLElement[] = [];
-
     init() {
         this.setDirection('vertical');
+        this.classList.add('g-scroll-list-v');
     }
 
     setDirection(dir: 'vertical' | 'horizontal') {
@@ -36,6 +37,10 @@ export class TabMenuElement extends CustomElement {
         return element;
     }
 
+    removeMenuItem(item: HTMLElement) {
+        this.pageList = this.pageList.filter(x => x.getAttribute('data-page-content') !== item.getAttribute('data-page-target'));
+    }
+
     registerPageElement(pageElement: HTMLElement, id: string) {
         pageElement.classList.add('hidden');
         pageElement.setAttribute('data-page-content', id);
@@ -46,53 +51,32 @@ export class TabMenuElement extends CustomElement {
         }
     }
 
-    sort(compare: SortComparer) {
-        this.append(...[...this.querySelectorAll<HTMLLIElement>('li')].sort(compare));
+    getMenuItemById(id: string) {
+        return this.querySelector<HTMLElement>(`[data-page-target="${id}"]`);
     }
 
-    *generateTabMenuAncestorList(from: Element | null, targetPageName = ''): Generator<Element> {
+    sort() {
+        const comparer = (a: HTMLElement, b: HTMLElement) => (a.getAttribute('data-index')?.localeCompare(b.getAttribute('data-index') || '', undefined, { numeric: true }) || 0);
+        this.append(...[...this.querySelectorAll<HTMLLIElement>('li')].sort(comparer));
+    }
+
+    *generateTabMenuAnectors(from: Element | null, targetPageName = ''): Generator<[MenuItem, PageElement]> {
         if (!from) {
             return;
         }
-        let page = from?.hasAttribute('data-page-content') ? from : null;
-        if (!page) {
-            page = from?.closest('[data-page-content]');
-            return yield* this.generateTabMenuAncestorList(page);
-        }
-        const menu = page?.querySelector(`:scope > ${TabMenuElement.name}`);
-        if (!menu) {
-            const pageName = page.getAttribute('data-page-content');
-            page = page.parentElement?.closest('[data-page-content]') ?? null;
-            return yield* this.generateTabMenuAncestorList(page, pageName ?? '');
-        }
-        if (!targetPageName) {
-            return;
-        }
-        const menuItem = menu.querySelector(`[data-page-target="${targetPageName}"]`);
-        if (menuItem) {
-            yield menuItem;
-        }
-        targetPageName = page?.getAttribute('data-page-content') ?? '';
-        page = page.parentElement?.closest('[data-page-content]') ?? null;
-        yield* this.generateTabMenuAncestorList(page, targetPageName);
-    }
-
-    *generateMenuItemListFromPageNameList(from: Element | null, pageNameList: string[]) {
-        for (const pageTargetName of pageNameList) {
-            if (!from) {
-                return;
-            }
+        if (targetPageName.length > 0) {
             const menu = from.querySelector(`:scope > ${TabMenuElement.name}`);
-            if (!menu) {
-                return;
+            if (menu) {
+                const menuItem = menu.querySelector(`[data-page-target="${targetPageName}"]`);
+                if (menuItem) {
+                    yield [menuItem, from];
+                }
             }
-            const menuItem = menu.querySelector(`[data-page-target="${pageTargetName}"]`);
-            if (!menuItem) {
-                return;
-            }
-            yield menuItem;
-
-            from = from.querySelector(`[data-page-content="${pageTargetName}"]`);
         }
+        if (from.hasAttribute('data-page-content')) {
+            targetPageName = from.getAttribute('data-page-content') ?? targetPageName;
+        }
+        const next = from.parentElement ?? from.nextElementSibling;
+        return yield* this.generateTabMenuAnectors(next, targetPageName);
     }
 }

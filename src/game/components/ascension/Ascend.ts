@@ -1,53 +1,44 @@
-import type { ZoneOptions } from 'src/game/combat/Zone';
-import { Zone } from 'src/game/combat/Zone';
-import { combat, game, gameLoop, player } from 'src/game/game';
-import * as GameSerialization from 'src/game/serialization/serialization';
-import * as GameModule from 'src/game/gameModule/GameModule';
+import { CombatArea, type CombatAreaOptions } from 'src/game/combat/CombatArea';
+import { combat, game, notifications, player } from 'src/game/game';
+import type * as GameSerialization from 'src/game/serialization';
 import { assertNonNullable } from 'src/shared/utils/assert';
-import { EventEmitter } from 'src/shared/utils/EventEmitter';
 
-const states = ['invalid', 'pendingText', 'text', 'pendingCombat', 'combat', 'cancelCombat', 'finalText', 'pendingAscend', 'ascend', 'complete'] as const;
+const states = ['invalid', 'Start', 'Trial', 'Ascend', 'Done'] as const;
 type State = typeof states[number];
 
 export class Ascend {
-    private curAscension?: GameModule.AscensionInstance | null;
-    readonly onAscension = new EventEmitter<GameModule.AscensionInstance>();
     readonly page: HTMLElement;
-    private _zone?: Zone | null;
+    private trialCompleted = false;
+    private _zone?: CombatArea | null;
     private _state: State = 'invalid';
-    constructor(private readonly overlord: GameModule.AscensionOverLord) {
+    constructor() {
         this.page = document.createElement('div');
         this.page.classList.add('p-ascend');
 
         const button = document.createElement('button');
-        button.textContent = 'Begin Ascend';
+        button.textContent = 'Begin Trial';
         button.setAttribute('data-ascend-button', '');
         button.addEventListener('click', () => {
-            switch (this._state) {
-                case 'pendingText': return this.executeState('text');
-                case 'pendingCombat': return this.executeState('combat');
-                case 'combat': return this.executeState('cancelCombat');
-                case 'pendingAscend': return this.executeState('ascend');
-                default: throw `${this._state} is an invalid state here`;
+            if (this.trialCompleted) {
+                this.executeState('Ascend');
+                return;
+            }
+            if (this._state === 'Start') {
+                this.executeState('Trial');
+            } else if (this._state === 'Trial') {
+                this.cancelTrial();
+                this.executeState('Start');
             }
         });
         this.page.appendChild(button);
 
-        // this.page.insertAdjacentHTML('beforeend', '<div class="message" data-msg></div>');
-        this.page.insertAdjacentHTML('beforeend', '<div class="s-text-area" data-text-area></div>');
-
         player.stats.level.addListener('change', (e) => {
-            if (this._state !== 'invalid') {
-                return;
-            }
+            this.updateButton();
             if (e.curValue < game.maxLevel) {
-                void this.executeState('invalid');
+                this.executeState('invalid');
                 return;
             }
-            if (this._state !== 'invalid') {
-                return;
-            }
-            void this.executeState('pendingText');
+            this.executeState('Start');
         });
     }
 
@@ -59,141 +50,125 @@ export class Ascend {
         return this._zone;
     }
 
-    setAscension(instance?: GameModule.AscensionInstance) {
-        this.curAscension = instance;
+    private updateButton() {
+        const btn = this.page.querySelectorStrict('[data-ascend-button]');
+        switch (this._state) {
+            case 'Ascend': btn.textContent = 'Ascend'; break;
+            case 'Trial': btn.textContent = 'Abort'; break;
+            default: btn.textContent = 'Begin Trial'; break;
+        }
+        btn.toggleAttribute('disabled', this._state === 'invalid' || this._state === 'Done');
     }
 
-    async executeState(state: State) {
-        const updateBtn = async (btnDisabled: boolean, btnText?: string) => {
-            const btn = this.page.querySelectorStrict('[data-ascend-button]');
-            btn.textContent = btnText ?? btn.textContent;
-            btn.toggleAttribute('disabled', btnDisabled);
-        };
+    executeState(state: State) {
         this._state = state;
-
+        this.updateButton();
         switch (state) {
-            case 'invalid': await updateBtn(true, 'Begin Ascension'); break;
-            case 'pendingText': await updateBtn(false, 'Begin Ascension'); break;
-            case 'text':
-                await updateBtn(true);
-                await this.beginPrintText(this.getTempTextLines());
-                await this.executeState('pendingCombat');
-                break;
-            case 'pendingCombat': await updateBtn(false, 'Attack'); break;
-            case 'combat':
-                await updateBtn(false, 'Abort');
-                this.startCombat();
-                break;
-            case 'cancelCombat':
-                this.cancelCombat();
-                await this.executeState('pendingCombat');
-                break;
-            case 'finalText':
-                await updateBtn(true, 'Ascend');
-                await this.beginPrintText(['Good Luck!']);
-                await this.executeState('pendingAscend');
-                break;
-            case 'pendingAscend': await updateBtn(false, 'Ascend'); break;
-            case 'ascend': await this.ascend(); break;
-            case 'complete': await updateBtn(true, 'Ascend'); break;
+            case 'Trial': this.startTrial(); break;
+            case 'Ascend': void this.ascend(); break;
         }
     }
 
-    private async beginPrintText(lines: string[]) {
-        await Promise.resolve(this.typeText(lines));
-    }
-
-    private startCombat() {
-        const zoneOptions: ZoneOptions = {
-            name: 'Overlord',
-            enemyBaseCount: 1,
-            candidates: [{ ...this.overlord, id: 'overlord', weight: 1 }],
-            areaModList: [],
-            enemyBaseLife: combat.enemyBaseLife
+    private startTrial() {
+        const trialData = game.gameConfig.ascension.trial;
+        const zoneOptions: CombatAreaOptions = {
+            name: 'Trial',
+            enemyBaseLife: combat.enemyBaseLife,
+            enemyBaseCount: trialData.enemyCount,
+            enemyCountOverride: trialData.enemyCount === 1 ? 1 : undefined,
+            candidates: trialData.enemyList,
+            areaModList: []
         };
-        this._zone = new Zone(zoneOptions);
-        this._zone.onComplete.listen(async () => {
-            await this.executeState('finalText');
+        this._zone = new CombatArea(zoneOptions);
+        this._zone.onComplete.listen(() => {
+            this._state = 'Ascend';
+            this.trialCompleted = true;
+            this.updateButton();
             this._zone = null;
         });
         combat.startZone(this._zone);
     }
 
-    private cancelCombat() {
+    private cancelTrial() {
         assertNonNullable(this._zone);
-        combat.stopZone(this._zone);
+        combat.stopZone();
+        this._zone = null;
     }
 
     private async ascend() {
-        await this.executeState('invalid');
-        game.stats.ascensionCount.add(1);
-
-        if (!this.curAscension) {
-            console.log('You have reached the end!');
-            void this.executeState('complete');
-            return;
+        this.executeState('invalid');
+        this.trialCompleted = false;
+        game.saveGame();
+        await this.fadeOut();
+        if (game.stats.ascensionCount.value >= (game.gameConfig.ascension.ascensionInstanceList?.length ?? 0)) {
+            this._state = 'Done';
+            await this.printEndScreen();
+        } else {
+            game.clearHighlights();
+            game.saveGame();
+            await game.resetForAscension();
+            notifications.addNotification({ title: 'You Have Ascended!' });
+            game.stats.ascensionCount.add(1);
+            game.saveGame();
         }
-
-        assertNonNullable(this.curAscension);
-        this.onAscension.invoke(this.curAscension);
-
-        await game.saveGame();
-
-        //TODO do some fade in/out
-        await game.resetAscension();
+        await this.fadeIn();
     }
 
-    private appendAllText(lines: string[]) {
-        this.page.querySelectorStrict('[data-text-area]').textContent = lines.join('\n');
+    private async fadeOut(): Promise<void> {
+        return new Promise((resolve) => {
+            const fadeElement = document.createElement('div');
+            fadeElement.setAttribute('data-ascension-fade', '');
+            fadeElement.style.cssText = `
+                    position: absolute;
+                    inset: 0;
+                    background-color: black;
+                    z-index: 1000;
+                    opacity: 0;
+                    text-align: center;
+                    padding-top: 5em;
+                `;
+            document.body.appendChild(fadeElement);
+            const anim = fadeElement.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1000, fill: 'forwards' });
+            anim.addEventListener('finish', () => {
+                resolve();
+            });
+        });
+    }
+
+    private async fadeIn(): Promise<void> {
+        return new Promise((resolve) => {
+            const fadeElement = document.body.querySelectorStrict('[data-ascension-fade]');
+            const anim = fadeElement.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1000, fill: 'forwards' });
+            anim.addEventListener('finish', () => {
+                fadeElement.remove();
+                resolve();
+            });
+        });
+    }
+
+    private async printEndScreen() {
+        const fadeElement = document.body.querySelectorStrict<HTMLElement>('[data-ascension-fade]');
+        fadeElement.insertAdjacentHTML('beforeend', 'Thank you for playing!');
+        return new Promise<void>((resolve) => {
+            fadeElement.addEventListener('click', () => {
+                resolve();
+            });
+        });
     }
 
     serialize() {
-        return { ascendState: this._state as string, zone: this._zone?.serialize() };
+        return { state: this._state, zone: this._zone?.serialize() };
     }
 
     deserialize(state?: string, zone?: DeepPartial<GameSerialization.Zone>) {
-        if (state && states.includes(state as State)) {
-            const stateIndex = states.indexOf(state as State);
-            if (stateIndex > states.indexOf('finalText')) {
-                this.appendAllText(['Good Luck!']);
-            } else if (stateIndex > states.indexOf('text')) {
-                this.appendAllText(this.getTempTextLines());
-            }
-            void this.executeState(state as State);
-        }
-        if (zone && (state as State) === 'combat') {
-            this.startCombat();
+        this._state = state && states.includes(state as State) ? state as State : 'invalid';
+        if (zone) {
+            this.trialCompleted = false;
+            this.executeState('Trial');
             this._zone?.deserialize(zone);
+        } else if (this._state === 'Ascend' || this._state === 'Done') {
+            this.trialCompleted = true;
         }
-    }
-
-    private getTempTextLines() {
-        return `
-            [Overlord] You've come far... Let's see how you fare against a real challenge...
-            ...
-            Prepare yourself!
-        `.split(/\r?\n/m).filter(x => x).map(x => x.trim());
-    }
-
-    private typeText(textLines: string[]): Promise<void> {
-        const text = textLines.join('\n');
-        return new Promise((resolve) => {
-            const element = this.page.querySelectorStrict('[data-text-area]');
-            element.textContent = '';
-            let charIndex = 0;
-            let timeTotal = 0;
-            const cancel = gameLoop.registerCallback((dt) => {
-                timeTotal += dt * 1000;
-                while (timeTotal > 50 && charIndex <= text.length) {
-                    element.innerHTML += text.charAt(charIndex++);
-                    timeTotal -= 50;
-                }
-                if (charIndex >= text.length) {
-                    cancel();
-                    resolve();
-                }
-            });
-
-        });
+        this.updateButton();
     }
 }

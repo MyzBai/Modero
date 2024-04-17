@@ -1,53 +1,19 @@
-import { lerp } from 'src/shared/utils/helpers';
+import { lerp } from 'src/shared/utils/utils';
 import { combat, player } from '../game';
 import type { DOTEffect, EffectType } from './Effects';
-import type * as GameSerialization from '../serialization/serialization';
+import type * as GameSerialization from '../serialization';
+import { ProgressElement } from 'src/shared/customElements/ProgressElement';
+import { createCustomElement } from 'src/shared/customElements/customElements';
 
 const sortByDamage = (a: { damage: number; }, b: { damage: number; }) => b.damage - a.damage;
 
 export type EffectSystem = BleedSystem | BurnSystem;
 
-export class EffectSystems {
-    private readonly systems = {
-        Bleed: new BleedSystem(),
-        Burn: new BurnSystem(),
-    } as const satisfies Record<EffectType, BaseEffectSystem>;
-
-    getSystem<T extends keyof typeof this.systems>(type: T): typeof this.systems[T] {
-        const system = this.systems[type];
-        return system;
-    }
-
-    clear() {
-        for (const system of this) {
-            system.clear();
-        }
-    }
-
-    updateValues() {
-        for (const system of this) {
-            system.update();
-        }
-    }
-
-    updateElements() {
-        for (const system of this) {
-            system.updateElements();
-        }
-    }
-
-    *[Symbol.iterator]() {
-        for (const system of Object.values(this.systems)) {
-            yield system;
-        }
-    }
-}
-
 export abstract class BaseEffectSystem<T extends BaseEffectInstance = BaseEffectInstance> {
     readonly element: HTMLElement;
     protected readonly timeSpan: HTMLElement;
     protected readonly stackSpan: HTMLElement;
-    protected readonly progressBar: HTMLProgressElement;
+    protected readonly progressBar: ProgressElement;
     protected _effectInstances: T[] = [];
     private time = 0;
     protected sort = <U extends T>(a: U, b: U) => b.time - a.time;
@@ -55,7 +21,7 @@ export abstract class BaseEffectSystem<T extends BaseEffectInstance = BaseEffect
         this.element = this.createElement();
         this.timeSpan = this.element.querySelectorStrict('[data-time]');
         this.stackSpan = this.element.querySelectorStrict('[data-stacks]');
-        this.progressBar = this.element.querySelectorStrict('progress');
+        this.progressBar = this.element.querySelectorStrict(ProgressElement.name);
     }
 
     get effectInstances() {
@@ -99,7 +65,7 @@ export abstract class BaseEffectSystem<T extends BaseEffectInstance = BaseEffect
         this.timeSpan.textContent = `${this.time.toFixed()}s`;
         this.stackSpan.textContent = stacks.toFixed();
         const pct = this.time / this.duration;
-        this.progressBar.value = Number.isFinite(pct) ? pct : 0;
+        this.progressBar.value = pct;
     }
 
     protected dealDamageOverTime(effectInstances: DOTEffectInstance[], dt: number) {
@@ -135,7 +101,9 @@ export abstract class BaseEffectSystem<T extends BaseEffectInstance = BaseEffect
         const li = document.createElement('li');
         li.classList.add('hidden', 's-effect');
         li.insertAdjacentHTML('beforeend', `<div><span>${this.type}</span> | Time: <span data-time></span> | Stacks: <span data-stacks></span></div>`);
-        li.insertAdjacentHTML('beforeend', `<progress value="0" max="1"></progress>`);
+        const progressBar = createCustomElement(ProgressElement);
+        progressBar.classList.add('progress-bar');
+        li.appendChild(progressBar);
         return li;
     }
 

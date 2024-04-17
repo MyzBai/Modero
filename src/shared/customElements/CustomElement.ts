@@ -7,4 +7,8 @@ export abstract class CustomElement extends HTMLElement {
         this.init?.();
         return this;
     }
+
+    disconnectedCallback() {
+        // this.remove();
+    }
 }

@@ -20,6 +20,7 @@ $color-tag-mana-fg: #307da1;
 
 $color-tag-valid: #54d354;
 $color-tag-invalid: #d86666;
+$color-tag-invalid-dark: #722c2c;
 $color-tag-link: #58a6ff;
 $color-tag-accent: #3983f3;
 
@@ -37,7 +38,8 @@ $color-tag-speed: #a5c748;
 $color-tag-bleed: #d64c42;
 $color-tag-burn: #d67142;
 
-//Other
 $padding-container: 0.3em;
-$default-border: 1px solid #3333334f;
-$default-gap: 0.1em;
+$default-border-size: 1px;
+$default-border-color: #1b1c1d;
+$default-border: $default-border-size solid $default-border-color;
+$default-gap: 2px;

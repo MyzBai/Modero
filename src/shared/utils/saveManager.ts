@@ -1,5 +1,5 @@
 import * as lzString from 'lz-string';
-import type { UnsafeSerialization } from 'src/game/serialization/serialization';
+import type { UnsafeSerialization } from 'src/game/serialization';
 
 export function saveGame(data: Map<string, UnsafeSerialization>) {
     saveData('game', Object.fromEntries(data));

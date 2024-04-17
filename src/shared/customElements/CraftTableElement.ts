@@ -1,6 +1,6 @@
-import { ModifierTags } from 'src/game/mods/types';
+import { ModifierTagList } from 'src/game/mods/types';
 import { createCustomElement } from './customElements';
-import { PromptWindowElement } from './PromptWindowElement';
+import { ModalElement } from './ModalElement';
 import { CustomElement } from './CustomElement';
 
 export class CraftTableElement extends CustomElement {
@@ -15,7 +15,7 @@ export class CraftTableElement extends CustomElement {
     init() {
         this.insertAdjacentHTML('beforeend', '<div class="g-title">Craft Table</div>');
         const toolbar = document.createElement('ul');
-        toolbar.classList.add('s-toolbar');
+        toolbar.classList.add('s-toolbar', 'g-toolbar');
         toolbar.insertAdjacentHTML('beforeend', '<li><button data-compare-button>Compare</button></li>');
         toolbar.insertAdjacentHTML('beforeend', '<li><button data-confirm-button data-role="confirm">Confirm</button></li>');
         toolbar.insertAdjacentHTML('beforeend', '<li><button data-cancel-button data-role="cancel">Cancel</button></li>');
@@ -26,7 +26,7 @@ export class CraftTableElement extends CustomElement {
         craftContainer.setAttribute('data-craft-container', '');
         craftContainer.insertAdjacentHTML('beforeend', '<button class="craft-button" data-craft-button disabled>Craft</button>');
         craftContainer.insertAdjacentHTML('beforeend', '<div class="craft-msg" data-msg>\u200B</div>');
-        craftContainer.insertAdjacentHTML('beforeend', '<ul class="s-craft-list" data-craft-list></ul>');
+        craftContainer.insertAdjacentHTML('beforeend', '<ul class="s-craft-list g-scroll-list-v" data-craft-list></ul>');
         this.appendChild(craftContainer);
 
         toolbar.querySelectorStrict('[data-compare-button]').addEventListener('click', () => {
@@ -82,7 +82,7 @@ export class CraftTableElement extends CustomElement {
         li.classList.add('g-list-item', 'g-field');
         li.setAttribute('data-id', id);
         desc = desc.replace(/\b\w+\b/g, a => {
-            if (ModifierTags.some(x => x.toLowerCase() == a.toLowerCase())) {
+            if (ModifierTagList.some(x => x.toLowerCase() == a.toLowerCase())) {
                 return `<span data-tag="${a}">${a}</span>`;
             }
             return a;
@@ -117,14 +117,12 @@ export class CraftTableElement extends CustomElement {
             return;
         }
         const [a, b] = this.compareCallback();
-        const prompt = createCustomElement(PromptWindowElement);
-        prompt.setTitle('Item Compare');
+        const modal = createCustomElement(ModalElement);
+        modal.setTitle('Item Compare');
         const element = document.createElement('div');
         element.classList.add('s-compare');
-        element.append(a.cloneNode(true), b.cloneNode(true));
-        prompt.setBodyElement(element);
-        this.append(prompt);
+        element.append(a, b);
+        modal.setBodyElement(element);
+        this.append(modal);
     }
 }
-
-document.createElement('craftTableElement') as CraftTableElement;

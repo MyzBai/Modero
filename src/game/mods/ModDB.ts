@@ -1,19 +1,11 @@
 import { EventEmitter } from '../../shared/utils/EventEmitter';
-import type { StatModTag, StatModifierValueType, StatName } from './types';
+import type { ModTemplateStat, StatName } from './types';
 
-export interface StatModifier {
-    name: StatName;
-    valueType: StatModifierValueType;
+export interface StatModifier extends ModTemplateStat {
     value: number;
     min?: number;
     max?: number;
-    negate?: boolean;
     source?: string;
-    override?: boolean;
-    modFlagsAll?: number;
-    modFlagsAny?: number;
-    keywordFlags?: number;
-    tags?: ReadonlyArray<StatModTag>;
 }
 
 export class ModDB {

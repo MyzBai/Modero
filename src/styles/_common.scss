@@ -1,18 +1,8 @@
-@forward "variables";
-@forward "globals";
-@forward "tags";
-@use "variables" as *;
-
-// *,
-// *::before,
-// *::after {
-//     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-//     -moz-box-sizing: border-box; /* Firefox, other Gecko */
-//     box-sizing: border-box; /* Opera/IE 8+ */
-// }
-// *:focus {
-//     outline: 0;
-// }
+@forward 'variables';
+@forward 'mixins';
+@forward 'globals';
+@forward 'tags';
+@use 'variables' as *;
 
 div,
 ul {
@@ -28,7 +18,7 @@ var {
 a {
     text-decoration: none;
     color: $color-tag-link;
-    font-family: "Times New Roman", monospace;
+    font-family: 'Times New Roman', monospace;
     cursor: pointer !important;
     &:hover {
         text-decoration: underline;
@@ -47,23 +37,25 @@ table {
 }
 
 button {
+    all: unset;
+    position: relative;
+    background-color: $color-primary-bg;
     color: $color-default-fg;
-    font-size: inherit;
-    font-family: inherit;
-    border: 0;
-    background-color: $color-primary-outset-bg;
-    padding: 0.3em 1em;
+    border: $default-border;
+    padding: calc(0.3em - $default-border-size) 1em;
     cursor: default;
     outline: none;
+    text-align: center;
+    cursor: default;
 
     &:hover {
         filter: brightness(120%);
     }
 
-    &[data-role="confirm"] {
+    &[data-role='confirm'] {
         color: $color-tag-valid;
     }
-    &[data-role="cancel"] {
+    &[data-role='cancel'] {
         color: $color-tag-invalid;
     }
 }
@@ -80,23 +72,23 @@ ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    gap: $default-gap;
 }
 
 input {
+    font-size: 1em;
+    font-family: inherit;
     background-color: $color-primary-inset-bg;
-    &[type="text"] {
-        display: block;
-        width: 100%;
-        outline: 0;
+    border-bottom: $default-border !important;
+    width: 100%;
+    outline: 0;
+    border: 0;
+    padding: 0.2em;
+    color: inherit;
+
+    &[type='submit'] {
         border: 0;
-        padding: 0.2em;
-        color: inherit;
     }
-    &[type="submit"] {
-        border: 0;
-    }
-    &[type="checkbox"] {
+    &[type='checkbox'] {
         position: relative;
         -webkit-appearance: none;
         appearance: none;
@@ -110,7 +102,7 @@ input {
         display: grid;
 
         &::before {
-            content: "";
+            content: '';
             position: absolute;
             display: none;
             inset: 20%;
@@ -119,25 +111,6 @@ input {
         &:checked::before {
             display: block;
         }
-    }
-}
-
-progress[value] {
-    display: block;
-    height: 5px;
-    width: 100%;
-    -webkit-appearance: none;
-    appearance: none;
-
-    &::-webkit-progress-bar {
-        background: none;
-        border-radius: 2px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-    }
-    &::-webkit-progress-value {
-        border-radius: 2px;
-        background-color: rgb(57, 168, 57);
-        transition: width 200ms linear;
     }
 }
 

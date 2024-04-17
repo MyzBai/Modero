@@ -1,32 +1,29 @@
-import { clamp, isDefined, isNumber } from 'src/shared/utils/helpers';
+import { clamp, isDefined, isNumber } from 'src/shared/utils/utils';
 import { calcEnemyStats } from '../calc/calcStats';
 import { Modifier } from '../mods/Modifier';
 import { ConditionFlags } from '../mods/types';
 import { combat } from '../game';
 import { ModDB } from '../mods/ModDB';
-import type * as GameSerialization from '../serialization/serialization';
+import type * as GameSerialization from '../serialization';
 import { createEnemyStats } from '../statistics/stats';
-import type * as GameModule from 'src/game/gameModule/GameModule';
 
 export interface EnemyData {
     id: string;
     name: string;
     baseLife: number;
     enemyModList: string[];
-    zoneModList: string[];
 }
 
 export class Enemy {
     readonly modDB = new ModDB();
     readonly stats = createEnemyStats();
     readonly modList: Modifier[];
-    readonly localRewards: GameModule.Rewards = {};
     constructor(readonly enemyData: EnemyData) {
         this.stats.baseLife.set(combat.enemyBaseLife);
-        this.modList = Modifier.modsFromTexts([...enemyData.enemyModList]);
+        this.modList = Modifier.modListFromTexts([...enemyData.enemyModList]);
         this.modDB.add('EnemyMod', Modifier.extractStatModifierList(...this.modList));
-        this.modDB.add('AreaMod', Modifier.extractStatModifierList(...Modifier.modsFromTexts(enemyData.zoneModList)));
-        this.updateStats();
+        this.stats.life.set(1);
+        this.stats.maxLife.set(1);
         this.stats.life.set(this.stats.maxLife.value);
     }
 
@@ -43,8 +40,19 @@ export class Enemy {
         return this.stats.maxLife.value;
     }
 
+    get lifeFrac() {
+        return clamp(this.life / this.maxLife, 0, 1);
+    }
+
     updateStats() {
+        const lifeFrac = this.lifeFrac;
         calcEnemyStats(this);
+        this.life = this.maxLife * lifeFrac;
+    }
+
+    updateModifiers(modList: Modifier[]) {
+        this.modDB.replace('AreaMod', Modifier.extractStatModifierList(...modList));
+        this.updateStats();
     }
 
     getConditionFlags(): number {
@@ -61,8 +69,8 @@ export class Enemy {
 
     serialize(): GameSerialization.EnemyInstance {
         return {
-            lifeFraction: clamp(this.life / this.maxLife, 0, 1),
-            modList: this.modList.map(x => x.serialize())
+            lifeFraction: this.lifeFrac,
+            modList: this.modList.map(x => ({ srcId: x.template.id, values: x.values }))
         };
     }
 
@@ -72,7 +80,7 @@ export class Enemy {
         }
         if (save.modList) {
             for (const serializedMod of save.modList.filter(isDefined)) {
-                const mod = this.modList.find(x => x.template.id === serializedMod.id);
+                const mod = this.modList.find(x => x.template.id === serializedMod.srcId);
                 if (mod && serializedMod.values) {
                     mod.setValues(serializedMod.values.filter(isNumber));
                 }

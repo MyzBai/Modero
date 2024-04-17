@@ -1,13 +1,11 @@
-import 'src/arrayExtensions';
+import 'src/extensions/arrayExtensions';
 import 'src/shared/customElements/customElements';
-import 'src/DOMExtensions';
+import 'src/extensions/DOMExtensions';
 import { Home } from './home/Home';
 
 void init();
 
 async function init() {
-    window.TS = {};
-
     history.replaceState(null, '', '#home');
     window.addEventListener('hashchange', locationHandler);
     const home = new Home();
