@@ -88,6 +88,6 @@ export class Ascension {
         }
         this.ascensions?.updateAscensionList();
         assertDefined(this.ascend);
-        this.ascend.deserialize(save?.state, save?.zone);
+        this.ascend.deserialize({ state: save.state, combatArea: save.combatArea, timeout: save.timeout });
     }
 }

@@ -14,7 +14,7 @@ import { playerModTemplateList } from '../mods/playerModTemplates';
 import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
 
 interface CombatEventData {
-    zone: CombatArea;
+    area: CombatArea;
     enemy: Enemy;
 }
 
@@ -26,7 +26,7 @@ export class Combat {
     readonly stats = createCombatStats();
     readonly page: HTMLElement;
     private lifebarElement: ProgressElement;
-    private _zone?: CombatArea;
+    private _area?: CombatArea;
 
     readonly effectHandler: Effects;
 
@@ -40,7 +40,7 @@ export class Combat {
         enemyLabel.addEventListener('click', () => {
             const body = document.createElement('ul');
             body.classList.add('g-mod-list');
-            for (const mod of this._zone?.enemy.modList ?? []) {
+            for (const mod of this._area?.enemy.modList ?? []) {
                 body.insertAdjacentHTML('beforeend', `<li>${mod.desc}</li>`);
             }
             const modal = createCustomElement(ModalElement);
@@ -68,12 +68,12 @@ export class Combat {
         game.addPage(this.page, 'Combat', 'combat');
     }
 
-    get zone() {
-        return this._zone;
+    get area() {
+        return this._area;
     }
 
     get enemy() {
-        return this._zone?.enemy;
+        return this._area?.enemy;
     }
 
     get enemyBaseLife() {
@@ -83,7 +83,7 @@ export class Combat {
     }
 
     init() {
-        this._zone = undefined;
+        this._area = undefined;
         statistics.createGroup('Combat', this.stats);
 
         this.effectHandler.init();
@@ -93,17 +93,17 @@ export class Combat {
         this.beginAutoAttack();
     }
 
-    startZone(zone: CombatArea | null) {
-        if (this._zone && this._zone.name !== zone?.name) {
-            this.stopZone();
+    startArea(area: CombatArea | null) {
+        if (this._area && this._area.name !== area?.name) {
+            this.stopArea();
         }
-        this._zone = zone ?? world.zone;
-        assertDefined(this._zone);
+        this._area = area ?? world.area;
+        assertDefined(this._area);
 
-        player.modDB.replace('Zone', Modifier.extractStatModifierList(...this._zone.modList.filter(x => playerModTemplateList.some(y => y.id === x.template.id))));
+        player.modDB.replace('Area', Modifier.extractStatModifierList(...this._area.modList.filter(x => playerModTemplateList.some(y => y.id === x.template.id))));
 
-        this.stats.maxEnemyCount.set(this._zone.maxEnemyCount);
-        this.stats.enemyCount.set(this._zone.enemyCount);
+        this.stats.maxEnemyCount.set(this._area.maxEnemyCount);
+        this.stats.enemyCount.set(this._area.enemyCount);
 
         this.updateLifebarName();
         this.updateElements();
@@ -111,16 +111,16 @@ export class Combat {
         statistics.updateStats('Combat');
     }
 
-    stopZone() {
-        this._zone = undefined;
+    stopArea() {
+        this._area = undefined;
         this.effectHandler.removeAllEffects();
-        if (world.zone) {
-            this.startZone(world.zone);
+        if (world.area) {
+            this.startArea(world.area);
         }
     }
 
     private processEnemyDeath(enemy: Enemy) {
-        assertDefined(this._zone);
+        assertDefined(this._area);
 
         const removeBurn = player.stats.lingeringBurn.value === 0;
         const effectTypesToRemove = [...effectTypes];
@@ -129,18 +129,18 @@ export class Combat {
         }
         this.effectHandler.clearEffectsByType(effectTypesToRemove);
 
-        this.events.enemyDeath.invoke({ zone: this._zone, enemy });
+        this.events.enemyDeath.invoke({ area: this._area, enemy });
 
-        this._zone.next();
-        if (this._zone.completed) {
-            assertDefined(world.zone);
-            this.startZone(world.zone);
+        this._area.next();
+        if (this._area.completed) {
+            assertDefined(world.area);
+            this.startArea(world.area);
             return;
         }
 
         player.updateStats();
 
-        this.stats.enemyCount.set(this._zone.enemyCount);
+        this.stats.enemyCount.set(this._area.enemyCount);
 
         this.updateElements();
         statistics.updateStats('Combat');
@@ -148,7 +148,7 @@ export class Combat {
 
     private updateElements() {
         this.updateLifebar();
-        game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]').textContent = this.zone?.enemy.enemyData.name ?? 'unknown';
+        game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]').textContent = this.area?.enemy.enemyData.name ?? 'unknown';
 
         this.updateAreaModListContainer();
     }
@@ -177,7 +177,7 @@ export class Combat {
     }
 
     private performAttack() {
-        assertDefined(this._zone);
+        assertDefined(this._area);
         const enemy = this.enemy;
         assertDefined(enemy, 'enemy is undefined');
 
@@ -186,7 +186,7 @@ export class Combat {
             return;
         }
 
-        this.events.enemyHit.invoke({ enemy, zone: this._zone });
+        this.events.enemyHit.invoke({ enemy, area: this._area });
 
         game.stats.totalPhysicalAttackDamage.add(result.physicalDamage);
         game.stats.totalElementalAttackDamage.add(result.elementalDamage);
@@ -202,10 +202,10 @@ export class Combat {
     }
 
     dealDamage(damage: number) {
-        if (!this._zone || !this._zone.enemy) {
+        if (!this._area || !this._area.enemy) {
             return;
         }
-        const enemy = this._zone.enemy;
+        const enemy = this._area.enemy;
         enemy.life -= damage;
         if (enemy.life <= 0) {
             this.processEnemyDeath(enemy);
@@ -226,22 +226,22 @@ export class Combat {
     }
 
     private updateLifebar() {
-        const life = this._zone?.enemy?.life ?? 0;
-        const maxLife = this._zone?.enemy?.stats.maxLife.value ?? 0;
+        const life = this._area?.enemy?.life ?? 0;
+        const maxLife = this._area?.enemy?.stats.maxLife.value ?? 0;
 
         const value = life / maxLife;
         this.lifebarElement.value = value;
     }
 
     private updateLifebarName() {
-        assertDefined(this._zone);
-        game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]').textContent = this._zone.enemy.enemyData.name;
+        assertDefined(this._area);
+        game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]').textContent = this._area.enemy.enemyData.name;
     }
 
     private updateAreaModListContainer() {
-        assertDefined(this._zone);
+        assertDefined(this._area);
         const container = this.page.querySelectorStrict('[data-area-mods]');
-        const modList = this._zone.localModList;
+        const modList = this._area.localModList;
         container.classList.toggle('hidden', modList.length === 0);
         if (!modList) {
             return;
@@ -254,7 +254,7 @@ export class Combat {
     }
 
     reset() {
-        this.stopZone();
+        this.stopArea();
         this.effectHandler.reset();
         Object.values(this.events).forEach(x => x.removeAllListeners());
         CombatArea.clearGlobalAreaModList();

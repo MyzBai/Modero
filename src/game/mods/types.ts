@@ -24,7 +24,7 @@ export type StatName =
     | 'AttackSkillCost'
     | 'Artifact' | 'Insight'
     | EnemyStatNames
-    | ZoneStatNames;
+    | AreaStatNames;
 
 export type DamageStatName =
     | 'Damage'
@@ -54,7 +54,7 @@ type EnemyStatNames =
     | 'Evade'
     | 'Life';
 
-type ZoneStatNames = 'EnemyCount';
+type AreaStatNames = 'EnemyCount';
 
 
 export type StatModTag = StatModConditionTag | StatModMultiplierTag | StatModPerStat;

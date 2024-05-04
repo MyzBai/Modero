@@ -1,4 +1,4 @@
-import { calcZoneStats } from '../calc/calcStats';
+import { calcCombatAreaStats as calcCombatAreaStats } from '../calc/calcStats';
 import { ModDB } from '../mods/ModDB';
 import { Modifier } from '../mods/Modifier';
 import { Enemy, type EnemyData } from './Enemy';
@@ -81,17 +81,17 @@ export class CombatArea {
         const globalModifiers = [...CombatArea.globalAreaModListMap.values()].flatMap(x => x);
         this._modList = [...this.localModList, ...globalModifiers];
         const areaModList = this._modList.filter(x => areaModTemplateList.find(y => y === x.template && !y.target));
-        this.modDB.replace('Zone', Modifier.extractStatModifierList(...areaModList));
+        this.modDB.replace('Area', Modifier.extractStatModifierList(...areaModList));
         const enemyModList = this._modList.filter(x => areaModTemplateList.find(y => y === x.template && y.target === 'Enemy'));
         this.enemy.updateModifiers(enemyModList);
         this.calcStats();
-        if (combat.zone === this) {
-            combat.startZone(this);
+        if (combat.area === this) {
+            combat.startArea(this);
         }
     }
 
     private calcStats() {
-        const { maxEnemyCount } = calcZoneStats({ stats: { baseEnemyCount: this.data.enemyBaseCount }, modDB: this.modDB });
+        const { maxEnemyCount } = calcCombatAreaStats({ stats: { baseEnemyCount: this.data.enemyBaseCount }, modDB: this.modDB });
         this._maxEnemyCount = this.data.enemyCountOverride ?? maxEnemyCount;
     }
 
@@ -135,16 +135,16 @@ export class CombatArea {
         this.updateModifiers();
     }
 
-    serialize(): GameSerialization.Zone {
+    serialize(): GameSerialization.CombatArea {
         return {
-            active: combat.zone === this,
+            active: combat.area === this,
             enemyId: this._enemy.enemyData.id,
             enemyCount: this.enemyCount,
             enemy: this._enemy?.serialize()
         };
     }
 
-    deserialize(save: DeepPartial<GameSerialization.Zone>) {
+    deserialize(save: DeepPartial<GameSerialization.CombatArea>) {
         this._enemyCount = Math.floor(Math.min(save.enemyCount || this._maxEnemyCount, this._maxEnemyCount));
         const enemyRef = this.data.candidates.find(x => x.id === save.enemyId);
         if (save.enemy && enemyRef) {
@@ -152,13 +152,13 @@ export class CombatArea {
             this._enemy.deserialize(save.enemy);
         }
         if (save.active) {
-            combat.startZone(this);
+            combat.startArea(this);
         }
     }
 
     static addGlobalAreaModifiers(key: string, ...modList: Modifier[]) {
         this.globalAreaModListMap.set(key, modList);
-        combat.zone?.updateModifiers();
+        combat.area?.updateModifiers();
     }
 
     static clearGlobalAreaModList() {

@@ -36,10 +36,10 @@ export interface Player {
 }
 
 export interface World {
-    zone?: Zone;
+    area?: CombatArea;
 }
 
-export interface Zone {
+export interface CombatArea {
     enemyCount: number;
     enemy?: EnemyInstance;
     enemyId?: string;
@@ -145,5 +145,6 @@ export interface Artifacts {
 export interface Ascension {
     ascensionInstanceId?: string;
     state?: string;
-    zone?: Zone;
+    combatArea?: CombatArea;
+    timeout?: number;
 }

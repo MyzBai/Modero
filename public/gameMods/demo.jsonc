@@ -46,6 +46,7 @@
     "ascension": {
         "trial": {
             "enemyCount": 1,
+            "timeout": 60,
             "enemyList": [
                 {
                     "id": "fba86b",

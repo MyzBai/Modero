@@ -18,7 +18,7 @@ export interface EnemyOptions {
     conditionFlags?: number;
     modDB?: ModDB;
 }
-export interface ZoneOptions {
+export interface CombatAreaOptions {
     stats: Record<'baseEnemyCount', number>;
     modDB?: ModDB;
 }
@@ -157,13 +157,13 @@ export function calcPlayerStats(player: PlayerOptions) {
     return stats;
 }
 
-export function calcZoneStats(zone: ZoneOptions) {
+export function calcCombatAreaStats(area: CombatAreaOptions) {
     const config: Configuration = {
         flags: 0,
-        source: { modDB: zone.modDB, stats: zone.stats }
+        source: { modDB: area.modDB, stats: area.stats }
     };
 
-    const baseEnemyCount = zone.stats.baseEnemyCount + calcModBase('EnemyCount', config);
+    const baseEnemyCount = area.stats.baseEnemyCount + calcModBase('EnemyCount', config);
     const maxEnemyCount = calcModIncMore('EnemyCount', baseEnemyCount, config);
 
     return { maxEnemyCount };

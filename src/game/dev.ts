@@ -35,7 +35,7 @@ export function initDevTools() {
             console.timeEnd('Skip Time');
         },
         killEnemies: (count: number, worldProgression = true) => {
-            const zone = worldProgression ? world.zone : new CombatArea({
+            const area = worldProgression ? world.area : new CombatArea({
                 areaModList: [],
                 candidates: game.gameConfig.enemyList.filter(x => (x.level ?? 1) <= player.level),
                 enemyBaseCount: Number.isFinite(count) ? count : 0,
@@ -43,12 +43,12 @@ export function initDevTools() {
                 name: '',
                 excludeGlobalAreaMods: true
             });
-            assertDefined(zone);
-            combat.startZone(zone);
+            assertDefined(area);
+            combat.startArea(area);
             for (let i = 0; i < count; i++) {
                 combat.dealDamage(Infinity);
             }
-            combat.startZone(null);
+            combat.startArea(null);
         },
         dispose: () => {
             document.body.removeEventListener('keydown', toggleLoop);

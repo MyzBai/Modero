@@ -3,10 +3,10 @@ import { CombatArea } from './CombatArea';
 import type * as GameSerialization from '../serialization';
 
 export class World {
-    private _zone?: CombatArea;
+    private _combatArea?: CombatArea;
 
-    get zone() {
-        return this._zone;
+    get area() {
+        return this._combatArea;
     }
 
     get baseEnemyCount() {
@@ -15,33 +15,33 @@ export class World {
 
     setup() {
         player.stats.level.addListener('change', () => {
-            if (combat.zone === this._zone) {
-                this._zone = this.createZone();
-                combat.startZone(this._zone);
+            if (combat.area === this._combatArea) {
+                this._combatArea = this.createCombatArea();
+                combat.startArea(this._combatArea);
             }
         });
 
-        if (!this._zone) {
-            this._zone = this.createZone();
-            combat.startZone(this._zone);
+        if (!this._combatArea) {
+            this._combatArea = this.createCombatArea();
+            combat.startArea(this._combatArea);
         }
     }
 
     reset() {
-        this._zone = undefined;
+        this._combatArea = undefined;
     }
 
-    private processZoneCompletion() {
+    private processCombatAreaCompletion() {
         if (player.level < game.maxLevel) {
             player.stats.level.add(1);
         }
-        this._zone = this.createZone();
-        combat.startZone(this._zone);
+        this._combatArea = this.createCombatArea();
+        combat.startArea(this._combatArea);
     }
 
-    private createZone() {
+    private createCombatArea() {
         const enemyList = game.gameConfig.enemyList;
-        const zone = new CombatArea({
+        const area = new CombatArea({
             name: 'World',
             enemyBaseCount: this.baseEnemyCount,
             enemyBaseLife: combat.enemyBaseLife,
@@ -50,26 +50,26 @@ export class World {
         });
 
         if (Number.isFinite(this.baseEnemyCount)) {
-            zone.onComplete.listen(this.processZoneCompletion.bind(this));
+            area.onComplete.listen(this.processCombatAreaCompletion.bind(this));
         }
-        return zone;
+        return area;
     }
 
     serialize(save: GameSerialization.Serialization) {
-        if (!this._zone) {
+        if (!this._combatArea) {
             return;
         }
-        const zone = this._zone.serialize();
-        save.world = { zone };
+        const area = this._combatArea.serialize();
+        save.world = { area: area };
     }
 
     deserialize({ world: save }: GameSerialization.UnsafeSerialization) {
-        const serializedZone = save?.zone;
-        if (!serializedZone) {
+        const serializedCombatArea = save?.area;
+        if (!serializedCombatArea) {
             return;
         }
 
-        this._zone = this.createZone();
-        this._zone.deserialize(serializedZone);
+        this._combatArea = this.createCombatArea();
+        this._combatArea.deserialize(serializedCombatArea);
     }
 }

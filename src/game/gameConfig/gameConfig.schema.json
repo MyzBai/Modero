@@ -129,6 +129,11 @@
     "AscensionTrial": {
       "type": "object",
       "properties": {
+        "timeout": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Time in seconds before trial fails"
+        },
         "enemyCount": {
           "type": "integer",
           "minimum": 1,

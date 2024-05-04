@@ -1,5 +1,5 @@
 import { CombatArea, type CombatAreaOptions } from 'src/game/combat/CombatArea';
-import { combat, game, notifications, player } from 'src/game/game';
+import { combat, game, gameLoop, notifications, player } from 'src/game/game';
 import type * as GameSerialization from 'src/game/serialization';
 import { assertNonNullable } from 'src/shared/utils/assert';
 
@@ -9,8 +9,11 @@ type State = typeof states[number];
 export class Ascend {
     readonly page: HTMLElement;
     private trialCompleted = false;
-    private _zone?: CombatArea | null;
+    private _combatArea?: CombatArea | null;
     private _state: State = 'invalid';
+    private timeout = 0;
+    private readonly timeoutElement: HTMLElement;
+    private unregisterTimeout?: () => void;
     constructor() {
         this.page = document.createElement('div');
         this.page.classList.add('p-ascend');
@@ -32,6 +35,10 @@ export class Ascend {
         });
         this.page.appendChild(button);
 
+        this.timeoutElement = document.createElement('div');
+        this.timeoutElement.classList.add('timeout');
+        this.page.appendChild(this.timeoutElement);
+
         player.stats.level.addListener('change', (e) => {
             this.updateButton();
             if (e.curValue < game.maxLevel) {
@@ -40,14 +47,15 @@ export class Ascend {
             }
             this.executeState('Start');
         });
+
     }
 
     get state() {
         return this._state;
     }
 
-    get zone() {
-        return this._zone;
+    get combatArea() {
+        return this._combatArea;
     }
 
     private updateButton() {
@@ -71,7 +79,7 @@ export class Ascend {
 
     private startTrial() {
         const trialData = game.gameConfig.ascension.trial;
-        const zoneOptions: CombatAreaOptions = {
+        const areaOptions: CombatAreaOptions = {
             name: 'Trial',
             enemyBaseLife: combat.enemyBaseLife,
             enemyBaseCount: trialData.enemyCount,
@@ -79,21 +87,55 @@ export class Ascend {
             candidates: trialData.enemyList,
             areaModList: []
         };
-        this._zone = new CombatArea(zoneOptions);
-        this._zone.onComplete.listen(() => {
+        this._combatArea = new CombatArea(areaOptions);
+        this._combatArea.onComplete.listen(() => {
             this._state = 'Ascend';
             this.trialCompleted = true;
             this.updateButton();
-            this._zone = null;
+            this._combatArea = null;
+            this.stopTimeout();
         });
-        combat.startZone(this._zone);
+        combat.startArea(this._combatArea);
+        this.startTimeout();
     }
 
     private cancelTrial() {
-        assertNonNullable(this._zone);
-        combat.stopZone();
-        this._zone = null;
+        assertNonNullable(this._combatArea);
+        combat.stopArea();
+        this._combatArea = null;
+        this.stopTimeout();
     }
+
+    private startTimeout() {
+        this.timeout = game.gameConfig.ascension.trial.timeout ?? 0;
+        if (this.timeout === 0) {
+            return;
+        }
+        this.timeoutElement.classList.remove('hidden');
+        this.unregisterTimeout = gameLoop.registerCallback(this.timeoutTick.bind(this), { delay: 1000 });
+        this.updateTimeoutElement();
+    }
+
+    private stopTimeout() {
+        this.timeoutElement.classList.add('hidden');
+        this.unregisterTimeout?.();
+    }
+
+    private timeoutTick() {
+        this.timeout--;
+        if (this.timeout <= 0) {
+            this.timeout = 0;
+            this.unregisterTimeout?.();
+            this.cancelTrial();
+            this.executeState('Start');
+        }
+        this.updateTimeoutElement();
+    }
+
+    private updateTimeoutElement() {
+        this.timeoutElement.textContent = `Time remaining: ${this.timeout.toFixed()} seconds`;
+    }
+
 
     private async ascend() {
         this.executeState('invalid');
@@ -156,16 +198,18 @@ export class Ascend {
         });
     }
 
-    serialize() {
-        return { state: this._state, zone: this._zone?.serialize() };
+    serialize(): PickStrict<Required<GameSerialization.Serialization>['ascension'], 'state' | 'combatArea' | 'timeout'> {
+        return { state: this._state, combatArea: this._combatArea?.serialize(), timeout: this.timeout };
     }
 
-    deserialize(state?: string, zone?: DeepPartial<GameSerialization.Zone>) {
+    deserialize({ state, combatArea, timeout }: { state?: string, combatArea?: DeepPartial<GameSerialization.CombatArea>, timeout?: number; }) {
         this._state = state && states.includes(state as State) ? state as State : 'invalid';
-        if (zone) {
+        if (combatArea) {
             this.trialCompleted = false;
             this.executeState('Trial');
-            this._zone?.deserialize(zone);
+            this._combatArea?.deserialize(combatArea);
+            this.timeout = timeout ?? 0;
+            this.updateTimeoutElement();
         } else if (this._state === 'Ascend' || this._state === 'Done') {
             this.trialCompleted = true;
         }

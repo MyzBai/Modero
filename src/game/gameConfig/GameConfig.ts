@@ -39,6 +39,8 @@ export interface Ascension {
 }
 export type AscensionEnemy = Omit<Enemy, 'level'>;
 export interface AscensionTrial {
+    /**@description Time in seconds before trial fails */
+    timeout?: UnsignedInteger;
     /**@TJS-type integer @TJS-minimum 1 @TJS-default 1 */
     enemyCount: number;
     enemyList: AscensionEnemy[];
