@@ -92,18 +92,16 @@ export function calcPlayerStats(player: PlayerOptions) {
     stats.criticalHitMultiplier = Math.min(stats.criticalHitMultiplier, 100);
 
 
-    const reducedDamage = config.target?.stats?.reducedDamageTaken || 1;
-
     let attackDps = 0;
     {
         const baseDamageResult = calcBaseAttackDamage(config, avg);
         const critDamageMultiplier = 1 + (clampedCritChance * (stats.criticalHitMultiplier - 1));
-        attackDps = baseDamageResult.totalBaseDamage * clampedHitChance * stats.attackSpeed * critDamageMultiplier * reducedDamage;
+        attackDps = baseDamageResult.totalBaseDamage * clampedHitChance * stats.attackSpeed * critDamageMultiplier;
 
-        stats.minPhysicalDamage = baseDamageResult.minPhysicalDamage * reducedDamage * critDamageMultiplier;
-        stats.maxPhysicalDamage = baseDamageResult.maxPhysicalDamage * reducedDamage * critDamageMultiplier;
-        stats.minElementalDamage = baseDamageResult.minElementalDamage * reducedDamage * critDamageMultiplier;
-        stats.maxElementalDamage = baseDamageResult.maxElementalDamage * reducedDamage * critDamageMultiplier;
+        stats.minPhysicalDamage = baseDamageResult.minPhysicalDamage * critDamageMultiplier;
+        stats.maxPhysicalDamage = baseDamageResult.maxPhysicalDamage * critDamageMultiplier;
+        stats.minElementalDamage = baseDamageResult.minElementalDamage * critDamageMultiplier;
+        stats.maxElementalDamage = baseDamageResult.maxElementalDamage * critDamageMultiplier;
     }
 
     //bleed
@@ -118,8 +116,8 @@ export function calcPlayerStats(player: PlayerOptions) {
         const maxStacks = Math.min(stacksPerSecond, stats.maxBleedStackCount);
         stats.baseBleedDamageMultiplier = calcModTotal('BaseBleedDamageMultiplier', config) / 100;
         stats.bleedDamageMultiplier = 1 + calcModTotal('DamageOverTimeMultiplier', config) / 100;
-        stats.minBleedDamage = min * reducedDamage * stats.baseBleedDamageMultiplier * stats.bleedDamageMultiplier;
-        stats.maxBleedDamage = max * reducedDamage * stats.baseBleedDamageMultiplier * stats.bleedDamageMultiplier;
+        stats.minBleedDamage = min * stats.baseBleedDamageMultiplier * stats.bleedDamageMultiplier;
+        stats.maxBleedDamage = max * stats.baseBleedDamageMultiplier * stats.bleedDamageMultiplier;
         const avgDamage = avg(stats.minBleedDamage, stats.maxBleedDamage);
         bleedDps = avgDamage * maxStacks;
     }
@@ -136,8 +134,8 @@ export function calcPlayerStats(player: PlayerOptions) {
         const maxStacks = Math.min(stacksPerSecond, stats.maxBurnStackCount);
         stats.baseBurnDamageMultiplier = calcModTotal('BaseBurnDamageMultiplier', config) / 100;
         stats.burnDamageMultiplier = 1 + calcModTotal('DamageOverTimeMultiplier', config) / 100;
-        stats.minBurnDamage = min * reducedDamage * stats.baseBurnDamageMultiplier * stats.burnDamageMultiplier;
-        stats.maxBurnDamage = max * reducedDamage * stats.baseBurnDamageMultiplier * stats.burnDamageMultiplier;
+        stats.minBurnDamage = min * stats.baseBurnDamageMultiplier * stats.burnDamageMultiplier;
+        stats.maxBurnDamage = max * stats.baseBurnDamageMultiplier * stats.burnDamageMultiplier;
 
         const baseDamage = avg(stats.minBurnDamage, stats.maxBurnDamage);
         burnDps = baseDamage * maxStacks;
@@ -182,7 +180,7 @@ export function calcEnemyStats(enemy: EnemyOptions) {
     stats.maxLife = calcModIncMore('Life', baseLife, config);
 
     stats.evadeChance = calcModBase('Evade', config) / 100;
-    stats.reducedDamageTaken = calcModIncMore('DamageTaken', 1, config);
+    stats.reducedDamageTakenMultiplier = calcModIncMore('DamageTaken', 1, config);
 
     applyStatValues(enemy.stats || {} as StatCollection, stats);
 }

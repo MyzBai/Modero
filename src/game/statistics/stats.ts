@@ -115,7 +115,7 @@ export function createEnemyStats() {
         maxLife: new Statistic({ label: 'Max Life', sticky: true }),
         life: new Statistic({ label: 'Life', sticky: true, valueColorTag: 'life' }),
         evadeChance: new Statistic({ computed: true }),
-        reducedDamageTaken: new Statistic({ computed: true }),
+        reducedDamageTakenMultiplier: new Statistic({ computed: true }),
     } as const;
 }
 

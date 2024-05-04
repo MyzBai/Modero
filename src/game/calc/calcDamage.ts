@@ -92,7 +92,9 @@ export function calcAttack(source: Player, enemy: Enemy) {
     const maxElementalDamage = stats.maxElementalDamage;
     const elementalDamage = lerp(minElementalDamage, maxElementalDamage, attackEffectiveness);
 
-    const totalDamage = (physicalDamage + elementalDamage) * finalMultiplier;
+    const reducedDamageMultiplier = enemy.stats.reducedDamageTakenMultiplier.value;
+
+    const totalDamage = (physicalDamage + elementalDamage) * finalMultiplier * reducedDamageMultiplier;
 
 
     const effects: EffectData[] = [];

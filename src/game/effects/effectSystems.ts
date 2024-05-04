@@ -75,7 +75,7 @@ export abstract class BaseEffectSystem<T extends BaseEffectInstance = BaseEffect
             if (!instance) {
                 break;
             }
-            const damage = instance.damage * dt;
+            const damage = instance.damage * dt * (combat.enemy?.stats.reducedDamageTakenMultiplier.value ?? 1);
             combat.dealDamageOverTime(damage, instance.type);
         }
     }
