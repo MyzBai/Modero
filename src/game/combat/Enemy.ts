@@ -19,10 +19,9 @@ export class Enemy {
     readonly stats = createEnemyStats();
     readonly modList: Modifier[];
     constructor(readonly enemyData: EnemyData) {
-        this.stats.baseLife.set(combat.enemyBaseLife);
+        this.stats.baseLife.set(enemyData.baseLife);
         this.modList = Modifier.modListFromTexts([...enemyData.enemyModList]);
         this.modDB.add('EnemyMod', Modifier.extractStatModifierList(...this.modList));
-        this.stats.life.set(1);
         this.stats.maxLife.set(1);
         this.stats.life.set(this.stats.maxLife.value);
     }
