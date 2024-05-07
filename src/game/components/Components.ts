@@ -7,14 +7,14 @@ import type * as GameSerialization from '../serialization';
 import { Artifacts } from './artifacts/Artifacts';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Weapon } from './weapon/Weapon';
-import { PlayerClasses } from './playerClasses/PlayerClasses';
 import type { Serialization } from '../serialization';
 import { evaluateStatRequirements } from '../statistics/statRequirements';
+import { Guilds } from './guilds/Guilds';
 
 type ComponentUnion = NonNullable<PropertyValuesToUnion<GameConfig.Components>>;
 export class Components {
     private readonly components = {
-        playerClasses: { label: 'Classes', constr: PlayerClasses },
+        guilds: { label: 'Guilds', constr: Guilds },
         skills: { label: 'Skills', constr: Skills },
         weapon: { label: 'Weapon', constr: Weapon },
         artifacts: { label: 'Artifacts', constr: Artifacts },

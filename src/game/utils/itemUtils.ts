@@ -6,11 +6,12 @@ import { createModListElement } from './dom';
 import { isDefined } from 'src/shared/utils/utils';
 
 export interface Item {
+    id?: string;
     name: string;
-    probability: number;
-    exp: number;
-    maxExp: number;
-    unlocked: boolean;
+    probability?: number;
+    exp?: number;
+    maxExp?: number;
+    unlocked?: boolean;
 }
 
 
@@ -62,14 +63,16 @@ export function createItemCandidates<T extends Item & { assigned?: boolean; allo
     });
 }
 
-export function createItemListElement(item: { id: string; name: string; probability?: number; }): HTMLElement {
+export function createItemListElement(item: Item): HTMLElement {
     const element = document.createElement('li');
     element.classList.add('g-list-item');
     const rankIndex = ROMAN_NUMERALS.indexOf(getItemRankNumeral(item.name) ?? 'I');
-    element.classList.toggle('hidden', rankIndex > 0 || !item.probability);
-    element.setAttribute('data-id', item.id);
-    element.toggleAttribute('disabled');
-    element.textContent = '?????';
+    element.classList.toggle('hidden', rankIndex > 0);
+    if (item.id) {
+        element.setAttribute('data-id', item.id);
+    }
+    element.toggleAttribute('disabled', !!item.probability);
+    element.textContent = item.probability ? '?????' : item.name;
     return element;
 }
 
@@ -93,7 +96,7 @@ export function createItemPropertyElement(propertyList: string[][]) {
 
 export function createExpBar(item: Item): ProgressElement {
     const element = createCustomElement(ProgressElement);
-    element.value = item.exp / item.maxExp;
+    element.value = (!!item.exp && !!item.maxExp) ? item.exp / item.maxExp : 0;
     return element;
 }
 

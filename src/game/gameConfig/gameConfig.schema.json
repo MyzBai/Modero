@@ -37,8 +37,8 @@
     "components": {
       "type": "object",
       "properties": {
-        "playerClasses": {
-          "$ref": "#/definitions/PlayerClasses"
+        "guilds": {
+          "$ref": "#/definitions/Guilds"
         },
         "skills": {
           "$ref": "#/definitions/Skills"
@@ -200,59 +200,22 @@
         "modList"
       ]
     },
-    "PlayerClasses": {
+    "Guilds": {
       "type": "object",
       "properties": {
         "requirements": {
           "$ref": "#/definitions/Requirements"
         },
-        "tokenProbability": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 100,
-          "description": "Percent = 1/Probability"
-        },
-        "startTokenCount": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "classList": {
+        "guildList": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/definitions/Id"
-              },
-              "name": {
-                "pattern": "^[A-Za-z 0-9]{3,32}$",
-                "type": "string"
-              },
-              "modList": {
-                "items": {
-                  "$ref": "#/definitions/PlayerMod"
-                },
-                "type": "array"
-              },
-              "tokenCost": {
-                "type": "integer",
-                "minimum": 0
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "id",
-              "modList",
-              "name",
-              "tokenCost"
-            ]
+            "$ref": "#/definitions/Guild"
           }
         }
       },
       "additionalProperties": false,
       "required": [
-        "classList",
-        "tokenProbability"
+        "guildList"
       ]
     },
     "Requirements": {
@@ -275,6 +238,122 @@
         }
       },
       "additionalProperties": false
+    },
+    "Guild": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "pattern": "^[A-Za-z 0-9]{3,32}$",
+          "type": "string"
+        },
+        "activityList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GuildActivity"
+          }
+        },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 0
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/PlayerMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "modList"
+            ]
+          }
+        },
+        "classes": {
+          "$ref": "#/definitions/GuildClasses"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "activityList",
+        "classes",
+        "id",
+        "levels",
+        "name"
+      ]
+    },
+    "GuildActivity": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/GuildActivityName"
+        },
+        "multiplier": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "multiplier",
+        "name"
+      ]
+    },
+    "GuildActivityName": {
+      "description": "Combat is disabled while performing an activity\r\n- Training - Attack skills gain exp faster\r\n- Exploring - Finds artifacts passively.\r\n- Meditation - Increased mana/mana regen and passive skills gain exp faster (auras are active while meditating)",
+      "enum": [
+        "Exploring",
+        "Meditation",
+        "Training"
+      ],
+      "type": "string"
+    },
+    "GuildClasses": {
+      "type": "object",
+      "properties": {
+        "classList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/Id"
+              },
+              "name": {
+                "pattern": "^[A-Za-z 0-9]{3,32}$",
+                "type": "string"
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/PlayerMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "modList",
+              "name"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "classList"
+      ]
     },
     "Skills": {
       "type": "object",

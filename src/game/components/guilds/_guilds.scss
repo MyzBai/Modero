@@ -1,0 +1,47 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+.p-guilds {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto max(40%) auto 1fr;
+    grid-auto-flow: column;
+    gap: $default-gap;
+
+    .token-counter {
+        padding: $padding-container;
+        background-color: $color-primary-bg;
+    }
+
+    .guild-list {
+        border: $default-border;
+    }
+
+    .class-list {
+        border: $default-border;
+    }
+
+    [data-guild-info] {
+        grid-column: 2;
+        grid-row: 1/4;
+        border: $default-border;
+        progress-element {
+            @include progress-multi-bar;
+        }
+
+        .s-activites {
+            display: grid;
+            grid-template-columns: repeat(2, min(1fr));
+            justify-content: center;
+            gap: $default-gap;
+
+            button.active {
+                filter: brightness(50%) !important;
+            }
+        }
+    }
+    [data-class-info] {
+        grid-column: 2;
+        grid-row: 4/-1;
+        border: $default-border;
+    }
+}

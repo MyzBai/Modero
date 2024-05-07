@@ -11,6 +11,8 @@ import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 interface Passive extends Item {
     name: string;
     data: GameConfig.PassiveSkill;
+    exp: number;
+    maxExp: number;
     unlocked: boolean;
     allocated: boolean;
     element: HTMLElement;
@@ -43,7 +45,7 @@ export class Passives {
         this.passiveList = data.passiveSkillList.map(data => {
             const element = createItemListElement(data);
             element.addEventListener('click', this.selectPassiveByName.bind(this, data.name));
-            return { data, ...createItem(data), allocated: false, element };
+            return { data, unlocked: false, allocated: false, maxExp: 0, exp: 0, ...createItem(data), element };
         });
         this.page.querySelectorStrict('[data-skill-list]').append(...this.passiveList.map(x => x.element));
         this.passiveList.filter(x => x.unlocked).forEach(x => this.unlockPassive(x));
@@ -69,7 +71,7 @@ export class Passives {
         game.tickSecondsEvent.listen(() => {
             const passives = this.passiveList.filter(x => x.allocated && x.exp < x.maxExp);
             for (const passive of passives) {
-                passive.exp++;
+                passive.exp += 1 * player.stats.meditationMultiplier.value;
                 if (passive.exp >= passive.maxExp) {
                     this.tryUnlockNextPassiveRank(passive);
                 }

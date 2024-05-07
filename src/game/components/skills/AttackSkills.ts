@@ -11,6 +11,8 @@ import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 interface Skill extends Item {
     name: string;
     data: GameConfig.AttackSkill;
+    exp: number;
+    maxExp: number;
     unlocked: boolean;
     assigned: boolean;
     element: HTMLElement;
@@ -31,7 +33,7 @@ export class AttackSkills {
         this.skillList = data.attackSkillList.map(data => {
             const element = createItemListElement(data);
             element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
-            return { data, ...createItem(data), assigned: false, element };
+            return { data, unlocked: false, assigned: false, maxExp: 0, exp: 0, ...createItem(data), element };
         });
         this.page.querySelectorStrict('[data-skill-list]').append(...this.skillList.map(x => x.element));
         this.skillList.filter(x => x.unlocked).forEach(x => this.unlockSkill(x));
@@ -54,7 +56,7 @@ export class AttackSkills {
             if (!this.activeSkill.maxExp || this.activeSkill.exp >= this.activeSkill.maxExp) {
                 return;
             }
-            this.activeSkill.exp++;
+            this.activeSkill.exp += 1 * player.stats.trainingMultiplier.value;
             this.updateSkillInfo();
             if (this.activeSkill.exp >= this.activeSkill.maxExp) {
                 this.tryUnlockNextSkillRank(this.activeSkill);
@@ -158,7 +160,7 @@ export class AttackSkills {
     serialize(): GameSerialization.Skills['attackSkills'] {
         return {
             skillName: this.activeSkill.data.name,
-            skillList: this.skillList.filter(x => x.unlocked).map(x => ({ name: x.data.name, expFac: (x.exp ?? 1) / (x.maxExp ?? 1) }))
+            skillList: this.skillList.filter(x => x.unlocked).map(x => ({ name: x.data.name, expFac: x.exp / x.maxExp }))
         };
     }
 

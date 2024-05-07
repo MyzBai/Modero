@@ -33,10 +33,9 @@
         "{5} Base Burn Duration",
         "+{1} Maximum Burn Stack",
         "{50}% Base Burn Damage Multiplier",
-        "{1}% More Attack Damage Per {2} Strength",
-        "{1}% More Attack Speed Per {10} Dexterity",
-        "+{1}% Hit Chance Per {6} Dexterity",
-        "+{1}% Critical Hit Chance Per {6} Dexterity",
+        "{1}% More Attack Damage Per {3} Strength",
+        "{1}% More Attack Speed Per {7} Dexterity",
+        "+{1}% Hit Chance Per {10} Dexterity",
         "+{2} Maximum Mana Per {1} Intelligence",
         "+{0.6}% Of Maximum Mana Regeneration",
         "+{100} Maximum Mana",
@@ -712,40 +711,65 @@
                 }
             ]
         },
-        "playerClasses": {
-            "requirements": { "ascensionCount": 1 },
-            "startTokenCount": 1,
-            "tokenProbability": 500,
-            "classList": [
+        "guilds": {
+            "guildList": [
                 {
-                    "id": "4c8b55",
-                    "name": "Warrior",
-                    "modList": [ "{30}% More Attack Damage", "+{40} To All Attributes" ],
-                    "tokenCost": 1
+                    "id": "50b5af",
+                    "name": "Vanguard Guild",
+                    "activityList": [ { "name": "Training", "multiplier": [ 300 ] } ],
+                    "levels": [
+                        { "exp": 3000, "modList": [ "+{20} Strength", "{20}% More Attack Damage" ] },
+                        { "exp": 4000, "modList": [ "+{30} Strength", "{30}% More Attack Damage" ] },
+                        { "exp": 5000, "modList": [ "+{40} Strength", "{40}% More Attack Damage" ] },
+                        { "modList": [ "+{50} Strength", "{50}% More Attack Damage" ] }
+                    ],
+                    "classes": {
+                        "classList": [
+                            { "id": "117852", "name": "Warrior", "modList": [ "{40}% More Physical Attack Damage", "+{50} Strength" ] },
+                            { "id": "98f85d", "name": "Berserker", "modList": [ "{40}% More Attack Damage", "+{50} Dexterity" ] },
+                            { "id": "196f34", "name": "Templar", "modList": [ "{40}% More Elemental Attack Damage", "+{50} Intelligence" ] }
+                        ]
+                    }
                 },
                 {
-                    "id": "49b91c",
-                    "name": "Wizard",
-                    "modList": [ "{30}% More Elemental Damage", "+{200} Maximum Mana" ],
-                    "tokenCost": 1
+                    "id": "5ae793",
+                    "name": "Wanderer Guild",
+                    "activityList": [
+                        { "name": "Training", "multiplier": [ 150 ] },
+                        { "name": "Exploring", "multiplier": [ 300 ] },
+                        { "name": "Meditation", "multiplier": [ 300 ] }
+                    ],
+                    "levels": [
+                        { "exp": 3000, "modList": [ "+{20} Dexterity", "{20}% More Damage" ] },
+                        { "exp": 4000, "modList": [ "+{30} Dexterity", "{30}% More Damage" ] },
+                        { "exp": 5000, "modList": [ "+{40} Dexterity", "{40}% More Damage" ] },
+                        { "modList": [ "+{50} Dexterity", "{50}% More Damage" ] }
+                    ],
+                    "classes": {
+                        "classList": [
+                            { "id": "a67775", "name": "Hunter", "modList": [ "+{50} Dexterity", "{40}% More Damage Over Time", "{20}% Increased Ailment Duration" ] },
+                            { "id": "a6a62d", "name": "Assassin", "modList": [ "+{20}% Critical Hit Chance", "+{100}% Critical Hit Multiplier" ] },
+                            { "id": "93f88a", "name": "Cutthroat", "modList": [ "{40}% More Bleed Damage", "+{15}% Chance To Bleed" ] }
+                        ]
+                    }
                 },
                 {
-                    "id": "a0f1e1",
-                    "name": "Hunter",
-                    "modList": [ "{60}% More Damage Over Time" ],
-                    "tokenCost": 1
-                },
-                {
-                    "id": "ff5cf9",
-                    "name": "Pyromancer",
-                    "modList": [ "+{20}% Chance To Burn", "{30}% Increased Burn Duration", "Burn Lingers" ],
-                    "tokenCost": 1
-                },
-                {
-                    "id": "1ca287",
-                    "name": "Assassin",
-                    "modList": [ "+{30}% Critical Hit Chance", "+{80}% Critical Hit Multiplier" ],
-                    "tokenCost": 1
+                    "id": "3a8609",
+                    "name": "Arcane Guild",
+                    "activityList": [ { "name": "Meditation", "multiplier": [ 300 ] } ],
+                    "levels": [
+                        { "exp": 3000, "modList": [ "+{20} Intelligence", "{20}% Increased Mana Regeneration" ] },
+                        { "exp": 4000, "modList": [ "+{30} Intelligence", "{30}% Increased Mana Regeneration" ] },
+                        { "exp": 5000, "modList": [ "+{40} Intelligence", "{40}% Increased Mana Regeneration" ] },
+                        { "modList": [ "+{50} Intelligence", "{50}% Increased Mana Regeneration" ] }
+                    ],
+                    "classes": {
+                        "classList": [
+                            { "id": "1db3a5", "name": "Wizard", "modList": [ "{60}% More Elemental Damage", "+{50} Intelligence" ] },
+                            { "id": "0f7f1a", "name": "Monk", "modList": [ "+{100} Intelligence", "+{1} Maximum Mana Per {1} Intelligence", "{20}% Increased Mana Regeneration" ] },
+                            { "id": "481c27", "name": "Pyromancer", "modList": [ "{40}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ] }
+                        ]
+                    }
                 }
             ]
         },

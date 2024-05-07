@@ -14,6 +14,8 @@ import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 interface Artifact extends Item {
     name: string;
     data: GameConfig.Artifact;
+    exp: number;
+    maxExp: number;
     unlocked: boolean;
     assigned: boolean;
     element: HTMLElement;
@@ -34,7 +36,7 @@ export class Artifacts extends Component {
         this.artifactList = data.artifactList.map(data => {
             const element = createItemListElement(data);
             element.addEventListener('click', this.selectArtifactByName.bind(this, data.name));
-            return { data, ...createItem(data), assigned: false, element };
+            return { data, unlocked: false, maxExp: 0, exp: 0, ...createItem(data), assigned: false, element };
         });
         this.page.querySelectorStrict('[data-artifact-list]').append(...this.artifactList.map(x => x.element));
         this.artifactList.filter(x => x.unlocked).forEach(x => this.unlockArtifact(x));
@@ -137,9 +139,9 @@ export class Artifacts extends Component {
         }
     }
 
-
     private tryUnlockArtifact() {
-        const candidates = this.artifactList.filter(x => (getItemRankNumeral(x.name) ?? 'I') === 'I');
+        const candidates = this.artifactList.filter(x => x.probability && (getItemRankNumeral(x.name) ?? 'I') === 'I');
+        candidates.forEach(x => x.probability = Math.ceil((x.data.probability || 0) / player.stats.explorationMultiplier.value));
         const artifact = pickOneFromPickProbability(candidates);
         if (!artifact) {
             return;
@@ -172,7 +174,6 @@ export class Artifacts extends Component {
         artifact.element.removeAttribute('disabled');
         artifact.element.classList.remove('hidden');
     }
-
 
     serialize(save: Serialization) {
         save.artifacts = {

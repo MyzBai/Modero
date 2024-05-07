@@ -52,7 +52,8 @@ export function createPlayerStats(gameStats: GameStatCollection) {
     const minElementalDamage = new Statistic({ computed: true });
     const maxElementalDamage = new Statistic({ computed: true });
     return {
-        playerClass: new Statistic({ label: 'Player Class', type: 'text', defaultValue: -1, computed: true, hiddenBeforeMutation: true }),
+        activity: new Statistic({ label: 'Activity', type: 'text', computed: true, hiddenBeforeMutation: true }),
+        guildClass: new Statistic({ label: 'Player Class', type: 'text', computed: true, hiddenBeforeMutation: true }),
         level: new Statistic({ label: 'Level', sticky: true, defaultValue: 1 }),
         dps: new Statistic({ label: 'DPS', sticky: true, computed: true, decimals: 1, hoverTip: 'Damage Per Second' }),
         totalHitCount: new Statistic({ accumulators: [gameStats.totalHitCount] }),
@@ -93,6 +94,7 @@ export function createPlayerStats(gameStats: GameStatCollection) {
         burnDamageMultiplier: new Statistic({ computed: true }),
         minBurnDamage: new Statistic({ computed: true }),
         maxBurnDamage: new Statistic({ computed: true }),
+        lingeringBurn: new Statistic({ computed: true, type: 'boolean' }),
 
         //Attributes
         strength: new Statistic({ label: 'Strength', computed: true }),
@@ -103,9 +105,12 @@ export function createPlayerStats(gameStats: GameStatCollection) {
         auraDurationMultiplier: new Statistic({ computed: true }),
         insightCapacity: new Statistic({ computed: true }),
         maxArtifacts: new Statistic({ computed: true }),
-        playerClassTokenCount: new Statistic(),
+        guildTokenCount: new Statistic(),
 
-        lingeringBurn: new Statistic({ computed: true, type: 'boolean' })
+        trainingMultiplier: new Statistic({ defaultValue: 1, computed: true }),
+        explorationMultiplier: new Statistic({ defaultValue: 1, computed: true }),
+        meditationMultiplier: new Statistic({ defaultValue: 1, computed: true }),
+
     } as const;
 }
 

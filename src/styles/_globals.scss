@@ -119,9 +119,6 @@
         flex: 1;
         border: $default-border;
         padding: $padding-container;
-        button {
-            margin-top: $padding-container;
-            align-self: center;
-        }
+        gap: $default-gap;
     }
 }

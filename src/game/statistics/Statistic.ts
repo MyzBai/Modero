@@ -34,6 +34,10 @@ export class Statistic extends Value {
         this.options.accumulators?.forEach(x => this.addAccumulator(x));
     }
 
+    static extractEnumType<T extends readonly string[]>(arr: T): T extends readonly (infer U)[] ? U : never {
+        return arr as any;
+    }
+
     get visible() {
         if (this.options.hiddenBeforeMutation && !this.mutated) {
             return false;
@@ -41,14 +45,18 @@ export class Statistic extends Value {
         return isString(this.options.label);
     }
 
+    setDefault() {
+        this.set(this.options.defaultValue ?? 0);
+    }
 
     setText(text: string) {
         this.texts = this.texts || [];
         if (!this.texts.includes(text)) {
             this.texts.push(text);
         }
-        this.set((this.texts || []).indexOf(text));
+        this.set((this.texts).indexOf(text));
     }
+
     getText() {
         return this.texts?.[this.value];
     }

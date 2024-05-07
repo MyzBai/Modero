@@ -114,9 +114,6 @@ export class Combat {
     stopArea() {
         this._area = undefined;
         this.effectHandler.removeAllEffects();
-        if (world.area) {
-            this.startArea(world.area);
-        }
     }
 
     private processEnemyDeath(enemy: Enemy) {

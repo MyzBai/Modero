@@ -49,9 +49,9 @@ export function getRandomWeightedItem<T extends readonly { weight: number; }[]>(
     return item;
 }
 
-export function pickOneFromPickProbability<T extends { probability: number; }>(items: readonly T[]): T | undefined {
+export function pickOneFromPickProbability<T extends { probability?: number; }>(items: readonly T[]): T | undefined {
     for (const item of items) {
-        const random = randomRangeInt(1, item.probability + 1);
+        const random = randomRangeInt(1, (item.probability ?? 0) + 1);
         const pick = item.probability === random;
         if (pick) {
             return item;

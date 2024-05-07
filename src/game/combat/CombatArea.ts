@@ -23,7 +23,7 @@ export interface CombatAreaOptions {
     readonly enemyBaseCount: number;
     readonly enemyCountOverride?: number;
     readonly candidates: EnemyCandidate[];
-    readonly areaModList: string[];
+    readonly areaModList?: string[];
     readonly excludeGlobalAreaMods?: boolean;
 }
 
@@ -43,7 +43,7 @@ export class CombatArea {
         this.modDB = new ModDB();
         this.onComplete = new EventEmitter<CombatArea>();
 
-        this.localModList = Modifier.modListFromTexts(data.areaModList);
+        this.localModList = Modifier.modListFromTexts(data.areaModList ?? []);
 
         this._enemyCount = 0;
         this._maxEnemyCount = 0;

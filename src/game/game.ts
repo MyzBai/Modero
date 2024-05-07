@@ -24,7 +24,7 @@ import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { createModEntryInfoElement } from 'src/home/dom';
 
-export const mainMenuNames = ['combat', 'skills', 'weapon', 'artifacts', 'playerClasses', 'ascension', 'achievements', 'statistics', 'notifications'] as const;
+export const mainMenuNames = ['combat', 'skills', 'weapon', 'artifacts', 'guilds', 'ascension', 'achievements', 'statistics', 'notifications'] as const;
 
 export const enum GameInitializationStage {
     None = 0,

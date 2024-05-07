@@ -13,6 +13,8 @@ import { createCustomElement } from 'src/shared/customElements/customElements';
 interface Skill extends Item {
     name: string;
     data: GameConfig.AuraSkill;
+    exp: number;
+    maxExp: number;
     unlocked: boolean;
     assigned: boolean;
     element: HTMLElement;
@@ -45,7 +47,7 @@ export class AuraSkills {
         this.skillList = data.auraSkillList.map(data => {
             const element = createItemListElement(data);
             element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
-            return { data, ...createItem(data), assigned: false, element };
+            return { data, unlocked: false, assigned: false, maxExp: 0, exp: 0, ...createItem(data), element };
         });
         this.page.querySelectorStrict('[data-skill-list]').append(...this.skillList.map(x => x.element));
         this.skillList.filter(x => x.unlocked).forEach(x => this.unlockSkill(x));
@@ -99,7 +101,7 @@ export class AuraSkills {
                     continue;
                 }
                 if (aura.exp < aura.maxExp) {
-                    aura.exp++;
+                    aura.exp += 1 * (player.stats.trainingMultiplier.value + player.stats.meditationMultiplier.value);
                     this.updateSkillInfo();
                     if (aura.exp >= aura.maxExp) {
                         this.tryUnlockNextSkillRank(aura);

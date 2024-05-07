@@ -1,4 +1,5 @@
 import type { EffectType } from './effects/Effects';
+import type { GuildActivityName } from './gameConfig/GameConfig';
 import type { SerializedModifier } from './mods/Modifier';
 import type { GameStatCollection, PlayerStatCollection } from './statistics/stats';
 
@@ -13,7 +14,7 @@ export interface Serialization {
     effects?: Effects;
     notifications?: Notifications;
     //components
-    playerClasses?: PlayerClasses;
+    guilds?: Guilds;
     weapon?: Weapon;
     skills?: Skills;
     artifacts?: Artifacts;
@@ -89,11 +90,10 @@ export interface Effect {
     effectivenessFactor?: number;
 }
 
-export interface PlayerClasses {
-    activePlayerClassName: string;
-    playerClassList: {
-        name: string;
-    }[];
+export interface Guilds {
+    guildId?: string;
+    classId?: string;
+    activity?: GuildActivityName | null;
 }
 
 export interface Weapon {

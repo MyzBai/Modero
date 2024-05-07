@@ -1,5 +1,5 @@
 import { CombatArea, type CombatAreaOptions } from 'src/game/combat/CombatArea';
-import { combat, game, gameLoop, notifications, player } from 'src/game/game';
+import { combat, game, gameLoop, notifications, player, world } from 'src/game/game';
 import type * as GameSerialization from 'src/game/serialization';
 import { assertNonNullable } from 'src/shared/utils/assert';
 
@@ -102,6 +102,7 @@ export class Ascend {
     private cancelTrial() {
         assertNonNullable(this._combatArea);
         combat.stopArea();
+        combat.startArea(world.area);
         this._combatArea = null;
         this.stopTimeout();
     }

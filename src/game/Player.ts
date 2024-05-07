@@ -55,8 +55,8 @@ export class Player {
     }
 
     setup() {
-        if (!this.stats.playerClass.texts) {
-            this.stats.playerClass.options.label = undefined;
+        if (!this.stats.guildClass.texts) {
+            this.stats.guildClass.options.label = undefined;
         }
         this.updateStatsDirect();
         if (this.stats.mana.value === Infinity) {
