@@ -87,6 +87,7 @@ export interface Skills {
     };
     passiveSkills?: {
         insightCapacityEnhancerList: {
+            id: Id;
             name: Name;
             insight: UnsignedInteger;
             probabilities: Probability[];

@@ -28,6 +28,7 @@ export class Artifacts extends Component {
     constructor(data: GameConfig.Artifacts) {
         super('artifacts');
 
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Artifacts</div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="g-toolbar" data-artifacts-counter><span>Artifacts: <var data-cur>0</var>/<var data-max></var></span></div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Artifact List</div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="artifact-list g-scroll-list-v" data-artifact-list></ul>');
@@ -133,7 +134,7 @@ export class Artifacts extends Component {
         if (!this.selectedArtifact) {
             return;
         }
-        const expbar = this.page.querySelector<ProgressElement>(`[data-skill-info] ${ProgressElement.name}`);
+        const expbar = this.page.querySelector<ProgressElement>(`[data-item-info] ${ProgressElement.name}`);
         if (expbar) {
             expbar.value = this.selectedArtifact.exp / this.selectedArtifact.maxExp;
         }
@@ -177,13 +178,13 @@ export class Artifacts extends Component {
 
     serialize(save: Serialization) {
         save.artifacts = {
-            artifactNameList: this.artifactList.filter(x => x.unlocked).map(x => ({ name: x.data.name, assigned: x.assigned, expFac: x.exp / x.maxExp }))
+            artifactNameList: this.artifactList.filter(x => x.unlocked).map(x => ({ id: x.data.id, assigned: x.assigned, expFac: x.exp / x.maxExp }))
         };
     }
 
     deserialize({ artifacts: save }: UnsafeSerialization) {
         for (const data of save?.artifactNameList?.filter(isDefined) || []) {
-            const artifact = this.artifactList.find(x => x.data.name === data.name);
+            const artifact = this.artifactList.find(x => x.data.id === data.id);
             if (!artifact) {
                 continue;
             }

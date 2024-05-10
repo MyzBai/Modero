@@ -84,17 +84,19 @@
 
 [data-highlight] {
     color: $color-title-accent;
+    box-shadow: 0 0 0 1px $color-title-accent inset;
 }
 
 .g-help-icon {
     position: absolute;
-    top: calc($padding-container);
-    right: calc($padding-container);
+    top: calc($padding-container + $default-border-size);
+    right: calc($padding-container + $default-border-size);
     cursor: default;
     outline: $default-border;
     width: 1.3em;
     text-align: center;
     font-weight: 600;
+    z-index: 1;
     &:hover {
         filter: brightness(130%);
     }

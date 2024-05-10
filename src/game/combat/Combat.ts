@@ -34,6 +34,8 @@ export class Combat {
         this.page = document.createElement('div');
         this.page.classList.add('p-combat', 'hidden');
 
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Combat</div>');
+
         this.lifebarElement = game.page.querySelectorStrict('[data-combat-overview] [data-life-bar]');
 
         const enemyLabel = game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]');
@@ -49,9 +51,9 @@ export class Combat {
             modal.setBodyElement(body);
         });
 
-        const effectsElement = document.createElement('div');
+        const effectsElement = document.createElement('fieldset');
+        effectsElement.insertAdjacentHTML('beforeend', '<legend>Effects</legend>');
         effectsElement.classList.add('s-effects');
-        effectsElement.insertAdjacentHTML('beforeend', '<div class="g-title">Effects</div>');
         effectsElement.insertAdjacentHTML('beforeend', '<ul class="effect-list" data-effect-list></ul>');
         this.page.appendChild(effectsElement);
 
@@ -198,17 +200,6 @@ export class Combat {
         }
     }
 
-    dealDamage(damage: number) {
-        if (!this._area || !this._area.enemy) {
-            return;
-        }
-        const enemy = this._area.enemy;
-        enemy.life -= damage;
-        if (enemy.life <= 0) {
-            this.processEnemyDeath(enemy);
-        }
-    }
-
     dealDamageOverTime(damage: number, type: DOTEffect) {
         this.dealDamage(damage);
 
@@ -220,6 +211,17 @@ export class Combat {
         game.stats.totalDamage.add(damage);
         game.stats[`total${type}Damage`].add(damage);
         game.stats[`total${damageType}Damage`].add(damage);
+    }
+
+    dealDamage(damage: number) {
+        if (!this._area || !this._area.enemy) {
+            return;
+        }
+        const enemy = this._area.enemy;
+        enemy.life -= damage;
+        if (enemy.life <= 0) {
+            this.processEnemyDeath(enemy);
+        }
     }
 
     private updateLifebar() {

@@ -61,18 +61,24 @@ export class Game {
         const combatOverview = document.createElement('div');
         combatOverview.classList.add('s-combat-overview');
         combatOverview.setAttribute('data-combat-overview', '');
-        combatOverview.insertAdjacentHTML('beforeend', '<span class="player-name" data-player-name>Player</span>');
+
+        const playerBar = document.createElement('div');
+        playerBar.classList.add('s-player-bar');
+        playerBar.insertAdjacentHTML('beforeend', '<span class="player-name" data-player-name>Player</span>');
         const manabar = createCustomElement(ProgressElement);
         manabar.classList.add('s-mana-bar');
         manabar.setAttribute('data-mana-bar', '');
-        combatOverview.appendChild(manabar);
+        playerBar.appendChild(manabar);
 
-        combatOverview.insertAdjacentHTML('beforeend', '<span class="enemy-name" data-enemy-name></span>');
+        const enemyBar = document.createElement('div');
+        enemyBar.classList.add('s-enemy-bar');
+        enemyBar.insertAdjacentHTML('beforeend', '<span class="enemy-name" data-enemy-name></span>');
         const lifebar = createCustomElement(ProgressElement);
         lifebar.classList.add('s-life-bar');
         lifebar.setAttribute('data-life-bar', '');
-        combatOverview.appendChild(lifebar);
+        enemyBar.appendChild(lifebar);
 
+        combatOverview.append(playerBar, enemyBar);
         this.page.appendChild(combatOverview);
 
 
@@ -252,7 +258,7 @@ export class Game {
     addElementHighlight(element: HTMLElement, onRemove?: () => void): void;
     addElementHighlight(arg: string | HTMLElement, onRemove?: () => void) {
         const element = arg instanceof HTMLElement ? arg : this.page.querySelector<HTMLElement>(`[data-id="${arg}"]`);
-        if (!element) {
+        if (!element || element.classList.contains('selected')) {
             return;
         }
         element.setAttribute('data-highlight', '');

@@ -1,5 +1,5 @@
 import { CombatArea } from 'src/game/combat/CombatArea';
-import { combat, game, player, statistics, world } from 'src/game/game';
+import { combat, game, player } from 'src/game/game';
 import * as GameConfig from 'src/game/gameConfig/GameConfig';
 import type { Guild } from './Guilds';
 import { clamp } from 'src/shared/utils/utils';
@@ -26,9 +26,9 @@ export function stopActivity() {
     player.stats.trainingMultiplier.setDefault();
     player.stats.explorationMultiplier.setDefault();
     player.stats.meditationMultiplier.setDefault();
-
+    player.modDB.removeBySource('GuildActivity');
     combat.stopArea();
-    combat.startArea(world.area);
+    combat.startArea(null);
 
     if (tickCallback) {
         game.tickSecondsEvent.removeListener(tickCallback);
@@ -76,5 +76,5 @@ function startExploration(multiplier: number) {
 function startMeditation(multiplier: number) {
     player.stats.activity.setText('Meditation');
     player.stats.meditationMultiplier.set(multiplier);
-    statistics.updateStats('Player');
+    player.modDB.add('GuildActivity', [{ name: 'MaxMana', valueType: 'More', value: 100 }, { name: 'ManaRegen', valueType: 'More', value: 100 }]);
 }

@@ -2,6 +2,7 @@
 .p-combat {
     overflow-y: auto;
     .s-effects {
+        min-height: 10em;
         .s-effect {
             display: grid;
             grid-template-rows: auto 1fr;

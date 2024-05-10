@@ -2,14 +2,14 @@
 
 .p-notifications {
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap: $default-gap;
 
     .s-toolbar {
         background-color: $color-primary-bg;
     }
 
     .s-notifications-list {
-        padding-top: $padding-container;
         li {
             white-space-collapse: break-spaces;
             border: $default-border;

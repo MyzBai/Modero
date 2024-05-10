@@ -406,6 +406,9 @@
               "items": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "$ref": "#/definitions/Id"
+                  },
                   "name": {
                     "pattern": "^[A-Za-z 0-9]{3,32}$",
                     "type": "string"
@@ -427,6 +430,7 @@
                 },
                 "additionalProperties": false,
                 "required": [
+                  "id",
                   "insight",
                   "name",
                   "probabilities"

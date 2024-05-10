@@ -17,17 +17,14 @@ export class Weapon extends Component {
     constructor(readonly data: GameConfig.Weapon) {
         super('weapon');
 
-        const titleElement = document.createElement('div');
-        titleElement.classList.add('g-title');
-        titleElement.textContent = 'Weapon';
         const helpIconElement = createHelpIcon('Weapon Help', `
             Craft your weapon using the craft table.
             New and better modifiers become available as you level up.
             You can click modifiers to see more information about them.
         `.trim());
-        titleElement.appendChild(helpIconElement);
-        this.page.appendChild(titleElement);
+        this.page.appendChild(helpIconElement);
 
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Weapon</div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="s-weapon" data-weapon><div class="hidden" data-weapon-type></div><ul class="s-mod-list g-mod-list" data-mod-list></ul></div>');
 
         this.craftTable = new CraftTable({

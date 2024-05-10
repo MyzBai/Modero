@@ -11,6 +11,7 @@ export class Achievements extends Component {
     constructor(readonly data: GameConfig.Achievements) {
         super('achievements');
 
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Achievements</div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v" data-achievement-list></ul>');
 
         const container = this.page.querySelectorStrict('[data-achievement-list]');

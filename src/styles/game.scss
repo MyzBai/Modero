@@ -22,26 +22,32 @@
     .s-combat-overview {
         border: $default-border;
         padding: $padding-container;
-        display: grid;
-        grid-template-rows: auto auto;
-        grid-auto-flow: column;
+        display: flex;
+        // grid-template-columns: 50% 50%;
+        // grid-auto-flow: column;
         column-gap: 0.5em;
         height: 2em;
-        .enemy-name {
-            cursor: default;
-            &:hover {
-                filter: brightness(120%);
-            }
-        }
 
-        .s-life-bar {
-            .value {
-                background-color: $color-tag-life-fg;
+        .s-player-bar {
+            flex: 1;
+            .s-mana-bar {
+                .value {
+                    background-color: $color-tag-mana-fg;
+                }
             }
         }
-        .s-mana-bar {
-            .value {
-                background-color: $color-tag-mana-fg;
+        .s-enemy-bar {
+            flex: 1;
+            .enemy-name {
+                cursor: default;
+                &:hover {
+                    filter: brightness(120%);
+                }
+            }
+            .s-life-bar {
+                .value {
+                    background-color: $color-tag-life-fg;
+                }
             }
         }
     }

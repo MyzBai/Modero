@@ -79,7 +79,7 @@ export class LoadGame extends GameInitializer {
 
     private showEntry(entry: SaveEntry | undefined) {
         if (!entry) {
-            this.page.querySelectorStrict('[data-mod-entry-info]').remove();
+            this.page.querySelector('[data-mod-entry-info]')?.remove();
             return;
         }
 

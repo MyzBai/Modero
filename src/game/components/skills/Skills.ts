@@ -19,6 +19,7 @@ export class Skills extends Component {
     constructor(readonly data: GameConfig.Skills) {
         super('skills');
 
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Skills</div>');
         const menu = createCustomElement(TabMenuElement);
         menu.classList.add('s-menu');
         menu.setDirection('horizontal');
@@ -35,7 +36,7 @@ export class Skills extends Component {
             ` : ''}
             Passives requires insight. You can gain insight by killing enemies.
         `.trim());
-        menu.appendChild(helpIconElement);
+        this.page.appendChild(helpIconElement);
 
         if (data.attackSkills) {
             this.attackSkills = new AttackSkills(data.attackSkills);

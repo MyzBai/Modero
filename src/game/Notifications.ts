@@ -28,6 +28,8 @@ export class Notifications {
         this.page.classList.add('p-notifications', 'hidden');
         this.page.setAttribute('data-page-content', 'notifications');
 
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Notifications</div>');
+
         const toolbarElement = this.createToolbarElement();
         this.page.appendChild(toolbarElement);
 
@@ -60,7 +62,9 @@ export class Notifications {
     private createToolbarElement() {
         const element = document.createElement('div');
         element.classList.add('s-toolbar', 'g-toolbar');
-        const markAllAsSeen = document.createElement('button');
+
+        const markAllAsSeen = document.createElement('span');
+        markAllAsSeen.classList.add('g-clickable-text', 'clear');
         markAllAsSeen.textContent = 'Mark all as seen';
         markAllAsSeen.addEventListener('click', () => {
             for (const notification of this.notificationList) {

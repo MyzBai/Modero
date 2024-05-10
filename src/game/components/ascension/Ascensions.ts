@@ -19,8 +19,8 @@ export class Ascensions {
         this.page.classList.add('p-ascensions');
 
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Ascension List</div>');
-        this.page.insertAdjacentHTML('beforeend', '<div class="s-ascension-info" data-ascension-info></div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="s-ascension-list g-scroll-list" data-ascension-list></ul>');
+        this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
     }
 
     updateAscensionList() {
@@ -69,7 +69,7 @@ export class Ascensions {
     }
 
     private showAscensionInstance(ascension: AscensionInstance) {
-        const element = this.page.querySelectorStrict('[data-ascension-info]');
+        const element = this.page.querySelectorStrict('[data-item-info]');
         element.replaceChildren();
 
         element.insertAdjacentHTML('beforeend', `<div class="g-title">${ascension.name}</div>`);

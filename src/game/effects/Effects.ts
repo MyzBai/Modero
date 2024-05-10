@@ -144,7 +144,4 @@ export interface BaseEffectData {
     effectivenessFactor?: number;
     timePct?: number;
 }
-export interface DOTEffectData extends PickStrict<BaseEffectData, 'timePct'> {
-    type: DOTEffect;
-    effectivenessFactor: number;
-}
+export type DOTEffectData = BaseEffectData & { type: DOTEffect; effectivenessFactor: number; };

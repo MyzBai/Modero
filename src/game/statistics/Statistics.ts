@@ -22,6 +22,8 @@ export class Statistics {
         this.page.classList.add('p-statistics', 'hidden');
         this.page.setAttribute('data-page-content', 'statistics');
 
+
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Statistics</div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v" data-stat-group-list></ul>');
 
         game.addPage(this.page, 'Statistics', 'statistics');

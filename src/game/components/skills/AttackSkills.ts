@@ -119,7 +119,7 @@ export class AttackSkills {
     }
 
     private updateSkillInfo() {
-        const expbar = this.page.querySelector<ProgressElement>(`[data-skill-info] ${ProgressElement.name}`);
+        const expbar = this.page.querySelector<ProgressElement>(`[data-item-info] ${ProgressElement.name}`);
         if (expbar) {
             expbar.value = this.selectedSkill.exp / this.selectedSkill.maxExp;
         }
@@ -159,20 +159,20 @@ export class AttackSkills {
 
     serialize(): GameSerialization.Skills['attackSkills'] {
         return {
-            skillName: this.activeSkill.data.name,
-            skillList: this.skillList.filter(x => x.unlocked).map(x => ({ name: x.data.name, expFac: x.exp / x.maxExp }))
+            skillId: this.activeSkill.data.id,
+            skillList: this.skillList.filter(x => x.unlocked).map(x => ({ id: x.data.id, expFac: x.exp / x.maxExp }))
         };
     }
 
     deserialize(save: DeepPartial<GameSerialization.Skills['attackSkills']>) {
-        const activeSkill = this.skillList.find(x => x.data.name === save?.skillName);
+        const activeSkill = this.skillList.find(x => x.data.id === save?.skillId);
         if (activeSkill) {
             this.assignSkill(activeSkill);
             this.selectSkillByName(activeSkill.data.name);
         }
 
         for (const skillData of save?.skillList?.filter(isDefined) ?? []) {
-            const skill = this.skillList.find(x => x.name === skillData?.name);
+            const skill = this.skillList.find(x => x.id === skillData?.id);
             if (!skill) {
                 continue;
             }

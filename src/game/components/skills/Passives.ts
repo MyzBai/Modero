@@ -152,7 +152,7 @@ export class Passives {
         if (!this.selectedPassive) {
             return;
         }
-        const expbar = this.page.querySelector<ProgressElement>(`[data-skill-info] ${ProgressElement.name}`);
+        const expbar = this.page.querySelector<ProgressElement>(`[data-item-info] ${ProgressElement.name}`);
         if (expbar) {
             expbar.value = this.selectedPassive.exp / this.selectedPassive.maxExp;
         }
@@ -215,7 +215,9 @@ export class Passives {
         const insightCapacityEnhancer = this.insightCapacityEnhancerList.findStrict(x => x.data === candidate.data);
         insightCapacityEnhancer.curCount++;
         this.applyInsightCapacityEnhancersAsModifiers();
-        this.updateInsightValueElement();
+        setTimeout(() => {
+            this.updateInsightValueElement();
+        }, 100);
 
         const skillsPage = this.page.closest('[data-page-content="skills"]');
         assertNonNullable(skillsPage);
@@ -254,14 +256,14 @@ export class Passives {
 
     serialize(): GameSerialization.Skills['passiveSkills'] {
         return {
-            insightCapacityEnhancerList: this.insightCapacityEnhancerList.filter(x => x.curCount > 0).map(x => ({ name: x.data.name, count: x.curCount })),
-            passiveList: this.passiveList.filter(x => x.unlocked).map(x => ({ name: x.data.name, allocated: x.allocated, expFac: x.exp / x.maxExp }))
+            insightCapacityEnhancerList: this.insightCapacityEnhancerList.filter(x => x.curCount > 0).map(x => ({ id: x.data.id, count: x.curCount })),
+            passiveList: this.passiveList.filter(x => x.unlocked).map(x => ({ id: x.data.id, allocated: x.allocated, expFac: x.exp / x.maxExp }))
         };
     }
 
     deserialize(save: DeepPartial<GameSerialization.Skills['passiveSkills']>) {
         for (const data of save?.insightCapacityEnhancerList?.filter(isDefined) || []) {
-            const insightCapacityEnhancer = this.insightCapacityEnhancerList.find(x => x.data.name === data.name);
+            const insightCapacityEnhancer = this.insightCapacityEnhancerList.find(x => x.data.id === data.id);
             if (!insightCapacityEnhancer || !data.count) {
                 continue;
             }
@@ -269,7 +271,7 @@ export class Passives {
         }
         this.applyInsightCapacityEnhancersAsModifiers();
         for (const data of save?.passiveList?.filter(isDefined) || []) {
-            const passive = this.passiveList.find(x => x.data.name === data?.name);
+            const passive = this.passiveList.find(x => x.data.id === data?.id);
             if (!passive) {
                 continue;
             }

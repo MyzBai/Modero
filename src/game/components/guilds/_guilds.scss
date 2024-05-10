@@ -1,12 +1,16 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 .p-guilds {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto max(40%) auto 1fr;
     grid-auto-flow: column;
     gap: $default-gap;
 
+    & > :first-child {
+        grid-column: span 2;
+    }
     .token-counter {
         padding: $padding-container;
         background-color: $color-primary-bg;
@@ -22,7 +26,7 @@
 
     [data-guild-info] {
         grid-column: 2;
-        grid-row: 1/4;
+        grid-row: 2/4;
         border: $default-border;
         progress-element {
             @include progress-multi-bar;

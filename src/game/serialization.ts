@@ -108,26 +108,26 @@ export interface WeaponCrafting {
 
 export interface Skills {
     attackSkills?: {
-        skillName: string;
+        skillId: string;
         skillList: {
-            name: string;
+            id: string;
             expFac: number;
         }[];
     };
     auraSkills?: {
         skillSlotList: ({
-            skillName: string;
+            id: string;
             timePct: number;
         } | undefined)[];
         skillList: {
-            name: string;
+            id: string;
             expFac: number;
         }[];
     };
     passiveSkills?: {
-        insightCapacityEnhancerList: { name: string; count: number; }[];
+        insightCapacityEnhancerList: { id: string; count: number; }[];
         passiveList: {
-            name: string;
+            id: string;
             allocated: boolean;
             expFac: number;
         }[];
@@ -136,7 +136,7 @@ export interface Skills {
 
 export interface Artifacts {
     artifactNameList: {
-        name: string;
+        id: string;
         assigned: boolean;
         expFac: number;
     }[];

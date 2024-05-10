@@ -1,7 +1,5 @@
-import { combat, game, gameLoop, gameLoopAnim, player, world } from './game';
+import { combat, game, gameLoop, gameLoopAnim, player } from './game';
 import { loadGame } from '../shared/utils/saveManager';
-import { CombatArea } from './combat/CombatArea';
-import { assertDefined } from 'src/shared/utils/assert';
 
 declare global {
     interface Window {
@@ -25,30 +23,9 @@ export function initDevTools() {
         getEnemy: () => combat.enemy,
         setLevel: (level: number) => player.stats.level.set(level),
         setAscension: (count: number) => game.stats.maxLevel.value >= game.maxLevel ? game.stats.ascensionCount.set(count) : console.error('reach max level first'),
-        skipTime: (time: number, units: 'ms' | 'sec' | 'min' = 'ms') => {
-            switch (units) {
-                case 'sec': time *= 1000; break;
-                case 'min': time *= 1000 * 60; break;
-            }
-            console.time('Skip Time');
-            gameLoop.skipTime(time);
-            console.timeEnd('Skip Time');
-        },
-        killEnemies: (count: number, worldProgression = true) => {
-            const area = worldProgression ? world.area : new CombatArea({
-                areaModList: [],
-                candidates: game.gameConfig.enemyList.filter(x => (x.level ?? 1) <= player.level),
-                enemyBaseCount: Number.isFinite(count) ? count : 0,
-                enemyBaseLife: 1,
-                name: '',
-                excludeGlobalAreaMods: true
-            });
-            assertDefined(area);
-            combat.startArea(area);
-            for (let i = 0; i < count; i++) {
-                combat.dealDamage(Infinity);
-            }
-            combat.startArea(null);
+
+        setLoopSpeed: (speed: number) => {
+            gameLoop.setSpeed(speed);
         },
         dispose: () => {
             document.body.removeEventListener('keydown', toggleLoop);

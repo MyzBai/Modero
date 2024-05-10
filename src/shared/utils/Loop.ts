@@ -65,6 +65,10 @@ export class Loop {
         }
     }
 
+    setSpeed(speed: number) {
+        BaseLoop.speedMultiplier = Math.round(speed);
+    }
+
     registerCallback(callback: Callback, options?: Options): () => void {
         const id = uuid();
         const instance: Instance = {
@@ -92,10 +96,6 @@ export class Loop {
         }
     }
 
-    skipTime(time: number) {
-        this.loop.skipTime(time);
-    }
-
     start() {
         if (this._state === 'Running') {
             return;
@@ -111,11 +111,14 @@ export class Loop {
 }
 
 abstract class BaseLoop {
+    static speedMultiplier = 1;
     abstract readonly type: LoopType;
     readonly instanceMap: InstanceMap = new Map();
     private lastTime = 0;
     private remainder = 0;
+
     dispose?(): void;
+
     unregister(id: string) {
         this.instanceMap.delete(id);
     }
@@ -131,7 +134,7 @@ abstract class BaseLoop {
         const frameTime = Math.min(performance.now() - this.lastTime, 2000); //to prevent accumulation using breakpoints etc..
         let time = frameTime + this.remainder;
         while (time >= TARGET_TICK_RATE) {
-            time -= TARGET_TICK_RATE;
+            time -= TARGET_TICK_RATE / BaseLoop.speedMultiplier;
             for (const instance of this.instanceMap.values()) {
                 instance.time += TARGET_TICK_RATE;
                 const targetWaitTime = instance.options?.delay ?? TARGET_TICK_RATE;

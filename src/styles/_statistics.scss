@@ -1,6 +1,8 @@
 @use 'variables' as *;
 .p-statistics {
     display: grid;
+    grid-template-rows: auto 1fr;
+    gap: $default-gap;
     ul {
         overflow-y: auto;
         border-bottom: $default-border;

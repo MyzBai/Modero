@@ -6,6 +6,7 @@ import { assertNonNullable } from 'src/shared/utils/assert';
 import { Modifier } from 'src/game/mods/Modifier';
 import { startActivity, stopActivity } from './activities';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
+import { createHelpIcon } from 'src/shared/utils/dom';
 
 type GuildClassData = GameConfig.GuildClasses['classList'][number];
 export interface Guild extends Item {
@@ -27,13 +28,25 @@ export class Guilds extends Component {
     constructor(private readonly data: GameConfig.Guilds) {
         super('guilds');
 
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-toolbar"><span>Tokens: <var data-token-counter></var></span></div>')
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Guilds</div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Guild List</div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v guild-list" data-guild-list></ul>');
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Class List</div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v class-list" data-class-list></ul>');
         this.page.insertAdjacentHTML('beforeend', '<div data-item-info data-guild-info></div>');
         this.page.insertAdjacentHTML('beforeend', '<div data-item-info data-class-info></div>');
+
+        const guildHelp = createHelpIcon('', () => `
+            Your guild gains exp during activities
+            - Training:
+                Attack skills gain increased exp
+            - Exploration:
+                Increased chance of finding artifacts
+            - Meditation:
+                Maximum mana and regeneration are doubled
+                Auras gain increased exp
+        `.trim());
+        this.page.appendChild(guildHelp);
 
         this.guildList = this.data.guildList.map(data => {
             const element = createItemListElement(data);
