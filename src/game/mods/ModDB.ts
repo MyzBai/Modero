@@ -9,14 +9,19 @@ export interface StatModifier extends ModTemplateStat {
 }
 
 export class ModDB {
-    private mods = new Map<StatName, (StatModifier & { source: string; })[]>();
+    private mods: Map<StatName, (StatModifier & { source: string; })[]>;
     public readonly onChange = new EventEmitter();
 
-    getModListByName(name?: StatName) {
-        if (!name) {
-            return [...this.mods.values()].flatMap(x => x);
-        }
+    constructor(modDB?: ModDB) {
+        this.mods = modDB ? new Map(modDB.mods) : new Map();
+    }
+
+    getModListByName(name: StatName) {
         return [...this.mods.get(name) || []];
+    }
+
+    extractAllMods(): StatModifier[] {
+        return [...this.mods.values()].flatMap(x => x);
     }
 
     add(source: string, statModList: StatModifier[]) {

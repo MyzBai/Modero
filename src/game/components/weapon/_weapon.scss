@@ -125,7 +125,13 @@
         .s-compare {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 5em;
+            grid-template-rows: auto 1fr;
+            column-gap: 5em;
+            row-gap: 0.5em;
+            .dps-compare {
+                margin: 0 auto;
+                grid-column: 1/3;
+            }
         }
     }
 }

@@ -13,6 +13,10 @@ import { evaluateStatRequirements } from 'src/game/statistics/statRequirements';
 import { TextInputDropdownElement } from 'src/shared/customElements/TextInputDropdownElement';
 import { createHelpIcon } from 'src/shared/utils/dom';
 import type { Requirements } from 'src/game/gameConfig/GameConfig';
+import { player } from '../../game';
+import { ModDB } from '../../mods/ModDB';
+import { calcPlayerStats, extractStats } from '../../calc/calcStats';
+import { Weapon } from './Weapon';
 
 export interface Craft {
     template: CraftTemplate;
@@ -432,6 +436,22 @@ export class CraftTable {
         const element = document.createElement('div');
         element.classList.add('s-compare');
 
+        {
+            const stats = extractStats(player.stats);
+            const dps1 = calcPlayerStats({ stats, modDB: player.modDB }).dps;
+
+            const modDB = new ModDB(player.modDB);
+            modDB.replace(Weapon.sourceName, Modifier.extractStatModifierList(...this.ctxCopy.modList));
+            const dps2 = calcPlayerStats({ stats, modDB }).dps;
+            const dpsCompareElement = document.createElement('div');
+            dpsCompareElement.classList.add('dps-compare');
+
+            dpsCompareElement.innerHTML = `<span data-tag="${dps2 > dps1 ? 'valid' : dps2 < dps1 ? 'invalid' : ''}">DPS: <var>${dps1.toFixed(0)}</var> → <var>${dps2.toFixed(0)}</var></span>`;
+
+            element.appendChild(dpsCompareElement);
+        }
+
+
         const createModListElement = (modList: Modifier[]) => {
             const element = document.createElement('ul');
             element.classList.add('g-mod-list');
@@ -442,6 +462,8 @@ export class CraftTable {
         const a = createModListElement(this.ctx.modList);
         const b = createModListElement(this.ctxCopy.modList);
         element.append(a, b);
+
+
 
         const missingModifiers = this.ctx.modList.filter(x => !this.ctxCopy?.modList.some(y => y.template === x.template));
         [...a.querySelectorAll<HTMLElement>('[data-mod]')].filter(x => missingModifiers.find(y => y.desc === x.textContent)).forEach(x => x.setAttribute('data-tag', 'invalid'));
@@ -568,7 +590,7 @@ export class CraftTable {
         this.updateCraftListItemStates();
     }
 
-    updateCraftCount(craft?: Craft) {
+    private updateCraftCount(craft?: Craft) {
         const craftList = craft ? [craft] : this.craftList;
         for (const craft of craftList) {
             craft.element.querySelectorStrict('[data-count]').textContent = craft.count.toFixed();

@@ -10,6 +10,7 @@ import { isDefined, isNumber, isString, pickManyFromPickProbability } from 'src/
 import { createHelpIcon } from 'src/shared/utils/dom';
 
 export class Weapon extends Component {
+    static sourceName = 'Weapon';
     private readonly modGroupsList: ModGroupList[] = [];
     private readonly candidateModList: WeaponModifierCandidate[] = [];
     private readonly craftTable: CraftTable;
@@ -73,7 +74,7 @@ export class Weapon extends Component {
     }
 
     private applyModifiers() {
-        player.modDB.replace('Weapon', Modifier.extractStatModifierList(...this.modList));
+        player.modDB.replace(Weapon.sourceName, Modifier.extractStatModifierList(...this.modList));
     }
 
     serialize(save: Serialization) {
