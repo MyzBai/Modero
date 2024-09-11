@@ -2,14 +2,14 @@
     "compilerOptions": {
         "module": "ESNext",
         "target": "ESNext",
-        "lib": [ "DOM", "ESNext", "dom.iterable" ],
-        "moduleResolution": "Node",
+        "lib": [ "DOM", "dom.iterable", "ESNext" ],
+        "types": [ ],
+        "moduleResolution": "Bundler",
         "resolveJsonModule": true,
         "verbatimModuleSyntax": true,
         "noUncheckedIndexedAccess": true,
         "skipLibCheck": true,
         "baseUrl": ".",
-        "typeRoots": [ "./node_modules/@types" ],
         "removeComments": true,
         "noEmit": true,
         "strict": true,
@@ -27,7 +27,6 @@
         "allowJs": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
-        "types": [ "node" ]
     },
-    "exclude": [ "public", "node_modules" ]
+    "exclude": [ "public", "scripts", "tests", "node_modules" ]
 }

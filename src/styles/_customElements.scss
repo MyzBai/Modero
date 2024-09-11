@@ -146,6 +146,7 @@ tab-menu-element {
 }
 
 text-input-dropdown-element {
+    display: flex;
     border: $default-border;
     input {
         &[readonly] {

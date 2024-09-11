@@ -1,0 +1,9 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "scripts",
+        "typeRoots": [ "../node_modules/@types" ],
+        "types": [ "node" ]
+    },
+    "include": [ "scripts", "tests" ]
+}

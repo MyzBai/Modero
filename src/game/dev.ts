@@ -5,6 +5,10 @@ declare global {
     interface Window {
         idleAscension: ReturnType<typeof initDevTools>;
     }
+    interface GlobalEventHandlersEventMap {
+        'Dev:AddArtifact': CustomEvent<string>;
+        'Dev:IncreaseArtifactRank': CustomEvent<string>;
+    }
 }
 
 export function initDevTools() {
@@ -23,7 +27,8 @@ export function initDevTools() {
         getEnemy: () => combat.enemy,
         setLevel: (level: number) => player.stats.level.set(level),
         setAscension: (count: number) => game.stats.maxLevel.value >= game.maxLevel ? game.stats.ascensionCount.set(count) : console.error('reach max level first'),
-
+        addArtifact: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:AddArtifact', { detail: baseName })),
+        increaseArtifactRank: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:IncreaseArtifactRank', { detail: baseName })),
         setLoopSpeed: (speed: number) => {
             gameLoop.setSpeed(speed);
         },

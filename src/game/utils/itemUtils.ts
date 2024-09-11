@@ -4,6 +4,7 @@ import { ROMAN_NUMERALS } from 'src/shared/utils/constants';
 import { rankNumeralsRegex } from 'src/shared/utils/textParsing';
 import { createModListElement } from './dom';
 import { isDefined } from 'src/shared/utils/utils';
+import { TextInputDropdownElement } from '../../shared/customElements/TextInputDropdownElement';
 
 export interface Item {
     id?: string;
@@ -12,13 +13,17 @@ export interface Item {
     exp?: number;
     maxExp?: number;
     unlocked?: boolean;
+    assigned?: boolean;
+    selected?: boolean;
 }
 
 
-interface ItemInfo {
-    item: Item;
+interface ItemInfo<T extends Item = Item> {
+    item: T;
     propertyList?: string[][];
     modList?: string[];
+    rankList?: T[];
+    onRankChange?: (item: T) => void;
 }
 
 
@@ -50,24 +55,10 @@ export function getRankItemBaseName(text: string) {
     return text.replace(rankNumeralsRegex, '').trimEnd();
 }
 
-export function createItemCandidates<T extends Item & { assigned?: boolean; allocated?: boolean; }>(itemList: T[]): T[] {
-    return itemList.filter(x => {
-        if (x.assigned || x.allocated || x.unlocked) {
-            return false;
-        }
-        const numeral = getItemRankNumeral(x.name);
-        if (numeral && numeral !== 'I') {
-            return false;
-        }
-        return true;
-    });
-}
-
-export function createItemListElement(item: Item): HTMLElement {
+export function createItemListElement(item: { id: string; name: string; probability?: number; }): HTMLElement {
     const element = document.createElement('li');
     element.classList.add('g-list-item');
-    const rankIndex = ROMAN_NUMERALS.indexOf(getItemRankNumeral(item.name) ?? 'I');
-    element.classList.toggle('hidden', rankIndex > 0);
+    element.classList.add('hidden');
     if (item.id) {
         element.setAttribute('data-id', item.id);
     }
@@ -83,6 +74,29 @@ export function getNextRankItem<T extends { name: string; }>(item: T, itemList: 
     const nextSkillName = `${baseName} ${nextRank}`;
     const nextItem = itemList.find(x => x.name === nextSkillName);
     return nextItem ?? null;
+}
+
+export function createItemRankDropdown(rankList: Item[], callback: (item: Item) => void) {
+    const element = createCustomElement(TextInputDropdownElement);
+    element.setReadonly();
+    const updateDropdownList = () => {
+        element.setDropdownList(rankList.filter(x => x.unlocked).map(x => x.name));
+        element.setInputText(rankList.find(x => x.selected)?.name ?? rankList.find(x => x.assigned)?.name ?? rankList[0]?.name);
+    };
+    updateDropdownList();
+
+    element.onInputOpen = () => {
+        updateDropdownList();
+    };
+    element.onInputChange = ({ index }) => {
+        const item = rankList[index];
+        if (!item) {
+            throw Error('invalid dropdown index');
+        }
+        rankList.forEach(x => x.selected = x === item);
+        callback(item);
+    };
+    return element;
 }
 
 export function createItemPropertyElement(propertyList: string[][]) {
@@ -113,14 +127,40 @@ export function createItemInfoElements(itemInfo: ItemInfo) {
     contentElement.classList.add('s-content');
     contentElement.setAttribute('data-content', '');
 
+    const rankDropdownElement = (itemInfo.rankList && itemInfo.onRankChange) ? createItemRankDropdown(itemInfo.rankList, itemInfo.onRankChange) : undefined;
+
     const propertyListElement = itemInfo.propertyList ? createItemPropertyElement(itemInfo.propertyList) : undefined;
 
     const modListElement = itemInfo.modList ? createModListElement(itemInfo.modList) : undefined;
 
     const expBar = itemInfo.item.maxExp ? createExpBar(itemInfo.item) : undefined;
 
-    contentElement.append(...Object.values([propertyListElement, modListElement, expBar].filter(isDefined)));
+    contentElement.append(...Object.values([rankDropdownElement, propertyListElement, modListElement, expBar].filter(isDefined)));
 
     element.append(titleElement, contentElement);
-    return { element, titleElement, contentElement, propertyListElement, modListElement, expBar };
+    return { element, titleElement, contentElement, rankDropdownElement, propertyListElement, modListElement, expBar };
+}
+
+export function unlockItem(item: Item, elementMap: Map<string, HTMLElement>) {
+    item.unlocked = true;
+    const rankNumeral = getItemRankNumeral(item.name);
+    if (!rankNumeral || rankNumeral === 'I') {
+        const baseName = getRankItemBaseName(item.name);
+        const element = elementMap.get(baseName);
+        if (!element) {
+            throw Error(`${baseName} is missing an element`);
+        }
+        element.textContent = item.name;
+        element.removeAttribute('disabled');
+        element.classList.remove('hidden');
+    }
+}
+
+export function selectItemByName<T extends Item>(name: string, itemList: T[], elementMap: Map<string, HTMLElement>) {
+    const baseName = getRankItemBaseName(name);
+    const rankList = itemList.filter(x => getRankItemBaseName(x.name) === baseName);
+    const item = rankList.find(x => x.selected || x.assigned) ?? rankList[0]!;
+    itemList.forEach(x => x.selected = x === item);
+    elementMap.forEach((el, key) => el.classList.toggle('selected', key === baseName));
+    return item;
 }

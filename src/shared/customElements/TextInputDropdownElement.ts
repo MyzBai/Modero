@@ -3,13 +3,16 @@ import { CustomElement } from './CustomElement';
 
 export class TextInputDropdownElement extends CustomElement {
     static readonly name = 'text-input-dropdown-element';
-    private readonly input: HTMLInputElement;
+    readonly input: HTMLInputElement;
+    private prevValue?: string;
     private inputAnchor: 'top left' | 'top right' | 'bottom right' | 'bottom left' = 'bottom left';
     private boxAnchor: 'top left' | 'top right' | 'bottom right' | 'bottom left' = 'top left';
     private dropdownList: string[] = [];
     private abortController?: AbortController;
     validator = (text: string) => text.length > 0 ? this.dropdownList.includes(text) : true;
     onInputChange?: (args: { text: string; index: number; valid: boolean; }) => void;
+    onInputOpen?: () => void;
+
     constructor() {
         super();
 
@@ -53,6 +56,7 @@ export class TextInputDropdownElement extends CustomElement {
     }
 
     private openContent() {
+        this.onInputOpen?.();
         const elements: HTMLElement[] = [];
         for (const item of this.dropdownList || []) {
             const li = document.createElement('li');
@@ -91,7 +95,10 @@ export class TextInputDropdownElement extends CustomElement {
         this.abortController?.abort();
 
         this.updateBackgroundState();
-        this.onInputChange?.({ text: this.input.value, index: this.dropdownList.indexOf(this.input.value), valid: this.validText });
+        if (this.prevValue !== this.input.value) {
+            this.prevValue = this.input.value;
+            this.onInputChange?.({ text: this.input.value, index: this.dropdownList.indexOf(this.input.value), valid: this.validText });
+        }
     }
 
     private updateDropdownContentElementPosition() {
@@ -138,12 +145,16 @@ export class TextInputDropdownElement extends CustomElement {
         this.input.toggleAttribute('readonly', state);
     }
 
-    setInputText<T extends string>(text: T) {
-        this.input.value = text;
+    setInputText<T extends string>(text?: T) {
+        this.input.value = text ?? '';
+        this.prevValue = this.input.value;
     }
 
     setDropdownList(items: string[]) {
         this.dropdownList = items;
+        const value = items[0];
+        this.setInputText(value);
+        this.prevValue = value;
     }
 
     setInputAnchor(position: typeof this.inputAnchor) {

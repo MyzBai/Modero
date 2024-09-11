@@ -1,28 +1,20 @@
-import { combat, notifications, player } from 'src/game/game';
+import { combat, player } from 'src/game/game';
 import { Modifier } from 'src/game/mods/Modifier';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import type * as GameSerialization from 'src/game/serialization';
 import { assertDefined } from 'src/shared/utils/assert';
 import type { StatModifier } from 'src/game/mods/ModDB';
-import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
-import { createItemCandidates, createItem, createItemListElement, getNextRankItem, type Item, createItemInfoElements } from 'src/game/utils/itemUtils';
+import { isDefined } from 'src/shared/utils/utils';
+import { createItem, createItemListElement, createItemInfoElements, getRankItemBaseName, unlockItem } from 'src/game/utils/itemUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
+import { SkillPage, type AttackSkill } from './SkillPage';
 
-interface Skill extends Item {
-    name: string;
-    data: GameConfig.AttackSkill;
-    exp: number;
-    maxExp: number;
-    unlocked: boolean;
-    assigned: boolean;
-    element: HTMLElement;
-}
 
-export class AttackSkills {
+export class AttackSkills extends SkillPage {
     readonly page: HTMLElement;
-    readonly skillList: Skill[];
-    private activeSkill: Skill;
+    protected readonly skillList: AttackSkill[];
     constructor(data: Required<GameConfig.Skills>['attackSkills']) {
+        super();
         this.page = document.createElement('div');
         this.page.classList.add('p-attack-skills');
 
@@ -31,19 +23,22 @@ export class AttackSkills {
         this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
 
         this.skillList = data.attackSkillList.map(data => {
-            const element = createItemListElement(data);
-            element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
-            return { data, unlocked: false, assigned: false, maxExp: 0, exp: 0, ...createItem(data), element };
+            const baseName = getRankItemBaseName(data.name);
+            if (!this.elementMap.has(baseName)) {
+                const element = createItemListElement(data);
+                element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
+                this.elementMap.set(baseName, element);
+            }
+            return { type: 'Attack', baseName, data, active: false, unlocked: false, assigned: false, maxExp: 0, exp: 0, ...createItem(data) };
         });
-        this.page.querySelectorStrict('[data-skill-list]').append(...this.skillList.map(x => x.element));
-        this.skillList.filter(x => x.unlocked).forEach(x => this.unlockSkill(x));
+        this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
+        this.skillList.filter(x => x.unlocked).forEach(x => unlockItem(x, this.elementMap));
 
         const firstSkill = this.skillList.findStrict(x => x.probability === 0);
         assertDefined(firstSkill, 'no attack skill available, at least 1 attack skill must have a pickProbability of 0');
-        this.activeSkill = firstSkill;
+        firstSkill.assigned = true;
         this.assignSkill(firstSkill);
-
-        this.selectSkillByName(this.activeSkill.data.name);
+        this.selectSkillByName(this.activeSkill.name);
 
         combat.events.enemyDeath.listen((_, instance) => {
             this.tryUnlockSkill();
@@ -65,43 +60,31 @@ export class AttackSkills {
     }
 
     get selectedSkill() {
-        return this.skillList.findStrict(x => x.element.classList.contains('selected'));
+        return this.skillList.findStrict(x => x.selected);
+    }
+
+    get activeSkill() {
+        return this.skillList.findStrict(x => x.assigned);
     }
 
     get canAssignSkill() {
         return this.selectedSkill !== this.activeSkill;
     }
 
-    private assignSkill(skill: Skill) {
-        this.activeSkill.element.removeAttribute('data-tag');
-        this.activeSkill.assigned = false;
-        this.activeSkill = skill;
-        skill.assigned = true;
-
-        const statModList: StatModifier[] = [
-            ...Modifier.extractStatModifierList(...Modifier.modListFromTexts(skill.data.modList)),
-            { name: 'AttackSpeed', valueType: 'Base', value: skill.data.attackSpeed, override: true },
-            { name: 'AttackManaCost', value: skill.data.manaCost, valueType: 'Base' }
-        ];
-        player.stats.attackEffectiveness.set(skill.data.attackEffectiveness);
-        player.modDB.replace('AttackSkill', statModList);
-
-        skill.element.setAttribute('data-tag', 'valid');
-    }
-
-    private selectSkillByName(name: string) {
-        const skill = this.skillList.findStrict(x => x.data.name === name);
-        this.showSkill(skill);
-        this.skillList.forEach(x => x.element.classList.toggle('selected', x === skill));
-    }
-
-    private showSkill(skill: Skill) {
+    protected showSkill(skill: AttackSkill) {
         const propertyList = [
             ['Attack Speed', skill.data.attackSpeed.toFixed(2)],
             ['Attack Effectiveness', skill.data.attackEffectiveness.toFixed()],
             ['Mana Cost', skill.data.manaCost.toFixed()]
         ];
-        const itemInfoElements = createItemInfoElements({ item: skill, propertyList, modList: skill.data.modList });
+        const rankList = this.skillList.filter(x => x.baseName === skill.baseName);
+        const itemInfoElements = createItemInfoElements({
+            item: skill,
+            propertyList,
+            modList: skill.data.modList,
+            rankList: rankList.length > 1 ? rankList : undefined,
+            onRankChange: (item) => this.showSkill(item as AttackSkill)
+        });
         this.page.querySelector('[data-item-info]')?.replaceWith(itemInfoElements.element) ?? this.page.appendChild(itemInfoElements.element);
 
         const button = document.createElement('button');
@@ -118,43 +101,44 @@ export class AttackSkills {
         itemInfoElements.contentElement.appendChild(button);
     }
 
+    private clearActiveSkill() {
+        const element = this.elementMap.get(this.activeSkill.baseName)!;
+        element.removeAttribute('data-tag');
+        element.textContent = this.skillList.find(x => x.baseName === this.activeSkill.baseName)!.name;
+        this.activeSkill.selected = false;
+        this.activeSkill.assigned = false;
+    }
+
+    private assignSkill(skill: AttackSkill) {
+        this.clearActiveSkill();
+        const element = this.elementMap.get(skill.baseName)!;
+        element.setAttribute('data-tag', 'valid');
+        element.textContent = skill.name;
+        skill.assigned = true;
+
+        const statModList: StatModifier[] = [
+            ...Modifier.extractStatModifierList(...Modifier.modListFromTexts(skill.data.modList)),
+            { name: 'AttackSpeed', valueType: 'Base', value: skill.data.attackSpeed, override: true },
+            { name: 'AttackManaCost', value: skill.data.manaCost, valueType: 'Base' }
+        ];
+        player.stats.attackEffectiveness.set(skill.data.attackEffectiveness);
+        player.modDB.replace('AttackSkill', statModList);
+
+        for (const [key, el] of this.elementMap.entries()) {
+            el.toggleAttribute('data-tag', key === skill.baseName);
+            if (key === skill.baseName) {
+                el.setAttribute('data-tag', 'valid');
+            } else {
+                el.textContent = this.skillList.find(x => x.baseName === key)!.name;
+            }
+        }
+    }
+
     private updateSkillInfo() {
         const expbar = this.page.querySelector<ProgressElement>(`[data-item-info] ${ProgressElement.name}`);
         if (expbar) {
             expbar.value = this.selectedSkill.exp / this.selectedSkill.maxExp;
         }
-    }
-
-    private tryUnlockSkill() {
-        const candidates = createItemCandidates(this.skillList);
-        const skill = pickOneFromPickProbability(candidates);
-        if (!skill) {
-            return;
-        }
-        this.unlockSkill(skill);
-        notifications.addNotification({
-            title: `New Attack Skill: ${skill.name}`,
-            elementId: skill.data.id,
-        });
-    }
-
-    private tryUnlockNextSkillRank(skill: Skill) {
-        const nextSkill = getNextRankItem(skill, this.skillList);
-        if (!nextSkill) {
-            return;
-        }
-        this.unlockSkill(nextSkill);
-        notifications.addNotification({
-            title: `New Attack Skill: ${nextSkill.name}`,
-            elementId: nextSkill.data.id,
-        });
-    }
-
-    private unlockSkill(skill: Skill) {
-        skill.unlocked = true;
-        skill.element.textContent = skill.data.name;
-        skill.element.removeAttribute('disabled');
-        skill.element.classList.remove('hidden');
     }
 
     serialize(): GameSerialization.Skills['attackSkills'] {
@@ -176,7 +160,7 @@ export class AttackSkills {
             if (!skill) {
                 continue;
             }
-            this.unlockSkill(skill);
+            unlockItem(skill, this.elementMap);
             skill.exp = skill.maxExp * (skillData.expFac ?? 0);
         }
         this.selectSkillByName(this.activeSkill.name);
