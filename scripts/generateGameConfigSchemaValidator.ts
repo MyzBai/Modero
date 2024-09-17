@@ -2,8 +2,9 @@ import ajvStandaloneCode from 'ajv/dist/standalone';
 import { mkdir, writeFile } from 'fs/promises';
 import * as path from 'path';
 import Ajv, { type Vocabulary } from 'ajv';
-import { resolveGamePathFromVersion } from 'src/config';
-import { GAME_CONFIG_VERSION } from 'src/game/gameConfig/GameConfig';
+import { resolveGamePathFromVersion } from '../src/config';
+import { GAME_CONFIG_VERSION } from '../src/game/gameConfig/GameConfig';
+import ajvKeywords from 'ajv-keywords';
 
 
 void (async () => {
@@ -26,6 +27,7 @@ function createAjvSchemaStandalone(schema: string) {
         keywords.push({ keyword: 'defaultSnippets' });
     }
     const ajv = new Ajv({ code: { es5: false, source: true, esm: true }, keywords });
+    ajvKeywords(ajv);
     const schemaObj = JSON.parse(schema);
     const validate = ajv.compile(schemaObj);
     return ajvStandaloneCode(ajv, validate);

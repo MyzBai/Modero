@@ -3,13 +3,13 @@ import { ascensionModTemplateList } from '../src/game/mods/modTemplates';
 import { integerRangeRegex, numberRangeRegex, symbolsRegex } from '../src/shared/utils/textParsing';
 import { generateSchema, buildGenerator, type PartialArgs, type Definition, type JsonSchemaGenerator, getProgramFromFiles } from 'typescript-json-schema';
 import { writeFile } from 'fs/promises';
-import { assertNonNullable } from 'src/shared/utils/assert';
-import { SchemaOverrideSymbolNames, type SchemaOverrideSymbolName } from 'src/game/gameConfig/GameConfig';
-import { isDefined } from 'src/shared/utils/utils';
-import { taskTemplates } from 'src/game/tasks/taskTemplates';
-import { craftTemplates } from 'src/game/components/weapon/craftTemplates';
-import { generalPlayerModTemplateList, playerStartModTemplateList } from 'src/game/mods/playerModTemplates';
-import { enemyModTemplateList } from 'src/game/mods/enemyModTemplates';
+import { assertNonNullable } from '../src/shared/utils/assert';
+import { SchemaOverrideSymbolNames, type SchemaOverrideSymbolName } from '../src/game/gameConfig/GameConfig';
+import { isDefined } from '../src/shared/utils/utils';
+import { taskTemplates } from '../src/game/tasks/taskTemplates';
+import { craftTemplates } from '../src/game/components/weapon/craftTemplates';
+import { generalPlayerModTemplateList, playerStartModTemplateList } from '../src/game/mods/playerModTemplates';
+import { enemyModTemplateList } from '../src/game/mods/enemyModTemplates';
 
 interface SchemaOverride {
     oneOf?: { pattern: string; }[];
