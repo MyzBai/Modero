@@ -20,7 +20,8 @@ export class ProgressElement extends CustomElement {
     }
 
     private update() {
-        this.valueElement.style.width = CSS.percent(this._value * 100).toString();
+        const pct = this._value * 100;
+        this.valueElement.style.width = CSS.percent(pct).toString();
     }
 
     init(): void {

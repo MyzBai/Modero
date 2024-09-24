@@ -1,18 +1,22 @@
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { TabMenuElement } from 'src/shared/customElements/TabMenuElement';
-import { Ascend } from './Ascend';
+import { Ascend as Trial } from './Trial';
 import { Ascensions } from './Ascensions';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { evaluateStatRequirements } from 'src/game/statistics/statRequirements';
-import { GameInitializationStage, game, notifications } from 'src/game/game';
+import { GameInitializationStage, game, gameLoop, notifications } from 'src/game/game';
 import { assertDefined } from 'src/shared/utils/assert';
+import { EventEmitter } from '../../../shared/utils/EventEmitter';
+import { fadeIn, fadeOut } from './utils';
+import { ModalElement } from '../../../shared/customElements/ModalElement';
 
 export class Ascension {
     private page?: HTMLElement;
     private menu?: TabMenuElement;
-    private ascend?: Ascend;
+    private trial?: Trial;
     private ascensions?: Ascensions;
-
+    private readonly ascensionListElements: HTMLElement[] = [];
+    readonly ascendEvent = new EventEmitter<HTMLElement[]>();
     init() {
         evaluateStatRequirements({ maxLevel: game.maxLevel }, () => {
             this.setup();
@@ -29,12 +33,12 @@ export class Ascension {
         this.menu.setDirection('horizontal');
         this.page.appendChild(this.menu);
 
-        this.ascend = new Ascend();
-        this.page.appendChild(this.ascend.page);
+        this.trial = new Trial();
+        this.page.appendChild(this.trial.page);
         this.menu.addMenuItem('Ascend', 'ascend');
-        this.menu.registerPageElement(this.ascend.page, 'ascend');
+        this.menu.registerPageElement(this.trial.page, 'ascend');
 
-        game.stats.ascensionCount.addListener('change', ({ curValue }) => {
+        game.stats.ascensionMax.addListener('change', ({ curValue }) => {
             if (!this.ascensions) {
                 this.createAscensions();
             }
@@ -43,6 +47,10 @@ export class Ascension {
             if (lastInstance) {
                 this.ascensions.updateAscensionList();
             }
+        });
+
+        game.stats.ascension.addListener('change', () => {
+            void this.ascensions?.initializeAscension();
         });
 
         if (game.initializationStage === GameInitializationStage.Done) {
@@ -64,13 +72,36 @@ export class Ascension {
         this.menu.style.visibility = 'visible';
     }
 
+    async ascend() {
+        gameLoop.stop();
+        game.saveGame();
+        await fadeOut();
+        game.clearHighlights();
+        game.stats.ascensionMax.add(1);
+        game.stats.ascension.add(1);
+        this.ascensionListElements.clear();
+        this.ascendEvent.invoke(this.ascensionListElements);
+        await game.softReset();
+        const modal = createCustomElement(ModalElement);
+        modal.setTitle('You have ascended!');
+        const body = document.createElement('div');
+        body.append(...this.ascensionListElements);
+        modal.setBodyElement(body);
+        await modal.setButtons([{ type: 'confirm', text: 'Contine' }]);
+        notifications.addNotification({ title: 'You Have Ascended!' });
+        game.saveGame();
+        gameLoop.start();
+        await fadeIn();
+    }
+
     reset() {
         this.page?.remove();
         this.page = undefined;
         this.menu = undefined;
-        this.ascend = undefined;
+        this.trial = undefined;
         this.ascensions = undefined;
         game.menu.getMenuItemById('ascension')?.remove();
+        this.ascendEvent.removeAllListeners();
     }
 
     serialize(save: Serialization) {
@@ -78,7 +109,7 @@ export class Ascension {
             return;
         }
         save.ascension = {
-            ...this.ascend?.serialize()
+            ...this.trial?.serialize()
         };
     }
 
@@ -87,7 +118,7 @@ export class Ascension {
             return;
         }
         this.ascensions?.updateAscensionList();
-        assertDefined(this.ascend);
-        this.ascend.deserialize({ state: save.state, combatArea: save.combatArea, timeout: save.timeout });
+        assertDefined(this.trial);
+        this.trial.deserialize({ state: save.state, combatArea: save.combatArea, timeout: save.timeout });
     }
 }

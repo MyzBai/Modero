@@ -24,7 +24,7 @@ import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { createModEntryInfoElement } from 'src/home/dom';
 
-export const mainMenuNames = ['combat', 'skills', 'weapon', 'artifacts', 'guilds', 'ascension', 'achievements', 'statistics', 'notifications'] as const;
+export const mainMenuNames = ['combat', 'skills', 'weapon', 'artifacts', 'guildHall', 'ascension', 'achievements', 'statistics', 'notifications'] as const;
 
 export const enum GameInitializationStage {
     None = 0,
@@ -38,7 +38,7 @@ export class Game {
     readonly pageShadowHost: HTMLElement;
     readonly page: HTMLElement;
     readonly components = new Components();
-    readonly tickSecondsEvent = new EventEmitter<undefined>();
+    readonly tickSecondsEvent = new EventEmitter<void>();
     private _gameConfig: GameConfig | null = null;
     private _gameConfigId?: string;
     readonly stats = createGameStats();
@@ -71,6 +71,7 @@ export class Game {
         playerBar.appendChild(manabar);
 
         const enemyBar = document.createElement('div');
+        enemyBar.setAttribute('data-enemy', '');
         enemyBar.classList.add('s-enemy-bar');
         enemyBar.insertAdjacentHTML('beforeend', '<span class="enemy-name" data-enemy-name></span>');
         const lifebar = createCustomElement(ProgressElement);
@@ -103,6 +104,12 @@ export class Game {
         //stats
         this.page.insertAdjacentHTML('beforeend', '<ul class="sticky-stat-group-list g-scroll-list-v" data-sticky-stat-group-list></ul>');
 
+
+        window.addEventListener('beforeunload', () => {
+            if (this._gameConfigId && loadGame().has(this._gameConfigId)) {
+                this.saveGame();
+            }
+        });
     }
 
     get menu() {
@@ -230,9 +237,11 @@ export class Game {
         notifications.reset();
     }
 
-    async resetForAscension() {
+    async softReset() {
         assertNonNullable(game.gameConfig);
         assertDefined(game.gameConfigId);
+
+        this.saveGame();
 
         const save = loadGame(game.gameConfigId) as UnsafeSerialization;
         assertDefined(save);
@@ -240,6 +249,7 @@ export class Game {
         const newSave: UnsafeSerialization = {
             ...save.meta,
             ascension: save.ascension,
+            guildHall: { ...save.guildHall, classId: undefined },
             game: { stats: save.game?.stats }
         };
 
@@ -331,10 +341,10 @@ export class Game {
         notifications.serialize(save);
         this.components.serialize(save);
 
+        save.elementHighlightIdList = [...game.page.querySelectorAll('[data-highlight]')].map(x => x.getAttribute('data-id')).filter(isNonNullable);
+
         const name = this.menu.querySelectorStrict('.selected')?.getAttribute('data-page-target');
         sessionStorage.setItem('main-menu', name || '');
-
-        save.elementHighlightIdList = [...game.page.querySelectorAll('[data-highlight]')].map(x => x.getAttribute('data-id')).filter(isNonNullable);
     }
 
     private deserialize(save: UnsafeSerialization) {

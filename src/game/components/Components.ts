@@ -9,18 +9,37 @@ import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Weapon } from './weapon/Weapon';
 import type { Serialization } from '../serialization';
 import { evaluateStatRequirements } from '../statistics/statRequirements';
-import { Guilds } from './guilds/Guilds';
+import { GuildHall } from './guildHall/GuildHall';
 
 type ComponentUnion = NonNullable<PropertyValuesToUnion<GameConfig.Components>>;
 export class Components {
     private readonly components = {
-        guilds: { label: 'Guilds', constr: Guilds },
+        guildHall: { label: 'Guild Hall', constr: GuildHall },
         skills: { label: 'Skills', constr: Skills },
         weapon: { label: 'Weapon', constr: Weapon },
         artifacts: { label: 'Artifacts', constr: Artifacts },
         achievements: { label: 'Achievements', constr: Achievements },
     } as const satisfies Record<GameConfig.ComponentName, { label: string; constr: new (data: UnionToIntersection<ComponentUnion>) => Component; }>;
     private componentList: Component[] = [];
+
+
+    private addComponent(name: GameConfig.ComponentName) {
+        const components = game.gameConfig.components ?? {};
+        const componentData = components[name];
+        assertDefined(componentData, `gameConfig does not contain the component: ${name}`);
+
+        const instance = new this.components[name].constr(componentData as UnionToIntersection<ComponentUnion>);
+        const label = this.components[name].label;
+
+        const { menuItem } = game.addPage(instance.page, label, name);
+
+        this.componentList.push(instance);
+
+        if (game.initializationStage === GameInitializationStage.Done) {
+            notifications.addNotification({ title: `You Have Unlocked ${label}` });
+            game.addElementHighlight(menuItem);
+        }
+    }
 
     init() {
         for (const key of Object.keys(this.components) as GameConfig.ComponentName[]) {
@@ -41,22 +60,8 @@ export class Components {
         }
     }
 
-    private addComponent(name: GameConfig.ComponentName) {
-        const components = game.gameConfig.components ?? {};
-        const componentData = components[name];
-        assertDefined(componentData, `gameConfig does not contain the component: ${name}`);
-
-        const instance = new this.components[name].constr(componentData as UnionToIntersection<ComponentUnion>);
-        const label = this.components[name].label;
-
-        const { menuItem } = game.addPage(instance.page, label, name);
-
-        this.componentList.push(instance);
-
-        if (game.initializationStage === GameInitializationStage.Done) {
-            notifications.addNotification({ title: `You Have Unlocked ${label}` });
-            game.addElementHighlight(menuItem);
-        }
+    has(name: GameConfig.ComponentName) {
+        return this.componentList.some(x => x.name === name);
     }
 
     reset() {

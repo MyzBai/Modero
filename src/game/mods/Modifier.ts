@@ -162,4 +162,15 @@ export class Modifier {
         const template: ModTemplate = { desc: '[Removed]', stats: [], id: '' };
         return new Modifier(template.desc, template, []);
     }
+
+    static combine(mod1: Modifier, mod2: Modifier) {
+        if (mod1.values.length !== mod2.values.length) {
+            throw Error('modifiers are not compatible');
+        }
+        const newValues = [];
+        for (let i = 0; i < mod1.values.length; i++) {
+            newValues[i] = mod1.values[i]! + mod2.values[i]!;
+        }
+        mod1.setValues(newValues);
+    }
 }

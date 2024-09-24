@@ -18,7 +18,7 @@ interface SkillSlot {
     progressBar: ProgressElement;
     time: number;
     duration: number;
-    unregisterLoopCallback?: (() => void) | null;
+    loopId?: string | null;
 }
 
 export class AuraSkills extends SkillPage {
@@ -92,7 +92,7 @@ export class AuraSkills extends SkillPage {
             if (skillList.length === this.skillList.length) {
                 instance.removeListener();
             }
-            const activeSkillSlots = this.skillSlotList.filter(x => !!x.unregisterLoopCallback);
+            const activeSkillSlots = this.skillSlotList.filter(x => !!x.loopId);
             for (const skillSlot of activeSkillSlots) {
                 const aura = skillSlot.skill;
                 if (!aura || !aura.maxExp) {
@@ -185,10 +185,10 @@ export class AuraSkills extends SkillPage {
 
     private startActiveSkill(skillSlot: SkillSlot) {
         assertNonNullable(skillSlot.skill, 'skill slot contains no skill');
-        assertNullable(skillSlot.unregisterLoopCallback);
-        const unregisterLoopCallback = gameLoop.registerCallback(() => {
-            if (!skillSlot.skill || skillSlot.unregisterLoopCallback) {
-                unregisterLoopCallback();
+        assertNullable(skillSlot.loopId);
+        const callbackId = gameLoop.registerCallback(() => {
+            if (!skillSlot.skill || skillSlot.loopId) {
+                gameLoop.unregister(callbackId);
                 return;
             }
             const manaCost = skillSlot.skill.data.manaCost;
@@ -196,7 +196,7 @@ export class AuraSkills extends SkillPage {
             if (!sufficientMana) {
                 return;
             }
-            unregisterLoopCallback();
+            gameLoop.unregister(callbackId);
 
             player.stats.mana.subtract(manaCost);
             skillSlot.time = skillSlot.skill.data.baseDuration * player.stats.auraDurationMultiplier.value;
@@ -206,9 +206,9 @@ export class AuraSkills extends SkillPage {
 
     private triggerSkillInSlot(skillSlot: SkillSlot) {
         assertNonNullable(skillSlot.skill);
-        assertNullable(skillSlot.unregisterLoopCallback);
+        assertNullable(skillSlot.loopId);
         this.applySkillModifiers(skillSlot.skill);
-        skillSlot.unregisterLoopCallback = gameLoop.registerCallback(this.processActiveSkill.bind(this, skillSlot));
+        skillSlot.loopId = gameLoop.registerCallback(this.processActiveSkill.bind(this, skillSlot));
     }
 
     private processActiveSkill(skillSlot: SkillSlot, dt: number) {
@@ -225,8 +225,10 @@ export class AuraSkills extends SkillPage {
     }
 
     private stopActiveSkill(skillSlot: SkillSlot) {
-        skillSlot.unregisterLoopCallback?.();
-        skillSlot.unregisterLoopCallback = null;
+        if (skillSlot.loopId) {
+            gameLoop.unregister(skillSlot.loopId);
+        }
+        skillSlot.loopId = null;
         if (skillSlot.skill) {
             this.removeSkillModifiers(skillSlot.skill);
         }

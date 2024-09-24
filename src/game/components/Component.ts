@@ -9,7 +9,6 @@ export abstract class Component {
         this.page = document.createElement('div');
         this.page.classList.add(`p-${name}`, 'hidden');
         game.page.appendChild(this.page);
-        this.page.setAttribute('data-page-content', name);
     }
 
     setup?(): void;

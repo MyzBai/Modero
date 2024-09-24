@@ -76,6 +76,10 @@ export class Passives extends SkillPage {
             }
             this.updatePassiveInfo();
         });
+
+        player.stats.insightCapacity.addListener('change', () => {
+            this.updateInsightValueElement();
+        });
     }
 
     get selectedPassive() {

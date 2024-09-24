@@ -2,7 +2,7 @@ import { hasAnyFlag } from 'src/shared/utils/utils';
 import { ModifierFlags, type ModTemplate, type ModTemplateStat, type ModifierTag } from './types';
 import { modTemplateList } from './modTemplates';
 import { assertDefined } from 'src/shared/utils/assert';
-import type { Modifier } from './Modifier';
+import { Modifier } from './Modifier';
 
 
 export function createModTags(statList: readonly ModTemplateStat[]) {
@@ -76,13 +76,25 @@ export function createModTags(statList: readonly ModTemplateStat[]) {
 }
 
 
-export function sortModifiers(modList: Modifier[]) {
-    const descriptions: string[] = modTemplateList.map(x => x.desc);
-    return modList.sort((a, b) => descriptions.indexOf(a.template.desc) - descriptions.indexOf(b.template.desc));
+export function sortModifiers(modList: string[] | Modifier[]) {
+    const descriptions = modTemplateList.map(x => x.desc);
+    modList.sort((a, b) => descriptions.indexOf(typeof a === 'string' ? Modifier.getTemplate(a)?.desc ?? '' : a.template.desc) - descriptions.indexOf(typeof b === 'string' ? Modifier.getTemplate(b)?.desc ?? '' : b.template.desc));
 }
 
 export function extractModifier<T extends ReadonlyArray<ModTemplate>>(list: T, desc: T[number]['desc']) {
     const template = list.find(x => x.desc === desc);
     assertDefined(template);
     return template;
+}
+
+export function combineModifiers(modList: Modifier[]): Modifier[] {
+    const map = new Map<string, Modifier>();
+    for (const mod of modList) {
+        if (!map.has(mod.template.desc)) {
+            map.set(mod.template.desc, Modifier.modFromText(mod.text));
+            continue;
+        }
+        Modifier.combine(map.get(mod.template.desc)!, mod);
+    }
+    return [...map.values()];
 }

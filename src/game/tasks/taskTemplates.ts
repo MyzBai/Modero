@@ -19,7 +19,7 @@ export interface TaskTemplateArgs {
 
 export const taskTemplates = [
     { desc: 'Reach Level #', progress: (data) => data.gameStats.maxLevel.value / data.value },
-    { desc: 'Ascend # Times', progress: (data) => data.gameStats.ascensionCount.value / data.value },
+    { desc: 'Ascend # Times', progress: (data) => data.gameStats.ascensionMax.value / data.value },
     { desc: 'Deal # Total Physical Attack Damage', progress: (data) => data.gameStats.totalPhysicalAttackDamage.value / data.value },
     { desc: 'Deal # Total Elemental Attack Damage', progress: (data) => data.gameStats.totalElementalAttackDamage.value / data.value },
     { desc: 'Deal # Total Physical Damage', progress: (data) => data.gameStats.totalPhysicalDamage.value / data.value },

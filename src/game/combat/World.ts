@@ -1,13 +1,11 @@
 import { game, combat, player } from '../game';
 import { CombatArea } from './CombatArea';
 import type * as GameSerialization from '../serialization';
-import { assertDefined } from 'src/shared/utils/assert';
 
 export class World {
     private _combatArea?: CombatArea;
 
     get area() {
-        assertDefined(this._combatArea);
         return this._combatArea;
     }
 

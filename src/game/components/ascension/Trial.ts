@@ -1,5 +1,5 @@
 import { CombatArea, type CombatAreaOptions } from 'src/game/combat/CombatArea';
-import { combat, game, gameLoop, notifications, player, world } from 'src/game/game';
+import { ascension, combat, game, gameLoop, player } from 'src/game/game';
 import type * as GameSerialization from 'src/game/serialization';
 import { assertNonNullable } from 'src/shared/utils/assert';
 
@@ -13,7 +13,7 @@ export class Ascend {
     private _state: State = 'invalid';
     private timeout = 0;
     private readonly timeoutElement: HTMLElement;
-    private unregisterTimeout?: () => void;
+    private timeoutId?: string | null;
     constructor() {
         this.page = document.createElement('div');
         this.page.classList.add('p-ascend');
@@ -73,7 +73,7 @@ export class Ascend {
         this.updateButton();
         switch (state) {
             case 'Trial': this.startTrial(); break;
-            case 'Ascend': void this.ascend(); break;
+            case 'Ascend': this.ascend(); break;
         }
     }
 
@@ -102,7 +102,7 @@ export class Ascend {
     private cancelTrial() {
         assertNonNullable(this._combatArea);
         combat.stopArea();
-        combat.startArea(world.area);
+        combat.startArea(null);
         this._combatArea = null;
         this.stopTimeout();
     }
@@ -113,20 +113,22 @@ export class Ascend {
             return;
         }
         this.timeoutElement.classList.remove('hidden');
-        this.unregisterTimeout = gameLoop.registerCallback(this.timeoutTick.bind(this), { delay: 1000 });
+        this.timeoutId = gameLoop.registerCallback(this.timeoutTick.bind(this), { delay: 1000 });
+
         this.updateTimeoutElement();
     }
 
     private stopTimeout() {
         this.timeoutElement.classList.add('hidden');
-        this.unregisterTimeout?.();
+        if (this.timeoutId) {
+            gameLoop.unregister(this.timeoutId);
+        }
     }
 
     private timeoutTick() {
         this.timeout--;
         if (this.timeout <= 0) {
             this.timeout = 0;
-            this.unregisterTimeout?.();
             this.cancelTrial();
             this.executeState('Start');
         }
@@ -138,65 +140,10 @@ export class Ascend {
     }
 
 
-    private async ascend() {
+    private ascend() {
         this.executeState('invalid');
         this.trialCompleted = false;
-        game.saveGame();
-        await this.fadeOut();
-        if (game.stats.ascensionCount.value >= (game.gameConfig.ascension.ascensionInstanceList?.length ?? 0)) {
-            this._state = 'Done';
-            await this.printEndScreen();
-        } else {
-            game.clearHighlights();
-            game.saveGame();
-            await game.resetForAscension();
-            notifications.addNotification({ title: 'You Have Ascended!' });
-            game.stats.ascensionCount.add(1);
-            game.saveGame();
-        }
-        await this.fadeIn();
-    }
-
-    private async fadeOut(): Promise<void> {
-        return new Promise((resolve) => {
-            const fadeElement = document.createElement('div');
-            fadeElement.setAttribute('data-ascension-fade', '');
-            fadeElement.style.cssText = `
-                    position: absolute;
-                    inset: 0;
-                    background-color: black;
-                    z-index: 1000;
-                    opacity: 0;
-                    text-align: center;
-                    padding-top: 5em;
-                `;
-            document.body.appendChild(fadeElement);
-            const anim = fadeElement.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1000, fill: 'forwards' });
-            anim.addEventListener('finish', () => {
-                resolve();
-            });
-        });
-    }
-
-    private async fadeIn(): Promise<void> {
-        return new Promise((resolve) => {
-            const fadeElement = document.body.querySelectorStrict('[data-ascension-fade]');
-            const anim = fadeElement.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1000, fill: 'forwards' });
-            anim.addEventListener('finish', () => {
-                fadeElement.remove();
-                resolve();
-            });
-        });
-    }
-
-    private async printEndScreen() {
-        const fadeElement = document.body.querySelectorStrict<HTMLElement>('[data-ascension-fade]');
-        fadeElement.insertAdjacentHTML('beforeend', 'Thank you for playing!');
-        return new Promise<void>((resolve) => {
-            fadeElement.addEventListener('click', () => {
-                resolve();
-            });
-        });
+        ascension.ascend();
     }
 
     serialize(): PickStrict<Required<GameSerialization.Serialization>['ascension'], 'state' | 'combatArea' | 'timeout'> {

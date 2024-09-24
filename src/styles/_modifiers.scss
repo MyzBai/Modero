@@ -1,0 +1,11 @@
+@use 'variables' as *;
+
+.m-text-green {
+    color: $color-tag-valid;
+}
+.m-text-red {
+    color: $color-tag-invalid;
+}
+.m-text-yellow {
+    color: #f1da58;
+}

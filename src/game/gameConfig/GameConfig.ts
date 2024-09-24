@@ -11,7 +11,7 @@ export interface GameConfig {
     enemyList: Enemy[];
     ascension: Ascension;
     components?: {
-        guilds?: Guilds;
+        guildHall?: GuildHall;
         skills?: Skills;
         weapon?: Weapon;
         artifacts?: Artifacts;
@@ -142,38 +142,26 @@ export interface Artifact {
     exp?: UnsignedInteger;
 }
 
-/**
- * @description
- * Combat is disabled while performing an activity
- * - Training - Attack skills gain exp faster
- * - Exploring - Finds artifacts passively.
- * - Meditation - Increased mana/mana regen and passive skills gain exp faster (auras are active while meditating)
- */
-export type GuildActivityName = 'Training' | 'Exploring' | 'Meditation';
-export interface Guilds {
+export type GuildName = 'Vanguard' | 'Wanderer' | 'Arcane';
+
+export interface GuildHall {
     requirements?: Requirements;
+    levelRequirements: { exp: Exp; }[];
     guildList: Guild[];
-}
-export interface GuildActivity {
-    name: GuildActivityName;
-    multiplier: UnsignedInteger[];
+    guildClassList: GuildClass[];
 }
 export interface Guild {
+    name: GuildName;
+    modList: PlayerModList[];
+}
+/**@uniqueItemProperties {["id"]} */
+export interface GuildClass {
     id: Id;
+    guildName: GuildName;
     name: Name;
-    activityList: GuildActivity[];
-    levels: { exp?: Exp; modList: PlayerModList; }[];
-    classes: GuildClasses;
+    modList: PlayerModList[];
+    ascensionModList: PlayerModList[];
 }
-
-export interface GuildClasses {
-    classList: {
-        id: Id;
-        name: Name;
-        modList: PlayerModList;
-    }[];
-}
-
 
 export interface Achievements {
     achievementList: Achievement[];

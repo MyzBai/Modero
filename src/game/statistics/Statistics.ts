@@ -20,8 +20,6 @@ export class Statistics {
     constructor() {
         this.page = document.createElement('div');
         this.page.classList.add('p-statistics', 'hidden');
-        this.page.setAttribute('data-page-content', 'statistics');
-
 
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Statistics</div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v" data-stat-group-list></ul>');

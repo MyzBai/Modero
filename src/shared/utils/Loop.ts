@@ -69,7 +69,7 @@ export class Loop {
         BaseLoop.speedMultiplier = Math.round(speed);
     }
 
-    registerCallback(callback: Callback, options?: Options): () => void {
+    registerCallback(callback: Callback, options?: Options): string {
         const id = uuid();
         const instance: Instance = {
             time: 0,
@@ -78,7 +78,7 @@ export class Loop {
             options,
         };
         this.loop.instanceMap.set(id, instance);
-        return () => this.unregister(id);
+        return id;
     }
 
     unregister(id: string) {

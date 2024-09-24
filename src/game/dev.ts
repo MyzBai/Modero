@@ -26,7 +26,7 @@ export function initDevTools() {
         player,
         getEnemy: () => combat.enemy,
         setLevel: (level: number) => player.stats.level.set(level),
-        setAscension: (count: number) => game.stats.maxLevel.value >= game.maxLevel ? game.stats.ascensionCount.set(count) : console.error('reach max level first'),
+        setMaxAscension,
         addArtifact: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:AddArtifact', { detail: baseName })),
         increaseArtifactRank: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:IncreaseArtifactRank', { detail: baseName })),
         setLoopSpeed: (speed: number) => {
@@ -46,4 +46,14 @@ function toggleLoop(e: KeyboardEvent) {
     gameLoop.toggleState();
     gameLoopAnim.toggleState();
     document.title = document.title.startsWith('*') ? document.title.slice(1) : `*${document.title}`;
+}
+
+function setMaxAscension(value: number) {
+    if (value <= 0) {
+        game.stats.maxLevel.setDefault();
+        game.stats.ascensionMax.setDefault();
+        return;
+    }
+    game.stats.maxLevel.set(game.maxLevel);
+    game.stats.ascensionMax.set(value);
 }

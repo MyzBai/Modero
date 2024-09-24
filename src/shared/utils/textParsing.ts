@@ -11,6 +11,7 @@ export const costRegex = new RegExp(`(?<value>${integerRegex.source}) (?<name>\\
 export const rankNumeralsRegex = new RegExp(`\\b(?<rank>${ROMAN_NUMERALS.join('|')})$`);
 export const strToPascal = (str: string) => str[0]?.toLowerCase() + str.replace(/(\w)(\w*)/g, (_, g1: string, g2: string) => `${g1.toUpperCase()}${g2.toLowerCase()}`).replaceAll(' ', '').substring(1);
 export const strToKebab = (str: string) => str.split(' ').join('-').toLowerCase();
+export const camelToKebab = (str: string) => str.replace(/(?=[A-Z])/g, '-').toLowerCase();
 
 export function parseTextValues(text: string) {
     const matches = [...text.matchAll(new RegExp(numberRangeRegex, 'g'))];

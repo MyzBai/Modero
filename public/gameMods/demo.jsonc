@@ -49,8 +49,8 @@
             "enemyList": [
                 {
                     "id": "fba86b",
-                    "name": "Guard",
-                    "modList": [ "{95}% Reduced Damage Taken" ]
+                    "name": "Guard"
+                    // "modList": [ "{95}% Reduced Damage Taken" ]
                 }
             ]
         },
@@ -713,66 +713,211 @@
                 }
             ]
         },
-        "guilds": {
-            "requirements": { "ascensionCount": 1 },
+        "guildHall": {
+            "levelRequirements": [ { "exp": 3000 }, { "exp": 5000 }, { "exp": 10000 }, { "exp": 15000 } ],
             "guildList": [
                 {
-                    "id": "50b5af",
-                    "name": "Vanguard Guild",
-                    "activityList": [ { "name": "Training", "multiplier": [ 300 ] } ],
-                    "levels": [
-                        { "exp": 3000, "modList": [ "+{20} Strength", "{20}% More Attack Damage" ] },
-                        { "exp": 4000, "modList": [ "+{30} Strength", "{30}% More Attack Damage" ] },
-                        { "exp": 5000, "modList": [ "+{40} Strength", "{40}% More Attack Damage" ] },
-                        { "modList": [ "+{50} Strength", "{50}% More Attack Damage" ] }
-                    ],
-                    "classes": {
-                        "classList": [
-                            { "id": "117852", "name": "Warrior", "modList": [ "{40}% More Physical Attack Damage", "+{50} Strength" ] },
-                            { "id": "98f85d", "name": "Berserker", "modList": [ "{40}% More Attack Damage", "+{50} Dexterity" ] },
-                            { "id": "196f34", "name": "Templar", "modList": [ "{40}% More Elemental Attack Damage", "+{50} Intelligence" ] }
-                        ]
-                    }
+                    "name": "Vanguard",
+                    "modList": [
+                        [ "+{20} Strength", "{20}% More Attack Damage" ],
+                        [ "+{30} Strength", "{30}% More Attack Damage" ],
+                        [ "+{40} Strength", "{40}% More Attack Damage" ],
+                        [ "+{50} Strength", "{50}% More Attack Damage" ],
+                        [ "+{80} Strength", "{80}% More Attack Damage" ]
+                    ]
                 },
                 {
-                    "id": "5ae793",
-                    "name": "Wanderer Guild",
-                    "activityList": [
-                        { "name": "Training", "multiplier": [ 150 ] },
-                        { "name": "Exploring", "multiplier": [ 300 ] },
-                        { "name": "Meditation", "multiplier": [ 300 ] }
-                    ],
-                    "levels": [
-                        { "exp": 3000, "modList": [ "+{20} Dexterity", "{20}% More Damage" ] },
-                        { "exp": 4000, "modList": [ "+{30} Dexterity", "{30}% More Damage" ] },
-                        { "exp": 5000, "modList": [ "+{40} Dexterity", "{40}% More Damage" ] },
-                        { "modList": [ "+{50} Dexterity", "{50}% More Damage" ] }
-                    ],
-                    "classes": {
-                        "classList": [
-                            { "id": "a67775", "name": "Hunter", "modList": [ "+{50} Dexterity", "{40}% More Damage Over Time", "{20}% Increased Ailment Duration" ] },
-                            { "id": "a6a62d", "name": "Assassin", "modList": [ "+{20}% Critical Hit Chance", "+{100}% Critical Hit Multiplier" ] },
-                            { "id": "93f88a", "name": "Cutthroat", "modList": [ "{40}% More Bleed Damage", "+{15}% Chance To Bleed" ] }
-                        ]
-                    }
+                    "name": "Wanderer",
+                    "modList": [
+                        [ "+{20} Dexterity", "{20}% More Damage" ],
+                        [ "+{30} Dexterity", "{30}% More Damage" ],
+                        [ "+{40} Dexterity", "{40}% More Damage" ],
+                        [ "+{50} Dexterity", "{50}% More Damage" ],
+                        [ "+{80} Dexterity", "{80}% More Damage" ]
+                    ]
                 },
                 {
-                    "id": "3a8609",
-                    "name": "Arcane Guild",
-                    "activityList": [ { "name": "Meditation", "multiplier": [ 300 ] } ],
-                    "levels": [
-                        { "exp": 3000, "modList": [ "+{20} Intelligence", "{20}% Increased Mana Regeneration" ] },
-                        { "exp": 4000, "modList": [ "+{30} Intelligence", "{30}% Increased Mana Regeneration" ] },
-                        { "exp": 5000, "modList": [ "+{40} Intelligence", "{40}% Increased Mana Regeneration" ] },
-                        { "modList": [ "+{50} Intelligence", "{50}% Increased Mana Regeneration" ] }
+                    "name": "Arcane",
+                    "modList": [
+                        [ "+{20} Intelligence", "{20}% More Elemental Damage", "+{1} Maximum Mana Per {2} Intelligence" ],
+                        [ "+{30} Intelligence", "{30}% More Elemental Damage", "+{2} Maximum Mana Per {2} Intelligence" ],
+                        [ "+{40} Intelligence", "{40}% More Elemental Damage", "+{3} Maximum Mana Per {2} Intelligence" ],
+                        [ "+{50} Intelligence", "{50}% More Elemental Damage", "+{4} Maximum Mana Per {2} Intelligence" ],
+                        [ "+{80} Intelligence", "{80}% More Elemental Damage", "+{5} Maximum Mana Per {2} Intelligence" ]
+                    ]
+                }
+            ],
+            "guildClassList": [
+                {
+                    "id": "17cdea",
+                    "guildName": "Vanguard",
+                    "name": "Warrior",
+                    "modList": [
+                        [ "{30}% More Physical Attack Damage", "+{30} Strength" ],
+                        [ "{40}% More Physical Attack Damage", "+{40} Strength" ],
+                        [ "{50}% More Physical Attack Damage", "+{50} Strength", "{2}% More Attack Damage Per {5} Strength" ],
+                        [ "{80}% More Physical Attack Damage", "+{60} Strength", "{2}% More Attack Damage Per {5} Strength" ],
+                        [ "{100}% More Physical Attack Damage", "+{80} Strength", "{3}% More Attack Damage Per {5} Strength" ]
                     ],
-                    "classes": {
-                        "classList": [
-                            { "id": "1db3a5", "name": "Wizard", "modList": [ "{60}% More Elemental Damage", "+{50} Intelligence" ] },
-                            { "id": "0f7f1a", "name": "Monk", "modList": [ "+{100} Intelligence", "+{1} Maximum Mana Per {1} Intelligence", "{20}% Increased Mana Regeneration" ] },
-                            { "id": "481c27", "name": "Pyromancer", "modList": [ "{40}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ] }
-                        ]
-                    }
+                    "ascensionModList": [
+                        [ "{5}% More Physical Attack Damage", "+{5} Strength" ],
+                        [ "{10}% More Physical Attack Damage", "+{10} Strength" ],
+                        [ "{15}% More Physical Attack Damage", "+{15} Strength" ],
+                        [ "{20}% More Physical Attack Damage", "+{20} Strength" ],
+                        [ "{25}% More Physical Attack Damage", "+{25} Strength" ]
+                    ]
+                },
+                {
+                    "id": "9f13e4",
+                    "guildName": "Vanguard",
+                    "name": "Berserker",
+                    "modList": [
+                        [ "{30}% More Attack Damage", "+{30} Dexterity", "{20}% Increased Dexterity" ],
+                        [ "{40}% More Attack Damage", "+{40} Dexterity", "{25}% Increased Dexterity" ],
+                        [ "{50}% More Attack Damage", "+{50} Dexterity", "{30}% Increased Dexterity" ],
+                        [ "{80}% More Attack Damage", "+{60} Dexterity", "{35}% Increased Dexterity" ],
+                        [ "{100}% More Attack Damage", "+{80} Dexterity", "{40}% Increased Dexterity" ]
+                    ],
+                    "ascensionModList": [
+                        [ "{5}% More Attack Damage", "+{5} Dexterity" ],
+                        [ "{10}% More Attack Damage", "+{10} Dexterity" ],
+                        [ "{15}% More Attack Damage", "+{15} Dexterity" ],
+                        [ "{20}% More Attack Damage", "+{20} Dexterity" ],
+                        [ "{25}% More Attack Damage", "+{25} Dexterity" ]
+                    ]
+                },
+                {
+                    "id": "b190fe",
+                    "guildName": "Vanguard",
+                    "name": "Templar",
+                    "modList": [
+                        [ "{30}% More Elemental Attack Damage", "+{30} Intelligence" ],
+                        [ "{40}% More Elemental Attack Damage", "+{40} Intelligence" ],
+                        [ "{50}% More Elemental Attack Damage", "+{50} Intelligence" ],
+                        [ "{80}% More Elemental Attack Damage", "+{50} Intelligence" ],
+                        [ "{100}% More Elemental Attack Damage", "+{80} Intelligence" ]
+                    ],
+                    "ascensionModList": [
+                        [ "{5}% More Elemental Attack Damage", "+{10} Intelligence" ],
+                        [ "{10}% More Elemental Attack Damage", "+{15} Intelligence" ],
+                        [ "{15}% More Elemental Attack Damage", "+{20} Intelligence" ],
+                        [ "{20}% More Elemental Attack Damage", "+{25} Intelligence" ],
+                        [ "{25}% More Elemental Attack Damage", "+{30} Intelligence" ]
+                    ]
+                },
+                {
+                    "id": "a67775",
+                    "guildName": "Wanderer",
+                    "name": "Hunter",
+                    "modList": [
+                        [ "{30}% More Damage Over Time", "{20}% Increased Ailment Duration", "+{30} Dexterity" ],
+                        [ "{40}% More Damage Over Time", "{25}% Increased Ailment Duration", "+{40} Dexterity" ],
+                        [ "{50}% More Damage Over Time", "{30}% Increased Ailment Duration", "+{50} Dexterity" ],
+                        [ "{60}% More Damage Over Time", "{40}% Increased Ailment Duration", "+{60} Dexterity" ],
+                        [ "{70}% More Damage Over Time", "{50}% Increased Ailment Duration", "+{70} Dexterity" ]
+                    ],
+                    "ascensionModList": [
+                        [ "{5}% More Damage Over Time", "+{5} Dexterity" ],
+                        [ "{10}% More Damage Over Time", "+{10} Dexterity" ],
+                        [ "{15}% More Damage Over Time", "+{15} Dexterity" ],
+                        [ "{20}% More Damage Over Time", "+{20} Dexterity" ],
+                        [ "{25}% More Damage Over Time", "+{25} Dexterity" ]
+                    ]
+                },
+                {
+                    "id": "a6a62d",
+                    "guildName": "Wanderer",
+                    "name": "Assassin",
+                    "modList": [
+                        [ "+{15}% Critical Hit Chance", "+{80}% Critical Hit Multiplier" ],
+                        [ "+{20}% Critical Hit Chance", "+{100}% Critical Hit Multiplier" ],
+                        [ "+{25}% Critical Hit Chance", "+{130}% Critical Hit Multiplier" ],
+                        [ "+{30}% Critical Hit Chance", "+{150}% Critical Hit Multiplier" ],
+                        [ "+{35}% Critical Hit Chance", "+{180}% Critical Hit Multiplier" ]
+                    ],
+                    "ascensionModList": [
+                        [ "+{3}% Critical Hit Chance", "+{20}% Critical Hit Multiplier", "+{1}% Hit Chance Per {30} Dexterity" ],
+                        [ "+{5}% Critical Hit Chance", "+{25}% Critical Hit Multiplier", "+{1}% Hit Chance Per {27} Dexterity" ],
+                        [ "+{6}% Critical Hit Chance", "+{30}% Critical Hit Multiplier", "+{1}% Hit Chance Per {25} Dexterity" ],
+                        [ "+{8}% Critical Hit Chance", "+{40}% Critical Hit Multiplier", "+{1}% Hit Chance Per {23} Dexterity" ],
+                        [ "+{10}% Critical Hit Chance", "+{50}% Critical Hit Multiplier", "+{1}% Hit Chance Per {20} Dexterity" ]
+                    ]
+                },
+                {
+                    "id": "93f88a",
+                    "guildName": "Wanderer",
+                    "name": "Cutthroat",
+                    "modList": [
+                        [ "{30}% More Bleed Damage", "+{15}% Chance To Bleed" ],
+                        [ "{40}% More Bleed Damage", "+{20}% Chance To Bleed" ],
+                        [ "{50}% More Bleed Damage", "+{25}% Chance To Bleed" ],
+                        [ "{80}% More Bleed Damage", "+{30}% Chance To Bleed" ],
+                        [ "{100}% More Bleed Damage", "+{35}% Chance To Bleed" ]
+                    ],
+                    "ascensionModList": [
+                        [ "{5}% More Bleed Damage", "{5}% Increased Bleed Duration" ],
+                        [ "{10}% More Bleed Damage", "{10}% Increased Bleed Duration" ],
+                        [ "{15}% More Bleed Damage", "{15}% Increased Bleed Duration" ],
+                        [ "{20}% More Bleed Damage", "{20}% Increased Bleed Duration" ],
+                        [ "{25}% More Bleed Damage", "{25}% Increased Bleed Duration" ]
+                    ]
+                },
+                {
+                    "id": "1db3a5",
+                    "name": "Wizard",
+                    "guildName": "Arcane",
+                    "modList": [
+                        [ "{30}% More Elemental Damage", "+{30} Intelligence" ],
+                        [ "{40}% More Elemental Damage", "+{40} Intelligence" ],
+                        [ "{50}% More Elemental Damage", "+{50} Intelligence" ],
+                        [ "{80}% More Elemental Damage", "+{60} Intelligence" ],
+                        [ "{100}% More Elemental Damage", "+{80} Intelligence" ]
+                    ],
+                    "ascensionModList": [
+                        [ "{5}% More Elemental Damage", "+{5} Intelligence" ],
+                        [ "{10}% More Elemental Damage", "+{10} Intelligence" ],
+                        [ "{15}% More Elemental Damage", "+{15} Intelligence" ],
+                        [ "{20}% More Elemental Damage", "+{20} Intelligence" ],
+                        [ "{25}% More Elemental Damage", "+{25} Intelligence" ]
+                    ]
+                },
+                {
+                    "id": "0f7f1a",
+                    "name": "Monk",
+                    "guildName": "Arcane",
+                    "modList": [
+                        [ "{20}% Increased Mana Regeneration", "+{30} Dexterity", "+{1}% Hit Chance Per {20} Dexterity" ],
+                        [ "{30}% Increased Mana Regeneration", "+{40} Dexterity", "+{1}% Hit Chance Per {18} Dexterity" ],
+                        [ "{40}% Increased Mana Regeneration", "+{50} Dexterity", "+{1}% Hit Chance Per {15} Dexterity" ],
+                        [ "{50}% Increased Mana Regeneration", "+{60} Dexterity", "+{1}% Hit Chance Per {13} Dexterity" ],
+                        [ "{60}% Increased Mana Regeneration", "+{80} Dexterity", "+{1}% Hit Chance Per {10} Dexterity" ]
+                    ],
+                    "ascensionModList": [
+                        [ "{5}% Increased Mana Regeneration", "+{5} Dexterity" ],
+                        [ "{8}% Increased Mana Regeneration", "+{10} Dexterity" ],
+                        [ "{10}% Increased Mana Regeneration", "+{15} Dexterity" ],
+                        [ "{13}% Increased Mana Regeneration", "+{20} Dexterity" ],
+                        [ "{15}% Increased Mana Regeneration", "+{25} Dexterity" ]
+                    ]
+                },
+                {
+                    "id": "481c27",
+                    "name": "Pyromancer",
+                    "guildName": "Arcane",
+                    "modList": [
+                        [ "{30}% More Burn Damage", "{20}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{40}% More Burn Damage", "{25}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{50}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{80}% More Burn Damage", "{40}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{100}% More Burn Damage", "{50}% Increased Burn Duration", "Burn Lingers" ]
+                    ],
+                    "ascensionModList": [
+                        [ "{5}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{10}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{15}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{20}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
+                        [ "{25}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ]
+                    ]
                 }
             ]
         },

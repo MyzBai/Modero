@@ -1,0 +1,76 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.p-guildHall {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto 1fr;
+    grid-auto-flow: column;
+    gap: $default-gap;
+
+    :first-child {
+        grid-column: span 2;
+    }
+
+    .rest-button {
+        position: absolute;
+        top: calc(0.3em + 1px);
+        left: calc(0.3em + 1px);
+        cursor: default;
+        &:hover {
+            filter: brightness(120%);
+        }
+        &[data-active] {
+            color: $color-tag-valid;
+        }
+    }
+
+    .s-exp {
+        grid-column: span 2;
+        display: flex;
+        border: $default-border;
+        padding: 0.2em;
+        .level {
+            min-height: auto;
+            text-align: center;
+            background-color: rgb(57, 168, 57);
+            aspect-ratio: 1/1;
+            border: $default-border;
+            border-radius: 50%;
+            font-size: 1.6em;
+            cursor: default;
+            &:hover {
+                transform: scale(120%);
+            }
+        }
+        progress-element {
+            justify-content: center;
+            height: 1.2em;
+            margin: auto 0;
+            position: relative;
+            &:hover::after {
+                content: attr(data-exp);
+                position: absolute;
+                inset: 0;
+                text-align: center;
+            }
+        }
+    }
+
+    .guild-class-list {
+        border: $default-border;
+
+        .s-guild-title {
+            &:hover {
+                cursor: default;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .guild-class-info {
+        grid-column: 2;
+        grid-row: 3/-1;
+    }
+}

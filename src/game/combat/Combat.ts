@@ -27,7 +27,8 @@ export class Combat {
     readonly page: HTMLElement;
     private lifebarElement: ProgressElement;
     private _area?: CombatArea;
-
+    private attackWaitTime = 0;
+    private autoAttackLoopId?: string;
     readonly effectHandler: Effects;
 
     constructor() {
@@ -68,6 +69,8 @@ export class Combat {
         this.effectHandler = new Effects();
 
         game.addPage(this.page, 'Combat', 'combat');
+
+        this.attackLoop = this.attackLoop.bind(this);
     }
 
     get area() {
@@ -92,14 +95,20 @@ export class Combat {
 
         gameLoopAnim.registerCallback(this.updateLifebar.bind(this), { delay: 100 });
 
-        this.beginAutoAttack();
+        this.startAutoAttack();
     }
 
     startArea(area: CombatArea | null) {
+        if (this.autoAttackLoopId) {
+            this.stopAutoAttack();
+        }
         if (this._area && this._area.name !== area?.name) {
             this.stopArea();
         }
         this._area = area ?? world.area;
+        if (!this._area) {
+            return;
+        }
         assertDefined(this._area);
 
         player.modDB.replace('Area', Modifier.extractStatModifierList(...this._area.modList.filter(x => playerModTemplateList.some(y => y.id === x.template.id))));
@@ -111,11 +120,15 @@ export class Combat {
         this.updateElements();
 
         statistics.updateStats('Combat');
+
+        this.startAutoAttack();
     }
 
     stopArea() {
         this._area = undefined;
         this.effectHandler.removeAllEffects();
+        this.stopAutoAttack();
+        this.updateLifebarName();
     }
 
     private processEnemyDeath(enemy: Enemy) {
@@ -152,27 +165,32 @@ export class Combat {
         this.updateAreaModListContainer();
     }
 
-    private beginAutoAttack() {
+    private startAutoAttack() {
         const calcAttackTime = () => 1 / player.stats.attackSpeed.value;
-        let attackWaitTime = calcAttackTime();
+        this.attackWaitTime = calcAttackTime();
         player.stats.attackSpeed.addListener('change', () => {
-            attackWaitTime = calcAttackTime();
+            this.attackWaitTime = calcAttackTime();
         });
+        this.autoAttackLoopId = gameLoop.registerCallback(this.attackLoop);
+    }
 
-        const attackLoop = ((dt: number) => {
-            player.stats.attackTime.add(dt);
-            if (player.stats.attackTime.value >= attackWaitTime) {
-                const manaCost = player.stats.attackManaCost.value;
-                if (player.stats.mana.value < manaCost) {
-                    return;
-                }
-                player.stats.mana.subtract(manaCost);
-                this.performAttack();
-                player.stats.attackTime.set(0);
+    private stopAutoAttack() {
+        if (this.autoAttackLoopId) {
+            gameLoop.unregister(this.autoAttackLoopId);
+        }
+    }
+
+    private attackLoop(dt: number) {
+        player.stats.attackTime.add(dt);
+        if (player.stats.attackTime.value >= this.attackWaitTime) {
+            const manaCost = player.stats.attackManaCost.value;
+            if (player.stats.mana.value < manaCost) {
+                return;
             }
-        }).bind(this);
-
-        gameLoop.registerCallback(attackLoop);
+            player.stats.mana.subtract(manaCost);
+            this.performAttack();
+            player.stats.attackTime.set(0);
+        }
     }
 
     private performAttack() {
@@ -233,8 +251,10 @@ export class Combat {
     }
 
     private updateLifebarName() {
-        assertDefined(this._area);
-        game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]').textContent = this._area.enemy.enemyData.name;
+        if (this._area) {
+            game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]').textContent = this._area.enemy.enemyData.name;
+        }
+        game.page.querySelectorStrict('[data-combat-overview] [data-enemy]').classList.toggle('hidden', !this.area);
     }
 
     private updateAreaModListContainer() {

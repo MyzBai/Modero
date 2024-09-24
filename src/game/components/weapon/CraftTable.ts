@@ -17,6 +17,7 @@ import { player } from '../../game';
 import { ModDB } from '../../mods/ModDB';
 import { calcPlayerStats, extractStats } from '../../calc/calcStats';
 import { Weapon } from './Weapon';
+import { ENVIRONMENT } from '../../../config';
 
 export interface Craft {
     template: CraftTemplate;
@@ -76,6 +77,10 @@ export class CraftTable {
 
         this.craftManager = new CraftManager();
         this.stopCrafting();
+
+        if (ENVIRONMENT === 'development') {
+            this.addCraft({ id: 'c71a6a', desc: '[Dev] Reforge High DPS' }, { min: 100, max: 100 }, Infinity);
+        }
     }
 
     private createToolbar() {
@@ -143,7 +148,11 @@ export class CraftTable {
         for (const craft of this.craftList) {
             craft.element.classList.toggle('selected', craft === this.selectedCraft);
             if (craft.count === 0) {
-                craft.element.setAttribute('disabled', '');
+                craft.element.toggleAttribute('disabled', true);
+                continue;
+            }
+            if (craft.count === Infinity) {
+                craft.element.toggleAttribute('disabled', false);
                 continue;
             }
 
@@ -220,6 +229,9 @@ export class CraftTable {
         this.abortController = new AbortController();
 
         const desc = this.selectedCraft.template.desc as CraftTemplateDescription;
+        if (desc === '[Dev] Reforge High DPS') {
+            modListElement.setAttribute('data-craft', '');
+        }
         if (desc === 'Reforge item with new random modifiers' || desc === 'Add new modifier') {
             modListElement.setAttribute('data-craft', '');
         }
@@ -259,7 +271,6 @@ export class CraftTable {
         e.stopPropagation();
         assertDefined(this.selectedCraft, 'no craft selected');
 
-
         this.updateCraftCount();
 
         const modId = e.target instanceof HTMLElement ? e.target.getAttribute('data-mod') : undefined;
@@ -272,7 +283,10 @@ export class CraftTable {
         }
 
         const desc = this.selectedCraft.template.desc as CraftTemplateDescription;
-        if (desc === 'Reforge item with new random modifiers') {
+        if (desc === '[Dev] Reforge High DPS') {
+            this.beginCrafting();
+            this.performReforgeDevCraft();
+        } else if (desc === 'Reforge item with new random modifiers') {
             this.beginCrafting();
             this.performReforgeCraft();
         } else {
@@ -350,6 +364,27 @@ export class CraftTable {
         if (useAdvReforge) {
             void this.triggerAdvReforgeOutcomeAnim(false);
         }
+    }
+
+    private performReforgeDevCraft() {
+        assertDefined(this.ctxCopy);
+
+        const stats = extractStats(player.stats);
+        const curDps = calcPlayerStats({ stats, modDB: player.modDB }).dps;
+
+        const modDB = new ModDB(player.modDB);
+        let lastDps = curDps;
+        let modList: Modifier[] = [];
+        for (let i = 0; i < 100; i++) {
+            const newModList = this.craftManager.reforge(this.ctx.candidateModList, [0, 0, 0, 0, 0, 1]);
+            modDB.replace(Weapon.sourceName, Modifier.extractStatModifierList(...newModList));
+            const dps = calcPlayerStats({ stats, modDB }).dps;
+            if (dps > lastDps || modList.length === 0) {
+                modList = newModList;
+                lastDps = dps;
+            }
+        }
+        this.ctxCopy.modList.splice(0, this.ctxCopy.modList.length, ...modList);
     }
 
     private confirm() {
