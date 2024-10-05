@@ -64,23 +64,35 @@ export const generalPlayerModTemplateList = [
 
     { desc: 'Burn Lingers', stats: [{ name: 'LingeringBurn', valueType: 'Flag' }], id: '5d6b21' },
 
+    { desc: '+#% Increased Attack Skills Experience Gain', stats: [{ name: 'AttackSkillExpMultiplier', valueType: 'Base' }], id: '69ca51' },
+    { desc: '+#% Increased Aura Skills Experience Gain', stats: [{ name: 'AuraSkillExpMultiplier', valueType: 'Base' }], id: '118098' },
+    { desc: '+#% Increased Passive Skills Experience Gain', stats: [{ name: 'PassiveSkillExpMultiplier', valueType: 'Base' }], id: '80ad3c' },
+
+    { desc: '+#% Increased Artifacts Found', stats: [{ name: 'ArtifactFind', valueType: 'Base' }], id: 'fdcab4' } as const,
 ] as const satisfies readonly ModTemplate[];
 
 
 //Modifiers which can be assigned but never unassigned
 export const persistentPlayerModTemplateList = [
+    { desc: '+# Maximum Artifacts', stats: [{ name: 'MaxArtifact', valueType: 'Base' }], id: '51cc9c' } as const,
+    { desc: '+# Additional Aura Slots', stats: [{ name: 'AuraSlot', valueType: 'Base' }], id: '45357c' } as const,
+    { desc: '+# Maximum Insight', stats: [{ name: 'Insight', valueType: 'Base' }], id: '419541' } as const,
+    { desc: '+# Additional Weapon Modifiers', stats: [{ name: 'AdditionalWeaponModifier', valueType: 'Base' }], id: '58c0f2' } as const,
+] as const satisfies readonly ModTemplate[];
+
+export const permanentPlayerModTemplateList = [
     { desc: '#% Base Bleed Damage Multiplier', stats: [{ name: 'BaseBleedDamageMultiplier', valueType: 'Base', override: true }], id: '01f233' },
     { desc: '#% Base Burn Damage Multiplier', stats: [{ name: 'BaseBurnDamageMultiplier', valueType: 'Base', override: true }], id: '7519a5' },
     { desc: '# Base Bleed Duration', stats: [{ name: 'BleedDuration', valueType: 'Base', override: true }], id: '1ec53c' },
     { desc: '# Base Burn Duration', stats: [{ name: 'BurnDuration', valueType: 'Base', override: true }], id: 'b56e1d' },
-
-    { desc: '+# Maximum Artifacts', stats: [{ name: 'Artifact', valueType: 'Base' }], id: '51cc9c' } as const,
-    { desc: '+# Maximum Insight', stats: [{ name: 'Insight', valueType: 'Base' }], id: '419541' } as const,
 ] as const satisfies readonly ModTemplate[];
 
 //Modifiers which can be assigned at start
 export const playerStartModTemplateList = [
-    ...persistentPlayerModTemplateList,
+    extractModifier(permanentPlayerModTemplateList, '#% Base Bleed Damage Multiplier'),
+    extractModifier(permanentPlayerModTemplateList, '# Base Bleed Duration'),
+    extractModifier(permanentPlayerModTemplateList, '#% Base Burn Damage Multiplier'),
+    extractModifier(permanentPlayerModTemplateList, '# Base Burn Duration'),
     extractModifier(generalPlayerModTemplateList, 'Adds # To # Physical Damage'),
     extractModifier(generalPlayerModTemplateList, 'Adds # To # Elemental Damage'),
     extractModifier(generalPlayerModTemplateList, '+# Maximum Bleed Stack'),
@@ -98,4 +110,4 @@ export const playerStartModTemplateList = [
     extractModifier(generalPlayerModTemplateList, '+##% Of Maximum Mana Regeneration'),
 ] as const satisfies readonly ModTemplate[];
 
-export const playerModTemplateList = [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList];
+export const playerModTemplateList = [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList, ...permanentPlayerModTemplateList];

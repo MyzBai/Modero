@@ -151,7 +151,7 @@ export function calcPlayerStats(player: PlayerOptions) {
     stats.lingeringBurn = calcModFlag('LingeringBurn', config);
 
     //Other
-    stats.maxArtifacts = calcModBase('Artifact', config);
+    stats.maxArtifacts = calcModBase('MaxArtifact', config);
     stats.insightCapacity = calcModBase('Insight', config);
 
     return stats;

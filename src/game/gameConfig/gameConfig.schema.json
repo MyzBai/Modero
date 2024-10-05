@@ -46,8 +46,8 @@
         "weapon": {
           "$ref": "#/definitions/Weapon"
         },
-        "artifacts": {
-          "$ref": "#/definitions/Artifacts"
+        "treasury": {
+          "$ref": "#/definitions/Treasury"
         },
         "achievements": {
           "$ref": "#/definitions/Achievements"
@@ -206,7 +206,7 @@
         "requirements": {
           "$ref": "#/definitions/Requirements"
         },
-        "levelRequirements": {
+        "levelList": {
           "type": "array",
           "items": {
             "type": "object",
@@ -239,8 +239,7 @@
       "additionalProperties": false,
       "required": [
         "guildClassList",
-        "guildList",
-        "levelRequirements"
+        "guildList"
       ]
     },
     "Requirements": {
@@ -338,6 +337,29 @@
     "Skills": {
       "type": "object",
       "properties": {
+        "levelList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 0
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/SkillsUpgradeMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "modList"
+            ]
+          }
+        },
         "attackSkills": {
           "type": "object",
           "properties": {
@@ -581,6 +603,29 @@
     "Weapon": {
       "type": "object",
       "properties": {
+        "levelList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 0
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/WeaponUpgradeMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "modList"
+            ]
+          }
+        },
         "weaponTypeList": {
           "type": "array",
           "items": {
@@ -854,6 +899,18 @@
         },
         {
           "body": "Burn Lingers"
+        },
+        {
+          "body": "+{${1:#}}% Increased Attack Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Aura Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Passive Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Artifacts Found"
         }
       ],
       "oneOf": [
@@ -1021,6 +1078,18 @@
         },
         {
           "pattern": "Burn Lingers"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Passive Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Artifacts Found$"
         }
       ]
     },
@@ -1103,6 +1172,41 @@
           "pattern": "Randomize numerical values"
         }
       ]
+    },
+    "Treasury": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "$ref": "#/definitions/Requirements"
+        },
+        "levelList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 0
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/TreasuryUpgradeMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "modList"
+            ]
+          }
+        },
+        "artifacts": {
+          "$ref": "#/definitions/Artifacts"
+        }
+      },
+      "additionalProperties": false
     },
     "Artifacts": {
       "type": "object",
@@ -1259,19 +1363,13 @@
           "body": "{${1:#}}% Base Bleed Damage Multiplier"
         },
         {
-          "body": "{${1:#}}% Base Burn Damage Multiplier"
-        },
-        {
           "body": "{${1:#}} Base Bleed Duration"
         },
         {
+          "body": "{${1:#}}% Base Burn Damage Multiplier"
+        },
+        {
           "body": "{${1:#}} Base Burn Duration"
-        },
-        {
-          "body": "+{${1:#}} Maximum Artifacts"
-        },
-        {
-          "body": "+{${1:#}} Maximum Insight"
         },
         {
           "body": "Adds {${1:#}} To {${2:#}} Physical Damage"
@@ -1324,19 +1422,13 @@
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Base Bleed Damage Multiplier$"
         },
         {
-          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Base Burn Damage Multiplier$"
-        },
-        {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\} Base Bleed Duration$"
         },
         {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Base Burn Damage Multiplier$"
+        },
+        {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\} Base Burn Duration$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
         },
         {
           "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Physical Damage$"
@@ -1385,6 +1477,1164 @@
         }
       ]
     },
+    "SkillsUpgradeMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% Increased Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Physical Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Speed"
+        },
+        {
+          "body": "{${1:#}}% Increased Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Mana Regeneration"
+        },
+        {
+          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Aura Duration"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Bleed"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% More Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Bleed Stack"
+        },
+        {
+          "body": "+{${1:#}}% Bleed Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Burn"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% More Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Burn Stack"
+        },
+        {
+          "body": "+{${1:#}}% Burn Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Multiplier"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance"
+        },
+        {
+          "body": "{${1:#}}% Increased Ailment Duration"
+        },
+        {
+          "body": "{${1:#}}% More Damage Over Time"
+        },
+        {
+          "body": "+{${1:#}} To All Attributes"
+        },
+        {
+          "body": "+{${1:#}} Strength"
+        },
+        {
+          "body": "{${1:#}}% Increased Strength"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
+        },
+        {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "{${1:#}}% Increased Dexterity"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Increased Intelligence"
+        },
+        {
+          "body": "{${1:#}}% More Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Reduced Mana Cost Of Skills"
+        },
+        {
+          "body": "+{${1:#}}% Damage Over Time Multiplier"
+        },
+        {
+          "body": "Burn Lingers"
+        },
+        {
+          "body": "+{${1:#}}% Increased Attack Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Aura Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Passive Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Artifacts Found"
+        },
+        {
+          "body": "+{${1:#}} Maximum Artifacts"
+        },
+        {
+          "body": "+{${1:#}} Additional Aura Slots"
+        },
+        {
+          "body": "+{${1:#}} Maximum Insight"
+        },
+        {
+          "body": "+{${1:#}} Additional Weapon Modifiers"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Physical Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Speed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\} Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Mana Regeneration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\}% Of Maximum Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Bleed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Bleed Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Bleed Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Burn$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Burn Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Burn Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Multiplier$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Ailment Duration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage Over Time$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} To All Attributes$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Mana Cost Of Skills$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Damage Over Time Multiplier$"
+        },
+        {
+          "pattern": "Burn Lingers"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Passive Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Artifacts Found$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Aura Slots$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Weapon Modifiers$"
+        }
+      ]
+    },
+    "WeaponUpgradeMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% Increased Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Physical Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Speed"
+        },
+        {
+          "body": "{${1:#}}% Increased Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Mana Regeneration"
+        },
+        {
+          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Aura Duration"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Bleed"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% More Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Bleed Stack"
+        },
+        {
+          "body": "+{${1:#}}% Bleed Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Burn"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% More Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Burn Stack"
+        },
+        {
+          "body": "+{${1:#}}% Burn Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Multiplier"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance"
+        },
+        {
+          "body": "{${1:#}}% Increased Ailment Duration"
+        },
+        {
+          "body": "{${1:#}}% More Damage Over Time"
+        },
+        {
+          "body": "+{${1:#}} To All Attributes"
+        },
+        {
+          "body": "+{${1:#}} Strength"
+        },
+        {
+          "body": "{${1:#}}% Increased Strength"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
+        },
+        {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "{${1:#}}% Increased Dexterity"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Increased Intelligence"
+        },
+        {
+          "body": "{${1:#}}% More Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Reduced Mana Cost Of Skills"
+        },
+        {
+          "body": "+{${1:#}}% Damage Over Time Multiplier"
+        },
+        {
+          "body": "Burn Lingers"
+        },
+        {
+          "body": "+{${1:#}}% Increased Attack Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Aura Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Passive Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Artifacts Found"
+        },
+        {
+          "body": "+{${1:#}} Maximum Artifacts"
+        },
+        {
+          "body": "+{${1:#}} Additional Aura Slots"
+        },
+        {
+          "body": "+{${1:#}} Maximum Insight"
+        },
+        {
+          "body": "+{${1:#}} Additional Weapon Modifiers"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Physical Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Speed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\} Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Mana Regeneration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\}% Of Maximum Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Bleed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Bleed Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Bleed Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Burn$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Burn Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Burn Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Multiplier$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Ailment Duration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage Over Time$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} To All Attributes$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Mana Cost Of Skills$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Damage Over Time Multiplier$"
+        },
+        {
+          "pattern": "Burn Lingers"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Passive Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Artifacts Found$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Aura Slots$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Weapon Modifiers$"
+        }
+      ]
+    },
+    "TreasuryUpgradeMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% Increased Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Attack Damage"
+        },
+        {
+          "body": "{${1:#}}% More Physical Damage"
+        },
+        {
+          "body": "{${1:#}}% More Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% More Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Physical Damage"
+        },
+        {
+          "body": "Adds {${1:#}} To {${2:#}} Elemental Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Attack Speed"
+        },
+        {
+          "body": "{${1:#}}% Increased Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana"
+        },
+        {
+          "body": "+{${1:#}} Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Mana Regeneration"
+        },
+        {
+          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+        },
+        {
+          "body": "{${1:#}}% Increased Aura Duration"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Bleed"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% More Bleed Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Bleed Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Bleed Stack"
+        },
+        {
+          "body": "+{${1:#}}% Bleed Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Chance To Burn"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% More Burn Damage"
+        },
+        {
+          "body": "{${1:#}}% Increased Burn Duration"
+        },
+        {
+          "body": "+{${1:#}} Maximum Burn Stack"
+        },
+        {
+          "body": "+{${1:#}}% Burn Damage Multiplier"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Multiplier"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance"
+        },
+        {
+          "body": "{${1:#}}% Increased Ailment Duration"
+        },
+        {
+          "body": "{${1:#}}% More Damage Over Time"
+        },
+        {
+          "body": "+{${1:#}} To All Attributes"
+        },
+        {
+          "body": "+{${1:#}} Strength"
+        },
+        {
+          "body": "{${1:#}}% Increased Strength"
+        },
+        {
+          "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
+        },
+        {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "{${1:#}}% Increased Dexterity"
+        },
+        {
+          "body": "{${1:#}}% More Attack Speed Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Increased Intelligence"
+        },
+        {
+          "body": "{${1:#}}% More Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "+{${1:#}} Maximum Mana Per {${2:#}} Intelligence"
+        },
+        {
+          "body": "{${1:#}}% Reduced Mana Cost Of Skills"
+        },
+        {
+          "body": "+{${1:#}}% Damage Over Time Multiplier"
+        },
+        {
+          "body": "Burn Lingers"
+        },
+        {
+          "body": "+{${1:#}}% Increased Attack Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Aura Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Passive Skills Experience Gain"
+        },
+        {
+          "body": "+{${1:#}}% Increased Artifacts Found"
+        },
+        {
+          "body": "+{${1:#}} Maximum Artifacts"
+        },
+        {
+          "body": "+{${1:#}} Additional Aura Slots"
+        },
+        {
+          "body": "+{${1:#}} Maximum Insight"
+        },
+        {
+          "body": "+{${1:#}} Additional Weapon Modifiers"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Attack Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Physical Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Physical Damage$"
+        },
+        {
+          "pattern": "^Adds \\{(([0-9]+)([-]([0-9]+))?)\\} To \\{(([0-9]+)([-]([0-9]+))?)\\} Elemental Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Speed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\} Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Mana Regeneration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\}% Of Maximum Mana Regeneration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Bleed$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Bleed Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Bleed Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Bleed Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Bleed Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Burn$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Burn Damage$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Burn Duration$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Burn Stack$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Burn Damage Multiplier$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Multiplier$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Ailment Duration$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Damage Over Time$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} To All Attributes$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Speed Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Mana Per \\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Mana Cost Of Skills$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Damage Over Time Multiplier$"
+        },
+        {
+          "pattern": "Burn Lingers"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Attack Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Aura Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Passive Skills Experience Gain$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Artifacts Found$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Aura Slots$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Weapon Modifiers$"
+        }
+      ]
+    },
     "AscensionMod": {
       "type": "string",
       "pattern": "^[^#]*$",
@@ -1394,12 +2644,6 @@
         },
         {
           "body": "{${1:#}}% More Enemies"
-        },
-        {
-          "body": "+{${1:#}} Maximum Artifacts"
-        },
-        {
-          "body": "+{${1:#}} Maximum Insight"
         }
       ],
       "oneOf": [
@@ -1408,12 +2652,6 @@
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemies$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
         }
       ]
     },

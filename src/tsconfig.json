@@ -2,5 +2,6 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "lib": [ "DOM", "dom.iterable", "ESNext" ],
-    }
+    },
+    "exclude": [ "../public", "../scripts", "../tests", "../node_modules" ],
 }

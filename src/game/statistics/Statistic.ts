@@ -55,6 +55,7 @@ export class Statistic extends Value {
             this.texts.push(text);
         }
         this.set((this.texts).indexOf(text));
+        this.mutated = true;
     }
 
     getText() {

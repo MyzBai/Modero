@@ -8,7 +8,7 @@ import { SchemaOverrideSymbolNames, type SchemaOverrideSymbolName } from '../src
 import { isDefined } from '../src/shared/utils/utils';
 import { taskTemplates } from '../src/game/tasks/taskTemplates';
 import { craftTemplates } from '../src/game/components/weapon/craftTemplates';
-import { generalPlayerModTemplateList, playerStartModTemplateList } from '../src/game/mods/playerModTemplates';
+import { generalPlayerModTemplateList, persistentPlayerModTemplateList, playerStartModTemplateList } from '../src/game/mods/playerModTemplates';
 import { enemyModTemplateList } from '../src/game/mods/enemyModTemplates';
 
 interface SchemaOverride {
@@ -73,12 +73,15 @@ function createSchema() {
 
 function createSchemaOverrideProperties(generator: JsonSchemaGenerator) {
     //strings which can be referenced throughout the config file
-    createStringSchemaOverride(generator, { symbolName: 'PlayerMod', descriptions: Object.values(generalPlayerModTemplateList).map(x => x.desc) });
-    createStringSchemaOverride(generator, { symbolName: 'PlayerStartMod', descriptions: Object.values(playerStartModTemplateList).map(x => x.desc) });
-    createStringSchemaOverride(generator, { symbolName: 'AscensionMod', descriptions: Object.values(ascensionModTemplateList).map(x => x.desc) });
-    createStringSchemaOverride(generator, { symbolName: 'EnemyMod', descriptions: Object.values(enemyModTemplateList).map(x => x.desc) });
-    createStringSchemaOverride(generator, { symbolName: 'WeaponCraftDescription', descriptions: Object.values(craftTemplates).map(x => x.desc) });
-    createStringSchemaOverride(generator, { symbolName: 'AchievementDescription', descriptions: Object.values(taskTemplates).map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'PlayerMod', descriptions: generalPlayerModTemplateList.map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'PlayerStartMod', descriptions: playerStartModTemplateList.map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'SkillsUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'WeaponUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'TreasuryUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'AscensionMod', descriptions: ascensionModTemplateList.map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'EnemyMod', descriptions: enemyModTemplateList.map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'WeaponCraftDescription', descriptions: craftTemplates.map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'AchievementDescription', descriptions: taskTemplates.map(x => x.desc) });
 
     //create snippet for id to automatically generate random base-16 digts
     const idOverride: SchemaOverride = {

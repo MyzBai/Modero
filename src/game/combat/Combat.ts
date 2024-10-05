@@ -106,9 +106,6 @@ export class Combat {
             this.stopArea();
         }
         this._area = area ?? world.area;
-        if (!this._area) {
-            return;
-        }
         assertDefined(this._area);
 
         player.modDB.replace('Area', Modifier.extractStatModifierList(...this._area.modList.filter(x => playerModTemplateList.some(y => y.id === x.template.id))));
@@ -122,6 +119,8 @@ export class Combat {
         statistics.updateStats('Combat');
 
         this.startAutoAttack();
+
+        player.setActivity('Combat', area?.data.interruptable);
     }
 
     stopArea() {

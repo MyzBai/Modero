@@ -1,15 +1,15 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Component } from '../Component';
 import { createItem, createItemInfoElements, createItemListElement, type Item } from 'src/game/utils/itemUtils';
-import { ascension, combat, game, player, statistics } from 'src/game/game';
+import { ascension, game, player } from 'src/game/game';
 import { Modifier } from 'src/game/mods/Modifier';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { createCustomElement } from '../../../shared/customElements/customElements';
-import { ProgressElement } from '../../../shared/customElements/ProgressElement';
 import { createHelpIcon } from '../../../shared/utils/dom';
 import { ModalElement } from '../../../shared/customElements/ModalElement';
 import { createModListElement } from '../../utils/dom';
 import { combineModifiers } from '../../mods/utils';
+import { LevelElement } from '../../../shared/customElements/LevelElement';
 
 export interface GuildClass extends Item {
     data: GameConfig.GuildClass;
@@ -23,43 +23,21 @@ export interface Guild {
 }
 
 export class GuildHall extends Component {
-    private _level = 1;
-    private _exp = 0;
     private readonly guildClassList: GuildClass[];
     private activeGuildClass?: GuildClass;
-    private readonly expProgressElement: ProgressElement;
+    private readonly levelElement?: LevelElement;
     constructor(private readonly data: GameConfig.GuildHall) {
         super('guildHall');
-
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Guild Hall</div>');
-        const restButton = document.createElement('span');
-        restButton.setAttribute('data-rest-button', '');
-        restButton.classList.add('rest-button');
-        restButton.textContent = 'Rest';
-        restButton.addEventListener('click', () => {
-            this.toggleResting(!this.isResting);
-        });
-        this.page.appendChild(restButton);
-
-        const levelElement = document.createElement('div');
-        levelElement.classList.add('level');
-        levelElement.setAttribute('data-level', '');
-        levelElement.textContent = '1';
-        levelElement.addEventListener('click', () => {
-            this.showGuildHallOverview();
-        });
-
-        this.expProgressElement = createCustomElement(ProgressElement);
-        this.expProgressElement.addEventListener('pointerenter', () => {
-            this.expProgressElement.setAttribute('data-exp', `${this._exp}/${this.maxExp}`);
-        });
-
-        const expElement = document.createElement('div');
-        expElement.classList.add('s-exp');
-        expElement.append(levelElement, this.expProgressElement);
-        this.page.appendChild(expElement);
-
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Class List</div>');
+
+        if (data.levelList) {
+            this.levelElement = createCustomElement(LevelElement);
+            this.levelElement.setAction('Training');
+            this.levelElement.setLevelClickCallback(this.showGuildHallOverview.bind(this));
+            this.levelElement.onLevelChange.listen(this.updateLevel.bind(this));
+            this.page.appendChild(this.levelElement);
+        }
+
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v guild-class-list" data-guild-class-list></ul>');
         this.page.insertAdjacentHTML('beforeend', '<div data-guild-class-info></div>');
 
@@ -99,13 +77,11 @@ export class GuildHall extends Component {
         }
         this.page.querySelectorStrict('[data-guild-class-list]').append(fragment);
 
-        player.stats.activity.setText('None');
-        player.stats.guildClass.setText('None');
+        player.stats.activity.texts = ['None'];
+        player.stats.guildClass.texts = ['None'];
 
         this.guildClassList.find(x => x.unlocked)?.element.click();
         this.page.querySelector<HTMLElement>('[data-class-list] li')?.click();
-
-        this.resting = this.resting.bind(this);
 
         ascension.ascendEvent.listen(listElements => {
             if (!this.activeGuildClass) {
@@ -120,43 +96,30 @@ export class GuildHall extends Component {
             element.appendChild(modListElement);
             listElements.push(element);
         });
+
+        this.updateLevel();
     }
 
     get level() {
-        return this._level;
-    }
-    get maxLevel() {
-        return this.data.levelRequirements.length;
-    }
-    get exp() {
-        return this._exp;
-    }
-    get maxExp() {
-        return this.data.levelRequirements[this._level]!.exp;
+        return this.levelElement?.level ?? 1;
     }
 
     get selectedGuildClass() {
         return this.guildClassList.find(x => x.selected);
     }
 
-    get isResting() {
-        return player.stats.activity.getText() === 'Resting';
-    }
-
-    protected addExp(amount: number) {
-        this._exp += amount;
-        this.updateLevel();
+    get isTraining() {
+        return player.stats.activity.getText() === 'Training';
     }
 
     private updateLevel() {
-        if (this._exp >= this.maxExp) {
-            this._level += 1;
-            this._exp = 0;
-            this.updateModifiers();
+        if (!this.data.levelList) {
+            return;
         }
-    }
-
-    private updateModifiers() {
+        if (!this.levelElement) {
+            return;
+        }
+        this.levelElement.maxExp = this.data.levelList[this.level - 1]?.exp ?? Infinity;
         if (!this.activeGuildClass) {
             return;
         }
@@ -171,13 +134,13 @@ export class GuildHall extends Component {
 
     private getGuildClassModList(name: string) {
         const guildClass = this.data.guildClassList.findStrict(x => x.name === name);
-        const index = Math.min(this._level - 1, guildClass.modList.length - 1);
+        const index = Math.min(this.level - 1, guildClass.modList.length - 1);
         return guildClass.modList[index]!;
     }
 
     private getGuildModList(name: string) {
         const guild = this.data.guildList.findStrict(x => x.name === name);
-        const index = Math.min(this._level - 1, guild.modList.length - 1);
+        const index = Math.min(this.level - 1, guild.modList.length - 1);
         return guild.modList[index]!;
     }
 
@@ -269,45 +232,26 @@ export class GuildHall extends Component {
         player.modDB.replace('GuildClassGlobal', Modifier.extractStatModifierList(...Modifier.modListFromTexts(guildClass.data.ascensionModList[game.stats.ascension.value - 1] ?? [])));
     }
 
-    private toggleResting(rest: boolean) {
-        this.page.querySelectorStrict('[data-rest-button]').toggleAttribute('data-active', rest);
-        if (rest) {
-            player.stats.activity.setText('Resting');
-            game.tickSecondsEvent.listen(this.resting);
-            combat.stopArea();
-        } else {
-            player.stats.activity.setDefault();
-            game.tickSecondsEvent.removeListener(this.resting);
-            combat.startArea(null);
-        }
-        statistics.updateStats('Player');
-    }
-
-    private resting() {
-        this.addExp(1);
-        this.updateExpProgressBar();
-    }
-
-    private updateExpProgressBar() {
-        this.expProgressElement.value = this._exp / this.maxExp;
-    }
-
     serialize(save: Serialization) {
         save.guildHall = {
             classId: this.activeGuildClass?.data.id,
-            resting: this.isResting,
-            level: this._level,
-            exp: this._exp,
+            training: this.isTraining,
+            level: this.level,
+            exp: this.levelElement?.curExp,
             guildClassList: this.guildClassList.filter(x => x.ascensionCount > 0).map(x => ({ classId: x.data.id, ascensionCount: x.ascensionCount }))
         }
     }
 
     deserialize({ guildHall: save }: UnsafeSerialization) {
-        this._level = save?.level ?? 1;
-        this._exp = save?.exp ?? 0;
-        this.updateLevel();
-        this.updateExpProgressBar();
-        this.toggleResting(!!save?.resting);
+        if (this.levelElement) {
+            this.levelElement.setLevel(save?.level ?? 1);
+            this.levelElement.curExp = save?.exp ?? 0;
+            this.levelElement.updateProgressBar();
+            this.updateLevel();
+            if (save?.training) {
+                this.levelElement.startAction();
+            }
+        }
         const guildClass = this.guildClassList.find(x => x.data.id === save?.classId);
         if (guildClass) {
             this.assignClass(guildClass);

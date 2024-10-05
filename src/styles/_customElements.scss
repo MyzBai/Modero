@@ -199,3 +199,48 @@ progress-element {
         transition: 250ms linear;
     }
 }
+
+level-element {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: auto 1fr;
+    border: $default-border;
+    padding: 0.2em;
+    .level {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        grid-row: span 2;
+        text-align: center;
+        background-color: rgb(57, 168, 57);
+        aspect-ratio: 1/1;
+        // border: $default-border;
+        border-radius: 10%;
+        margin-right: 0.2em;
+        // font-size: 1.6em;
+        cursor: default;
+        &:hover {
+            background-color: rgb(45, 136, 45);
+        }
+    }
+    .action {
+        cursor: default;
+        text-decoration: underline;
+
+        &:hover {
+            filter: brightness(80%);
+        }
+    }
+    progress-element {
+        justify-content: center;
+        height: 1.2em;
+        margin: auto 0;
+        position: relative;
+        &:hover::after {
+            content: attr(data-exp);
+            position: absolute;
+            inset: 0;
+            text-align: center;
+        }
+    }
+}

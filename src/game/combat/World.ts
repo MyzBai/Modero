@@ -46,7 +46,8 @@ export class World {
             enemyBaseCount: this.baseEnemyCount,
             enemyBaseLife: combat.enemyBaseLife,
             candidates: enemyList,
-            areaModList: []
+            areaModList: [],
+            interruptable: true
         });
 
         if (Number.isFinite(this.baseEnemyCount)) {

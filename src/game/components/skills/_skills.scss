@@ -4,11 +4,21 @@
 .p-skills {
     position: relative;
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto 1fr;
     gap: $default-gap;
+
+    & > :first-child {
+        grid-column: span 2;
+    }
+
+    level-element {
+        grid-column: span 2;
+    }
 
     & > .s-menu {
         position: relative;
+        grid-column: span 2;
     }
 
     .s-skill-list {
@@ -16,8 +26,8 @@
     }
 
     [data-item-info] {
-        grid-row: 1 / -1;
         grid-column: 2;
+        grid-row: 1 / -1;
 
         progress-element {
             @include progress-multi-bar;
@@ -32,6 +42,7 @@
     }
 
     .p-attack-skills {
+        grid-column: span 2;
         display: grid;
         grid-template-rows: auto 1fr;
         grid-template-columns: 1fr 1fr;
@@ -39,6 +50,7 @@
     }
 
     .p-aura-skills {
+        grid-column: span 2;
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto max(40%) auto 1fr;
@@ -91,6 +103,7 @@
     }
 
     .p-passive-skills {
+        grid-column: span 2;
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto 1fr;

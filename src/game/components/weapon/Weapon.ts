@@ -8,6 +8,10 @@ import { CraftTable, type ModGroupList, type WeaponModifierCandidate } from './C
 import { craftTemplates, type CraftTemplateDescription } from './craftTemplates';
 import { isDefined, isNumber, isString, pickManyFromPickProbability } from 'src/shared/utils/utils';
 import { createHelpIcon } from 'src/shared/utils/dom';
+import { LevelElement } from '../../../shared/customElements/LevelElement';
+import { createCustomElement } from '../../../shared/customElements/customElements';
+import { ModalElement } from '../../../shared/customElements/ModalElement';
+import { createModListElement } from '../../utils/dom';
 
 export class Weapon extends Component {
     static sourceName = 'Weapon';
@@ -15,6 +19,7 @@ export class Weapon extends Component {
     private readonly candidateModList: WeaponModifierCandidate[] = [];
     private readonly craftTable: CraftTable;
     private readonly modList: Modifier[] = [];
+    private readonly levelElement?: LevelElement;
     constructor(readonly data: GameConfig.Weapon) {
         super('weapon');
 
@@ -26,6 +31,14 @@ export class Weapon extends Component {
         this.page.appendChild(helpIconElement);
 
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Weapon</div>');
+        if (data.levelList) {
+            this.levelElement = createCustomElement(LevelElement);
+            this.levelElement.setAction('Refining Weapon');
+            this.levelElement.setLevelClickCallback(this.showWeaponUpgradeOverview.bind(this));
+            this.levelElement.onLevelChange.listen(this.updateWeaponLevel.bind(this));
+
+            this.page.appendChild(this.levelElement);
+        }
         this.page.insertAdjacentHTML('beforeend', '<div class="s-weapon" data-weapon><div class="hidden" data-weapon-type></div><ul class="s-mod-list g-mod-list" data-mod-list></ul></div>');
 
         this.craftTable = new CraftTable({
@@ -71,14 +84,35 @@ export class Weapon extends Component {
             const candidates = this.data.crafting.craftList;
             pickManyFromPickProbability(candidates).forEach(x => this.craftTable.addCraftCount(x.desc as CraftTemplateDescription, 1));
         });
+
+        this.updateWeaponLevel();
     }
 
     private applyModifiers() {
         player.modDB.replace(Weapon.sourceName, Modifier.extractStatModifierList(...this.modList));
     }
 
+    private updateWeaponLevel() {
+        if (!this.levelElement) {
+            return;
+        }
+        this.levelElement.maxExp = this.data.levelList?.[this.levelElement.level - 1]?.exp ?? Infinity;
+        const modList = this.data.levelList?.[this.levelElement.level - 1]?.modList ?? [];
+        player.modDB.replace('WeaponUpgrade', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+    }
+
+    private showWeaponUpgradeOverview() {
+        const modal = createCustomElement(ModalElement);
+        modal.setTitle('Weapon Upgrade Overview');
+        const body = createModListElement(this.data.levelList?.[this.levelElement!.level - 1]?.modList ?? []);
+        modal.setBodyElement(body);
+    }
+
     serialize(save: Serialization) {
         save.weapon = {
+            level: this.levelElement?.level ?? 0,
+            exp: this.levelElement?.curExp ?? 0,
+            refining: player.activity?.name === 'Refining Weapon',
             modList: this.modList.map(x => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === x.text).id, values: x.values })),
             crafting: this.craftTable.serialize(this.data.modLists.flatMap(x => x).map(x => ({ id: x.id, text: x.mod })))
         };
@@ -106,6 +140,16 @@ export class Weapon extends Component {
             }
             return mod;
         };
+        if (this.levelElement) {
+            this.levelElement.setLevel(save?.level ?? 1);
+            this.levelElement.curExp = save?.exp ?? 0;
+            this.levelElement.updateProgressBar();
+            this.updateWeaponLevel();
+            if (save?.refining) {
+                this.levelElement.startAction();
+            }
+        }
+
         const modList = save.modList?.map(x => x && deserializeMod(x.srcId, x.values?.filter(isNumber))).filter(isDefined) ?? [];
         this.modList.splice(0, this.modList.length, ...modList);
         this.applyModifiers();

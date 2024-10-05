@@ -16,7 +16,7 @@ export interface Serialization {
     guildHall?: GuildHall;
     weapon?: Weapon;
     skills?: Skills;
-    artifacts?: Artifacts;
+    treasury?: Treasury;
     ascension?: Ascension;
     elementHighlightIdList?: string[];
 }
@@ -90,10 +90,10 @@ export interface Effect {
 }
 
 export interface GuildHall {
+    level?: number;
+    exp?: number;
+    training?: boolean;
     classId?: string;
-    resting: boolean;
-    level: number;
-    exp: number;
     guildClassList: {
         classId: string;
         ascensionCount: number;
@@ -101,6 +101,9 @@ export interface GuildHall {
 }
 
 export interface Weapon {
+    level?: number;
+    exp?: number;
+    refining?: boolean;
     weaponTypeId?: string;
     modList: SerializedModifier[];
     crafting: WeaponCrafting;
@@ -111,6 +114,9 @@ export interface WeaponCrafting {
 }
 
 export interface Skills {
+    level?: number;
+    exp?: number;
+    meditating?: boolean;
     attackSkills?: {
         skillId: string;
         skillList: {
@@ -138,12 +144,17 @@ export interface Skills {
     };
 }
 
-export interface Artifacts {
-    artifactNameList: {
-        id: string;
-        assigned: boolean;
-        expFac: number;
-    }[];
+export interface Treasury {
+    level?: number;
+    exp?: number;
+    expanding?: boolean;
+    artifacts?: {
+        artifactNameList: {
+            id: string;
+            assigned: boolean;
+            expFac: number;
+        }[];
+    }
 }
 
 export interface Ascension {

@@ -22,7 +22,10 @@ export type StatName =
     | 'AilmentDuration' | 'LingeringBurn'
     | 'AuraDuration'
     | 'AttackSkillCost'
-    | 'Artifact' | 'Insight'
+    | 'MaxArtifact' | 'ArtifactFind'
+    | 'AdditionalWeaponModifier'
+    | 'Insight' | 'AuraSlot'
+    | `${'Attack' | 'Aura' | 'Passive'}SkillExpMultiplier`
     | EnemyStatNames
     | AreaStatNames;
 

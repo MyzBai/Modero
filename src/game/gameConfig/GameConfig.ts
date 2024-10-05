@@ -14,7 +14,8 @@ export interface GameConfig {
         guildHall?: GuildHall;
         skills?: Skills;
         weapon?: Weapon;
-        artifacts?: Artifacts;
+        // artifacts?: Artifacts;
+        treasury?: Treasury;
         achievements?: Achievements;
     };
 }
@@ -51,6 +52,10 @@ export interface AscensionInstance {
 }
 
 export interface Weapon {
+    levelList?: {
+        exp?: Exp;
+        modList: WeaponUpgradeModList;
+    }[];
     weaponTypeList?: WeaponType[];
     modLists: WeaponMod[][];
     crafting: {
@@ -77,6 +82,10 @@ export interface WeaponCraft {
 }
 
 export interface Skills {
+    levelList?: {
+        exp?: Exp;
+        modList: SkillsUpgradeModList;
+    }[];
     attackSkills?: {
         attackSkillList: AttackSkill[];
     };
@@ -130,6 +139,15 @@ export interface PassiveSkill {
     exp?: UnsignedInteger;
 }
 
+export interface Treasury {
+    requirements?: Requirements;
+    levelList?: {
+        exp?: Exp;
+        modList: TreasuryUpgradeModList;
+    }[];
+    artifacts?: Artifacts;
+}
+
 export interface Artifacts {
     requirements?: Requirements;
     artifactList: Artifact[];
@@ -146,7 +164,7 @@ export type GuildName = 'Vanguard' | 'Wanderer' | 'Arcane';
 
 export interface GuildHall {
     requirements?: Requirements;
-    levelRequirements: { exp: Exp; }[];
+    levelList?: { exp: Exp; }[];
     guildList: Guild[];
     guildClassList: GuildClass[];
 }
@@ -173,9 +191,12 @@ export interface Achievement {
 export const SchemaOverrideSymbolNames = [
     'PlayerMod',
     'PlayerStartMod',
+    'SkillsUpgradeMod',
+    'WeaponUpgradeMod',
+    'WeaponCraftDescription',
+    'TreasuryUpgradeMod',
     'AscensionMod',
     'EnemyMod',
-    'WeaponCraftDescription',
     'AchievementDescription',
     'EnemyBaseLife',
     'EnemyBaseCount'
@@ -264,6 +285,21 @@ type PlayerModList = PlayerMod[];
 type PlayerStartMod = string;
 /**@items {"$ref": "#/definitions/PlayerStartMod"} */
 type PlayerStartModList = PlayerStartMod[];
+
+/**@$ref #/definitions/SkillsUpgradeMod */
+type SkillsUpgradeMod = string;
+/**@items {"$ref": "#/definitions/SkillsUpgradeMod"} */
+type SkillsUpgradeModList = SkillsUpgradeMod[];
+
+/**@$ref #/definitions/WeaponUpgradeMod */
+type WeaponUpgradeMod = string;
+/**@items {"$ref": "#/definitions/WeaponUpgradeMod"} */
+type WeaponUpgradeModList = WeaponUpgradeMod[];
+
+/**@$ref #/definitions/TreasuryUpgradeMod */
+type TreasuryUpgradeMod = string;
+/**@items {"$ref": "#/definitions/TreasuryUpgradeMod"} */
+type TreasuryUpgradeModList = TreasuryUpgradeMod[];
 
 /**@$ref #/definitions/EnemyMod */
 type EnemyMod = string;

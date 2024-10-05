@@ -3,14 +3,16 @@
 
 .p-artifacts {
     display: grid;
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto 1fr;
     grid-template-columns: 1fr 1fr;
     gap: $default-gap;
 
     & > :first-child {
         grid-column: span 2;
     }
+
     .artifact-list {
+        grid-column: 1;
         border: $default-border;
     }
 

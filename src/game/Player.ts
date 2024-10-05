@@ -8,18 +8,29 @@ import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ENVIRONMENT } from 'src/config';
 import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
 
+export const playerActivityNameList = ['Combat', 'Meditating', 'Refining Weapon', 'Expanding Treasury', 'Training'] as const;
+export type PlayerActivityName = typeof playerActivityNameList[number];
+export interface PlayerActivity {
+    name: PlayerActivityName;
+    interruptable: boolean;
+}
 export class Player {
     readonly onStatsChange = new EventEmitter();
     readonly modDB = new ModDB();
     readonly stats = createPlayerStats(game.stats);
     private readonly manaBar: ProgressElement;
     private statUpdatePending = false;
+    private _activity?: PlayerActivity;
     constructor() {
         this.manaBar = game.page.querySelectorStrict<ProgressElement>('[data-combat-overview] [data-mana-bar]');
     }
 
     get level() {
         return this.stats.level.value;
+    }
+
+    get activity() {
+        return this._activity;
     }
 
     init() {
@@ -105,6 +116,11 @@ export class Player {
         const result = calcPlayerStats(playerOptions);
         applyStatValues(this.stats, result);
         statistics.updateStats('Player');
+    }
+
+    setActivity(name: PlayerActivityName, interruptable?: boolean) {
+        this._activity = { name, interruptable: interruptable ?? true };
+        this.stats.activity.setText(name);
     }
 
     serialize(save: GameSerialization.Serialization) {

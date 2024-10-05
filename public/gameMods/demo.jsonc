@@ -37,10 +37,7 @@
         "{1}% More Attack Speed Per {7} Dexterity",
         "+{1}% Hit Chance Per {10} Dexterity",
         "+{2} Maximum Mana Per {1} Intelligence",
-        "+{0.6}% Of Maximum Mana Regeneration",
-        "+{100} Maximum Mana",
-        "+{1} Maximum Artifacts",
-        "+{100} Maximum Insight"
+        "+{0.6}% Of Maximum Mana Regeneration"
     ],
     "ascension": {
         "trial": {
@@ -56,12 +53,29 @@
         },
         "ascensionInstanceList": [
             { "id": "b0cfcb", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life" ] },
-            { "id": "37d4dd", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life", "+{100} Maximum Insight" ] },
-            { "id": "c3f79c", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life", "+{1} Maximum Artifacts" ] }
+            { "id": "37d4dd", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life" ] },
+            { "id": "c3f79c", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life" ] }
         ]
     },
     "components": {
         "skills": {
+            "levelList": [
+                {
+                    "exp": 5,
+                    "modList": [
+                        "+{1} Additional Aura Slots",
+                        "+{100} Maximum Insight",
+                        "+{100} Maximum Mana"
+                    ]
+                },
+                {
+                    "modList": [
+                        "+{2} Additional Aura Slots",
+                        "+{300} Maximum Insight",
+                        "+{200} Maximum Mana"
+                    ]
+                }
+            ],
             "attackSkills": {
                 "attackSkillList": [
                     {
@@ -497,6 +511,15 @@
             }
         },
         "weapon": {
+            "levelList": [
+                {
+                    "exp": 5,
+                    "modList": [ "+{3} Additional Weapon Modifiers" ]
+                },
+                {
+                    "modList": [ "+{4} Additional Weapon Modifiers" ]
+                }
+            ],
             "crafting": {
                 "advReforgeRequirements": { "ascensionCount": 1, "curLevel": 3 },
                 "craftList": [
@@ -637,84 +660,90 @@
                 ]
             ]
         },
-        "artifacts": {
-            "artifactList": [
-                {
-                    "id": "71c815",
-                    "name": "Rusted Sword I",
-                    "probability": 1000,
-                    "exp": 5,
-                    "modList": [ "{50}% More Physical Attack Damage" ]
-                },
-                {
-                    "id": "07f2ad",
-                    "name": "Rusted Sword II",
-                    "modList": [ "{80}% More Physical Attack Damage", "+{20}% Hit Chance" ]
-                },
-                {
-                    "id": "f418e8",
-                    "name": "Spell Book I",
-                    "probability": 1000,
-                    "exp": 5,
-                    "modList": [ "{50}% More Elemental Attack Damage" ]
-                },
-                {
-                    "id": "02c2e3",
-                    "name": "Spell Book II",
-                    "modList": [ "{80}% More Elemental Attack Damage", "+{20}% Hit Chance" ]
-                },
-                {
-                    "id": "d991a6",
-                    "name": "Sacrifical Dagger I",
-                    "probability": 1000,
-                    "exp": 5,
-                    "modList": [ "{50}% More Bleed Damage", "{30}% Increased Bleed Duration" ]
-                },
-                {
-                    "id": "097c5b",
-                    "name": "Sacrifical Dagger II",
-                    "modList": [ "{80}% More Bleed Damage", "{30}% Increased Bleed Duration", "+{30}% Bleed Damage Multiplier" ]
-                },
-                {
-                    "id": "70ef5b",
-                    "name": "Burned Robe I",
-                    "probability": 1000,
-                    "exp": 5,
-                    "modList": [ "{50}% More Burn Damage", "{30}% Increased Burn Duration" ]
-                },
-                {
-                    "id": "1144d3",
-                    "name": "Burned Robe II",
-                    "modList": [ "{80}% More Burn Damage", "{30}% Increased Burn Duration", "+{30}% Burn Damage Multiplier" ]
-                },
-                {
-                    "id": "9d918d",
-                    "name": "Amulet Of Pryhz I",
-                    "exp": 5,
-                    "probability": 1000,
-                    "modList": [ "+{20}% Critical Hit Chance", "+{50}% Critical Hit Multiplier" ]
-                },
-                {
-                    "id": "adef18",
-                    "name": "Amulet Of Pryhz II",
-                    "modList": [ "+{25}% Critical Hit Chance", "+{120}% Critical Hit Multiplier" ]
-                },
-                {
-                    "id": "998209",
-                    "name": "Eternal Crystal I",
-                    "exp": 5,
-                    "probability": 1000,
-                    "modList": [ "{30}% Increased Mana Regeneration", "+{100} Maximum Mana" ]
-                },
-                {
-                    "id": "741539",
-                    "name": "Eternal Crystal II",
-                    "modList": [ "{50}% Increased Mana Regeneration", "+{200} Maximum Mana" ]
-                }
-            ]
+        "treasury": {
+            "levelList": [
+                { "exp": 5, "modList": [ "+{1} Maximum Artifacts" ] },
+                { "modList": [ "+{2} Maximum Artifacts", "+{30}% Increased Artifacts Found" ] }
+            ],
+            "artifacts": {
+                "artifactList": [
+                    {
+                        "id": "71c815",
+                        "name": "Rusted Sword I",
+                        "probability": 1000,
+                        "exp": 5,
+                        "modList": [ "{50}% More Physical Attack Damage" ]
+                    },
+                    {
+                        "id": "07f2ad",
+                        "name": "Rusted Sword II",
+                        "modList": [ "{80}% More Physical Attack Damage", "+{20}% Hit Chance" ]
+                    },
+                    {
+                        "id": "f418e8",
+                        "name": "Spell Book I",
+                        "probability": 1000,
+                        "exp": 5,
+                        "modList": [ "{50}% More Elemental Attack Damage" ]
+                    },
+                    {
+                        "id": "02c2e3",
+                        "name": "Spell Book II",
+                        "modList": [ "{80}% More Elemental Attack Damage", "+{20}% Hit Chance" ]
+                    },
+                    {
+                        "id": "d991a6",
+                        "name": "Sacrifical Dagger I",
+                        "probability": 1000,
+                        "exp": 5,
+                        "modList": [ "{50}% More Bleed Damage", "{30}% Increased Bleed Duration" ]
+                    },
+                    {
+                        "id": "097c5b",
+                        "name": "Sacrifical Dagger II",
+                        "modList": [ "{80}% More Bleed Damage", "{30}% Increased Bleed Duration", "+{30}% Bleed Damage Multiplier" ]
+                    },
+                    {
+                        "id": "70ef5b",
+                        "name": "Burned Robe I",
+                        "probability": 1000,
+                        "exp": 5,
+                        "modList": [ "{50}% More Burn Damage", "{30}% Increased Burn Duration" ]
+                    },
+                    {
+                        "id": "1144d3",
+                        "name": "Burned Robe II",
+                        "modList": [ "{80}% More Burn Damage", "{30}% Increased Burn Duration", "+{30}% Burn Damage Multiplier" ]
+                    },
+                    {
+                        "id": "9d918d",
+                        "name": "Amulet Of Pryhz I",
+                        "exp": 5,
+                        "probability": 1000,
+                        "modList": [ "+{20}% Critical Hit Chance", "+{50}% Critical Hit Multiplier" ]
+                    },
+                    {
+                        "id": "adef18",
+                        "name": "Amulet Of Pryhz II",
+                        "modList": [ "+{25}% Critical Hit Chance", "+{120}% Critical Hit Multiplier" ]
+                    },
+                    {
+                        "id": "998209",
+                        "name": "Eternal Crystal I",
+                        "exp": 5,
+                        "probability": 1000,
+                        "modList": [ "{30}% Increased Mana Regeneration", "+{100} Maximum Mana" ]
+                    },
+                    {
+                        "id": "741539",
+                        "name": "Eternal Crystal II",
+                        "modList": [ "{50}% Increased Mana Regeneration", "+{200} Maximum Mana" ]
+                    }
+                ]
+            }
         },
         "guildHall": {
-            "levelRequirements": [ { "exp": 3000 }, { "exp": 5000 }, { "exp": 10000 }, { "exp": 15000 } ],
+            "levelList": [ { "exp": 5 }, { "exp": 5 }, { "exp": 5 }, { "exp": 5 } ],
             "guildList": [
                 {
                     "name": "Vanguard",

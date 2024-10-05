@@ -1,15 +1,14 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
-import { Component } from '../Component';
 import { Modifier } from 'src/game/mods/Modifier';
 import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
 import { combat, notifications, player } from 'src/game/game';
-import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
+import type * as GameSerialization from 'src/game/serialization';
 import { createItemListElement, type Item, getNextRankItem, createItem, getItemRankNumeral, getRankItemBaseName, createItemInfoElements, unlockItem, selectItemByName } from 'src/game/utils/itemUtils';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ROMAN_NUMERALS } from 'src/shared/utils/constants';
 import { assertDefined } from 'src/shared/utils/assert';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
-import { ENVIRONMENT } from '../../../config';
+import { ENVIRONMENT } from '../../../../config';
 
 interface Artifact extends Item {
     baseName: string;
@@ -21,14 +20,14 @@ interface Artifact extends Item {
     assigned: boolean;
 }
 
-export class Artifacts extends Component {
+export class Artifacts {
+    readonly page: HTMLElement;
     private onArtifactFound = new EventEmitter<Artifact>();
     private artifactList: Artifact[];
     private elementMap = new Map<string, HTMLElement>();
     constructor(data: GameConfig.Artifacts) {
-        super('artifacts');
-
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Artifacts</div>');
+        this.page = document.createElement('div');
+        this.page.classList.add('p-artifacts');
         this.page.insertAdjacentHTML('beforeend', '<div class="g-toolbar" data-artifacts-counter><span>Artifacts: <var data-cur>0</var>/<var data-max></var></span></div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Artifact List</div>');
         this.page.insertAdjacentHTML('beforeend', '<ul class="artifact-list g-scroll-list-v" data-artifact-list></ul>');
@@ -216,13 +215,13 @@ export class Artifacts extends Component {
         });
     }
 
-    serialize(save: Serialization) {
-        save.artifacts = {
+    serialize(): GameSerialization.Treasury['artifacts'] {
+        return {
             artifactNameList: this.artifactList.filter(x => x.unlocked).map(x => ({ id: x.data.id, assigned: x.assigned, expFac: x.exp / x.maxExp }))
         };
     }
 
-    deserialize({ artifacts: save }: UnsafeSerialization) {
+    deserialize(save: DeepPartial<GameSerialization.Treasury['artifacts']>) {
         for (const data of save?.artifactNameList?.filter(isDefined) || []) {
             const artifact = this.artifactList.find(x => x.data.id === data.id);
             if (!artifact) {

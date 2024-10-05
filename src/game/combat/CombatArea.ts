@@ -25,6 +25,7 @@ export interface CombatAreaOptions {
     readonly candidates: EnemyCandidate[];
     readonly areaModList?: string[];
     readonly excludeGlobalAreaMods?: boolean;
+    readonly interruptable?: boolean;
 }
 
 export class CombatArea {

@@ -1,0 +1,8 @@
+@use 'variables' as *;
+@use 'artifacts/artifacts';
+
+.p-treasury {
+    display: grid;
+    grid-template-rows: auto auto auto 1fr;
+    gap: $default-gap;
+}

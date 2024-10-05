@@ -4,12 +4,12 @@ import type { Component } from './Component';
 import { Achievements } from './achievements/Achievements';
 import { Skills } from './skills/Skills';
 import type * as GameSerialization from '../serialization';
-import { Artifacts } from './artifacts/Artifacts';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Weapon } from './weapon/Weapon';
 import type { Serialization } from '../serialization';
 import { evaluateStatRequirements } from '../statistics/statRequirements';
 import { GuildHall } from './guildHall/GuildHall';
+import { Treasury } from './treasury/Treasury';
 
 type ComponentUnion = NonNullable<PropertyValuesToUnion<GameConfig.Components>>;
 export class Components {
@@ -17,7 +17,7 @@ export class Components {
         guildHall: { label: 'Guild Hall', constr: GuildHall },
         skills: { label: 'Skills', constr: Skills },
         weapon: { label: 'Weapon', constr: Weapon },
-        artifacts: { label: 'Artifacts', constr: Artifacts },
+        treasury: { label: 'Treasury', constr: Treasury },
         achievements: { label: 'Achievements', constr: Achievements },
     } as const satisfies Record<GameConfig.ComponentName, { label: string; constr: new (data: UnionToIntersection<ComponentUnion>) => Component; }>;
     private componentList: Component[] = [];
