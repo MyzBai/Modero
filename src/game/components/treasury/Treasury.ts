@@ -9,6 +9,7 @@ import { createModListElement } from '../../utils/dom';
 import { Artifacts } from './artifacts/Artifacts';
 import { Component } from '../Component';
 import type { Serialization, UnsafeSerialization } from '../../serialization';
+import { PlayerUpdateStatsFlag } from '../../Player';
 
 export class Treasury extends Component {
     private readonly levelElement?: LevelElement;
@@ -21,8 +22,9 @@ export class Treasury extends Component {
             this.levelElement = createCustomElement(LevelElement);
             this.levelElement.setAction('Expanding Treasury');
             this.levelElement.setLevelClickCallback(this.showTreasuryUpgradeOverview.bind(this));
-            this.levelElement.onLevelChange.listen(this.updateLevel.bind(this));
+            this.levelElement.onLevelChange.listen(this.updateTreasuryLevel.bind(this));
             this.page.appendChild(this.levelElement);
+            this.updateTreasuryLevel();
         }
         const menu = createCustomElement(TabMenuElement);
         menu.classList.add('s-menu');
@@ -35,17 +37,16 @@ export class Treasury extends Component {
             menu.registerPageElement(this.artifacts.page, 'artifacts');
             this.page.append(this.artifacts.page);
         }
-
-        this.updateLevel();
     }
 
-    private updateLevel() {
+    private updateTreasuryLevel() {
         if (!this.levelElement) {
             return;
         }
         this.levelElement.maxExp = this.data.levelList![this.levelElement.level - 1]?.exp ?? Infinity;
         const modList = this.data.levelList?.[this.levelElement.level - 1]?.modList ?? [];
         player.modDB.replace('Treasury', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+        player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
     private showTreasuryUpgradeOverview() {
@@ -71,7 +72,7 @@ export class Treasury extends Component {
             this.levelElement.setLevel(save?.level ?? 1);
             this.levelElement.curExp = save?.exp ?? 0;
             this.levelElement.updateProgressBar();
-            this.updateLevel();
+            this.updateTreasuryLevel();
             if (save?.expanding) {
                 this.levelElement.startAction();
             }

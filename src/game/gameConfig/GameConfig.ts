@@ -14,7 +14,6 @@ export interface GameConfig {
         guildHall?: GuildHall;
         skills?: Skills;
         weapon?: Weapon;
-        // artifacts?: Artifacts;
         treasury?: Treasury;
         achievements?: Achievements;
     };
@@ -90,9 +89,7 @@ export interface Skills {
         attackSkillList: AttackSkill[];
     };
     auraSkills?: {
-        requirements?: Requirements;
         auraSkillList: AuraSkill[];
-        auraSkillSlotList: AuraSkillSlot[];
     };
     passiveSkills?: {
         insightCapacityEnhancerList: {
@@ -126,9 +123,6 @@ export interface AuraSkill {
     modList: PlayerModList;
     probability?: Probability;
     exp?: UnsignedInteger;
-}
-export interface AuraSkillSlot {
-    requirements?: Requirements;
 }
 export interface PassiveSkill {
     id: Id;

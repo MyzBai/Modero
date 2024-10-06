@@ -1,4 +1,4 @@
-import { clamp, avg, isNumber, isDefined } from 'src/shared/utils/utils';
+import { clamp, avg, isNumber, isDefined, hasAnyFlag } from 'src/shared/utils/utils';
 import { calcBaseAttackDamage, calcAilmentBaseDamage } from './calcDamage';
 import { calcModBase, calcModFlag, calcModIncMore, calcModTotal, type Configuration, type EnemyConfiguration, type PlayerConfiguration } from './calcMod';
 import { ModifierFlags } from '../mods/types';
@@ -6,8 +6,10 @@ import type { EnemyStatCollection, PlayerStatCollection, StatCollection } from '
 import type { Statistic } from '../statistics/Statistic';
 import { compareValueTypes } from '../utils/utils';
 import type { ModDB } from '../mods/ModDB';
+import { PlayerUpdateStatsFlag } from '../Player';
 
 export interface PlayerOptions {
+    flags?: PlayerUpdateStatsFlag;
     stats: Record<keyof PlayerStatCollection, number>;
     conditionFlags?: number;
     modDB?: ModDB;
@@ -47,8 +49,8 @@ export function applyStatValues<T extends StatCollection>(stats: T, values: Reco
 }
 
 export function calcPlayerStats(player: PlayerOptions) {
+    player.flags = player.flags ?? 0;
     const stats = player.stats;
-    const enemy = player.enemy;
     const config: PlayerConfiguration = {
         flags: 0,
         source: {
@@ -58,8 +60,20 @@ export function calcPlayerStats(player: PlayerOptions) {
             conditionFlags: player.conditionFlags || 0,
         }
     };
-    config.flags = config.flags || 0;
 
+    if (hasAnyFlag(player.flags, PlayerUpdateStatsFlag.Combat)) {
+        calcPlayerCombatStats(player.stats, config, player.enemy);
+    }
+
+    if (hasAnyFlag(player.flags, PlayerUpdateStatsFlag.Persistent)) {
+        calcPlayerPersistantStats(player.stats, config);
+    }
+
+    return stats;
+}
+
+function calcPlayerCombatStats(stats: PlayerOptions['stats'], config: PlayerConfiguration, enemy?: EnemyOptions) {
+    config.flags = config.flags ?? 0;
     //Attributes
     stats.strength = calcModTotal(['Attribute', 'Strength'], config);
     stats.dexterity = calcModTotal(['Attribute', 'Dexterity'], config);
@@ -150,11 +164,12 @@ export function calcPlayerStats(player: PlayerOptions) {
 
     stats.lingeringBurn = calcModFlag('LingeringBurn', config);
 
-    //Other
+}
+
+function calcPlayerPersistantStats(stats: PlayerOptions['stats'], config: PlayerConfiguration) {
+    stats.maxAura = calcModBase('AuraSlot', config);
     stats.maxArtifacts = calcModBase('MaxArtifact', config);
     stats.insightCapacity = calcModBase('Insight', config);
-
-    return stats;
 }
 
 export function calcCombatAreaStats(area: CombatAreaOptions) {

@@ -378,26 +378,16 @@
         "auraSkills": {
           "type": "object",
           "properties": {
-            "requirements": {
-              "$ref": "#/definitions/Requirements"
-            },
             "auraSkillList": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/AuraSkill"
               }
-            },
-            "auraSkillSlotList": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/AuraSkillSlot"
-              }
             }
           },
           "additionalProperties": false,
           "required": [
-            "auraSkillList",
-            "auraSkillSlotList"
+            "auraSkillList"
           ]
         },
         "passiveSkills": {
@@ -551,15 +541,6 @@
         "modList",
         "name"
       ]
-    },
-    "AuraSkillSlot": {
-      "type": "object",
-      "properties": {
-        "requirements": {
-          "$ref": "#/definitions/Requirements"
-        }
-      },
-      "additionalProperties": false
     },
     "PassiveSkill": {
       "type": "object",

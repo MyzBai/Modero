@@ -1,4 +1,4 @@
-import { game, statistics, combat, gameLoop, gameLoopAnim } from './game';
+import { game, statistics, combat, gameLoop, gameLoopAnim, GameInitializationStage } from './game';
 import { applyStatValues, calcPlayerStats, extractStats, type PlayerOptions } from './calc/calcStats';
 import { Modifier } from './mods/Modifier';
 import { createPlayerStats, deserializeStats, serializeStats } from './statistics/stats';
@@ -7,6 +7,14 @@ import type * as GameSerialization from './serialization';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ENVIRONMENT } from 'src/config';
 import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
+
+export enum PlayerUpdateStatsFlag {
+    None = 0,
+    Combat = 1 << 0,
+    Persistent = 1 << 1,
+    All = PlayerUpdateStatsFlag.Combat | PlayerUpdateStatsFlag.Persistent
+};
+
 
 export const playerActivityNameList = ['Combat', 'Meditating', 'Refining Weapon', 'Expanding Treasury', 'Training'] as const;
 export type PlayerActivityName = typeof playerActivityNameList[number];
@@ -90,7 +98,7 @@ export class Player {
             return;
         }
         this.statUpdatePending = true;
-        if (ENVIRONMENT === 'development' && gameLoop.state === 'Stopped') {
+        if (ENVIRONMENT === 'development' && gameLoop.state === 'Stopped' && game.initializationStage === GameInitializationStage.Done) {
             this.updateStatsDirect();
             statistics.updateStats('Player');
             this.statUpdatePending = false;
@@ -103,8 +111,9 @@ export class Player {
         }, { once: true });
     }
 
-    private updateStatsDirect() {
+    updateStatsDirect(flags?: PlayerUpdateStatsFlag) {
         const playerOptions: PlayerOptions = {
+            flags: flags ?? PlayerUpdateStatsFlag.All,
             modDB: this.modDB,
             stats: extractStats(this.stats),
             enemy: combat.enemy ? {

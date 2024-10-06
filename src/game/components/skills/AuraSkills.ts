@@ -1,10 +1,9 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
-import { GameInitializationStage, combat, game, gameLoop, gameLoopAnim, notifications, player } from 'src/game/game';
+import { combat, game, gameLoop, gameLoopAnim, player } from 'src/game/game';
 import { assertDefined, assertNonNullable, assertNullable } from 'src/shared/utils/assert';
 import { Modifier } from 'src/game/mods/Modifier';
 import type * as GameSerialization from 'src/game/serialization';
 import { compareNamesWithNumerals } from 'src/shared/utils/textParsing';
-import { evaluateStatRequirements } from 'src/game/statistics/statRequirements';
 import { isDefined } from 'src/shared/utils/utils';
 import { createItemListElement, createItem, createItemInfoElements, getRankItemBaseName, unlockItem } from 'src/game/utils/itemUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
@@ -23,7 +22,7 @@ interface SkillSlot {
 
 export class AuraSkills extends SkillPage {
     readonly page: HTMLElement;
-    readonly skillSlotList: SkillSlot[];
+    readonly skillSlotList: SkillSlot[] = [];
     protected readonly skillList: AuraSkill[];
     constructor(data: Required<GameConfig.Skills>['auraSkills']) {
         super();
@@ -47,21 +46,11 @@ export class AuraSkills extends SkillPage {
         this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
         this.skillList.filter(x => x.unlocked).forEach(x => unlockItem(x, this.elementMap));
 
-        this.skillSlotList = [];
-        for (const skillSlot of data.auraSkillSlotList) {
-            if (!skillSlot.requirements) {
-                this.createSkillSlot();
-                continue;
-            }
-            evaluateStatRequirements(skillSlot.requirements, () => {
-                this.createSkillSlot();
-                if (skillSlot.requirements && game.initializationStage === GameInitializationStage.Done) {
-                    notifications.addNotification({ title: 'New Aura Slot' });
-                }
-            });
-        }
         this.skillSlotList[0]?.element.click();
-        this.selectSkillSlot(this.skillSlotList[0]!);
+        if (this.skillSlotList[0]) {
+            this.selectSkillSlot(this.skillSlotList[0]);
+        }
+
         const firstUnlockedSkill = this.skillList.find(x => x.unlocked);
         if (firstUnlockedSkill) {
             this.selectSkillByName(firstUnlockedSkill.name);
@@ -107,6 +96,8 @@ export class AuraSkills extends SkillPage {
                 }
             }
         });
+
+        player.stats.maxAura.addListener('change', this.updateSkillSlots.bind(this));
     }
 
     get selectedSkillSlot() {
@@ -115,6 +106,16 @@ export class AuraSkills extends SkillPage {
 
     get selectedSkill() {
         return this.skillList.findStrict(x => x.selected);
+    }
+
+    private updateSkillSlots() {
+        const count = player.stats.maxAura.value - this.skillSlotList.length;
+        for (let i = 0; i < count; i++) {
+            this.createSkillSlot();
+        }
+        if (!this.selectedSkillSlot && this.skillSlotList[0]) {
+            this.selectSkillSlot(this.skillSlotList[0])
+        }
     }
 
     private createSkillSlot() {
@@ -148,17 +149,22 @@ export class AuraSkills extends SkillPage {
         return element;
     }
 
-    private selectSkillSlot(skillSlot: SkillSlot) {
-        const baseName = skillSlot.skill?.baseName;
+    private selectSkillSlot(skillSlot?: SkillSlot) {
+        const baseName = skillSlot?.skill?.baseName;
         if (baseName) {
             this.elementMap.get(baseName)?.click();
         }
         if (this.selectedSkillSlot) {
             this.selectedSkillSlot.selected = false;
         }
-        skillSlot.selected = true;
+        if (skillSlot) {
+            skillSlot.selected = true;
+            this.selectSkillByName(skillSlot.skill?.data.name);
+        }
         this.skillSlotList.forEach(x => x.element.classList.toggle('selected', x === skillSlot));
-        this.selectSkillByName(skillSlot.skill?.data.name);
+        if (this.selectedSkill) {
+            this.showSkill(this.selectedSkill);
+        }
     }
 
     private updateSkillSlotProgressBar(skillSlot: SkillSlot) {

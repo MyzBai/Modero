@@ -10,6 +10,7 @@ import { ModalElement } from '../../../shared/customElements/ModalElement';
 import { createModListElement } from '../../utils/dom';
 import { combineModifiers } from '../../mods/utils';
 import { LevelElement } from '../../../shared/customElements/LevelElement';
+import { PlayerUpdateStatsFlag } from '../../Player';
 
 export interface GuildClass extends Item {
     data: GameConfig.GuildClass;
@@ -34,8 +35,9 @@ export class GuildHall extends Component {
             this.levelElement = createCustomElement(LevelElement);
             this.levelElement.setAction('Training');
             this.levelElement.setLevelClickCallback(this.showGuildHallOverview.bind(this));
-            this.levelElement.onLevelChange.listen(this.updateLevel.bind(this));
+            this.levelElement.onLevelChange.listen(this.updateGuildHallLevel.bind(this));
             this.page.appendChild(this.levelElement);
+            this.updateGuildHallLevel();
         }
 
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v guild-class-list" data-guild-class-list></ul>');
@@ -96,8 +98,6 @@ export class GuildHall extends Component {
             element.appendChild(modListElement);
             listElements.push(element);
         });
-
-        this.updateLevel();
     }
 
     get level() {
@@ -112,7 +112,7 @@ export class GuildHall extends Component {
         return player.stats.activity.getText() === 'Training';
     }
 
-    private updateLevel() {
+    private updateGuildHallLevel() {
         if (!this.data.levelList) {
             return;
         }
@@ -130,6 +130,7 @@ export class GuildHall extends Component {
             const modList = Modifier.modListFromTexts(this.getGuildModList(guildName));
             player.modDB.replace('GuildClassAscension', Modifier.extractStatModifierList(...modList));
         }
+        player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
     private getGuildClassModList(name: string) {
@@ -247,7 +248,7 @@ export class GuildHall extends Component {
             this.levelElement.setLevel(save?.level ?? 1);
             this.levelElement.curExp = save?.exp ?? 0;
             this.levelElement.updateProgressBar();
-            this.updateLevel();
+            this.updateGuildHallLevel();
             if (save?.training) {
                 this.levelElement.startAction();
             }

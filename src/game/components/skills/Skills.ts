@@ -6,13 +6,13 @@ import { Passives } from './Passives';
 import { TabMenuElement } from 'src/shared/customElements/TabMenuElement';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { createCustomElement } from 'src/shared/customElements/customElements';
-import { GameInitializationStage, game, notifications, player } from 'src/game/game';
-import { evaluateStatRequirements } from 'src/game/statistics/statRequirements';
+import { player } from 'src/game/game';
 import { createHelpIcon } from 'src/shared/utils/dom';
 import { LevelElement } from '../../../shared/customElements/LevelElement';
 import { Modifier } from '../../mods/Modifier';
 import { ModalElement } from '../../../shared/customElements/ModalElement';
 import { createModListElement } from '../../utils/dom';
+import { PlayerUpdateStatsFlag } from '../../Player';
 
 export class Skills extends Component {
 
@@ -30,6 +30,7 @@ export class Skills extends Component {
             this.levelElement.setLevelClickCallback(this.showSkillsOverview.bind(this));
             this.levelElement.onLevelChange.listen(this.updateLevel.bind(this));
             this.page.appendChild(this.levelElement);
+            this.updateLevel();
         }
         const menu = createCustomElement(TabMenuElement);
         menu.classList.add('s-menu');
@@ -49,35 +50,20 @@ export class Skills extends Component {
         `.trim());
         this.page.appendChild(helpIconElement);
 
+
+
         if (data.attackSkills) {
             this.attackSkills = new AttackSkills(data.attackSkills);
             menu.addMenuItem('Attack', 'attack', 0);
             menu.registerPageElement(this.attackSkills.page, 'attack');
             this.page.append(this.attackSkills.page);
         }
-        const auraSkills = data.auraSkills;
-        if (auraSkills) {
-            evaluateStatRequirements(auraSkills.requirements ?? {}, () => {
-                const initDone = game.initializationStage === GameInitializationStage.Done;
-                if (initDone) {
-                    notifications.addNotification({
-                        title: 'You Unlocked Aura Skills'
-                    });
-                }
-
-                this.auraSkills = new AuraSkills(auraSkills);
-                menu.addMenuItem('Aura', 'aura', 1);
-                menu.registerPageElement(this.auraSkills.page, 'aura');
-                menu.sort();
-                this.page.append(this.auraSkills.page);
-
-                if (initDone) {
-                    const element = menu.getMenuItemById('aura');
-                    if (element) {
-                        game.addElementHighlight(element);
-                    }
-                }
-            });
+        if (data.auraSkills) {
+            this.auraSkills = new AuraSkills(data.auraSkills);
+            menu.addMenuItem('Aura', 'aura', 1);
+            menu.registerPageElement(this.auraSkills.page, 'aura');
+            menu.sort();
+            this.page.append(this.auraSkills.page);
         }
         if (data.passiveSkills) {
             this.passiveSkills = new Passives(data.passiveSkills);
@@ -85,8 +71,6 @@ export class Skills extends Component {
             menu.registerPageElement(this.passiveSkills.page, 'passives');
             this.page.appendChild(this.passiveSkills.page);
         }
-
-        this.updateLevel();
     }
 
     private updateLevel() {
@@ -96,6 +80,7 @@ export class Skills extends Component {
         this.levelElement.maxExp = this.data.levelList?.[this.levelElement.level - 1]?.exp ?? Infinity;
         const modList = this.data.levelList?.[this.levelElement!.level - 1]?.modList ?? [];
         player.modDB.replace('Skills', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+        player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
     private showSkillsOverview() {

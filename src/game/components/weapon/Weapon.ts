@@ -12,6 +12,7 @@ import { LevelElement } from '../../../shared/customElements/LevelElement';
 import { createCustomElement } from '../../../shared/customElements/customElements';
 import { ModalElement } from '../../../shared/customElements/ModalElement';
 import { createModListElement } from '../../utils/dom';
+import { PlayerUpdateStatsFlag } from '../../Player';
 
 export class Weapon extends Component {
     static sourceName = 'Weapon';
@@ -36,8 +37,8 @@ export class Weapon extends Component {
             this.levelElement.setAction('Refining Weapon');
             this.levelElement.setLevelClickCallback(this.showWeaponUpgradeOverview.bind(this));
             this.levelElement.onLevelChange.listen(this.updateWeaponLevel.bind(this));
-
             this.page.appendChild(this.levelElement);
+            this.updateWeaponLevel();
         }
         this.page.insertAdjacentHTML('beforeend', '<div class="s-weapon" data-weapon><div class="hidden" data-weapon-type></div><ul class="s-mod-list g-mod-list" data-mod-list></ul></div>');
 
@@ -84,8 +85,6 @@ export class Weapon extends Component {
             const candidates = this.data.crafting.craftList;
             pickManyFromPickProbability(candidates).forEach(x => this.craftTable.addCraftCount(x.desc as CraftTemplateDescription, 1));
         });
-
-        this.updateWeaponLevel();
     }
 
     private applyModifiers() {
@@ -99,6 +98,7 @@ export class Weapon extends Component {
         this.levelElement.maxExp = this.data.levelList?.[this.levelElement.level - 1]?.exp ?? Infinity;
         const modList = this.data.levelList?.[this.levelElement.level - 1]?.modList ?? [];
         player.modDB.replace('WeaponUpgrade', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+        player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
     private showWeaponUpgradeOverview() {

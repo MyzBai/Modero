@@ -85,7 +85,7 @@
                         "attackSpeed": 1,
                         "attackEffectiveness": 150,
                         "manaCost": 1,
-                        "modList": [ "+{80}% Hit Chance", "{50}% More Physical Attack Damage" ]
+                        "modList": [ "+{80}% Hit Chance", "Adds {2} To {4} Physical Damage", "{30}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "267dcd",
@@ -94,7 +94,7 @@
                         "attackSpeed": 1,
                         "attackEffectiveness": 175,
                         "manaCost": 3,
-                        "modList": [ "+{80}% Hit Chance", "{70}% More Physical Attack Damage" ]
+                        "modList": [ "+{80}% Hit Chance", "Adds {5} To {9} Physical Damage", "{50}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "d4a5a5",
@@ -102,7 +102,7 @@
                         "attackSpeed": 1,
                         "attackEffectiveness": 200,
                         "manaCost": 5,
-                        "modList": [ "+{70}% Hit Chance", "{90}% More Physical Attack Damage" ]
+                        "modList": [ "+{70}% Hit Chance", "Adds {12} To {17} Physical Damage", "{80}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "3704e5",
@@ -185,27 +185,21 @@
                 ]
             },
             "auraSkills": {
-                "requirements": { "maxLevel": 3 },
-                "auraSkillSlotList": [
-                    { },
-                    { "requirements": { "curLevel": 7 } },
-                    { "requirements": { "curLevel": 5, "ascensionCount": 1 } }
-                ],
                 "auraSkillList": [
                     {
                         "id": "3a3d8a",
                         "name": "Physical Attack Damage I",
                         "exp": 600,
                         "baseDuration": 60,
-                        "manaCost": 150,
-                        "modList": [ "{30}% More Physical Attack Damage" ]
+                        "manaCost": 60,
+                        "modList": [ "{20}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "a1412b",
                         "name": "Physical Attack Damage II",
                         "baseDuration": 60,
-                        "manaCost": 300,
-                        "modList": [ "{50}% More Physical Attack Damage" ]
+                        "manaCost": 200,
+                        "modList": [ "{30}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "e4016a",
@@ -531,18 +525,18 @@
                 ]
             },
             "modLists": [
-                [
-                    { "mod": "Adds {2-3} To {4-5} Physical Damage", "level": 1, "weight": 500, "id": "4fc5e5" },
-                    { "mod": "Adds {4-7} To {8-12} Physical Damage", "level": 3, "weight": 500, "id": "a40645" },
-                    { "mod": "Adds {8-13} To {16-20} Physical Damage", "level": 5, "weight": 400, "id": "096093" },
-                    { "mod": "Adds {15-20} To {23-28} Physical Damage", "level": 7, "weight": 300, "id": "967461" }
-                ],
-                [
-                    { "mod": "Adds {2-3} To {4-5} Elemental Damage", "level": 1, "weight": 500, "id": "947f0a" },
-                    { "mod": "Adds {4-7} To {8-12} Elemental Damage", "level": 3, "weight": 500, "id": "3fe294" },
-                    { "mod": "Adds {8-13} To {16-20} Elemental Damage", "level": 5, "weight": 400, "id": "c19de7" },
-                    { "mod": "Adds {15-20} To {23-28} Elemental Damage", "level": 7, "weight": 300, "id": "8afa7c" }
-                ],
+                // [
+                //     { "mod": "Adds {2-3} To {4-5} Physical Damage", "level": 1, "weight": 500, "id": "4fc5e5" },
+                //     { "mod": "Adds {4-7} To {8-12} Physical Damage", "level": 3, "weight": 500, "id": "a40645" },
+                //     { "mod": "Adds {8-13} To {16-20} Physical Damage", "level": 5, "weight": 400, "id": "096093" },
+                //     { "mod": "Adds {15-20} To {23-28} Physical Damage", "level": 7, "weight": 300, "id": "967461" }
+                // ],
+                // [
+                //     { "mod": "Adds {2-3} To {4-5} Elemental Damage", "level": 1, "weight": 500, "id": "947f0a" },
+                //     { "mod": "Adds {4-7} To {8-12} Elemental Damage", "level": 3, "weight": 500, "id": "3fe294" },
+                //     { "mod": "Adds {8-13} To {16-20} Elemental Damage", "level": 5, "weight": 400, "id": "c19de7" },
+                //     { "mod": "Adds {15-20} To {23-28} Elemental Damage", "level": 7, "weight": 300, "id": "8afa7c" }
+                // ],
                 [
                     { "mod": "{20-35}% Increased Physical Attack Damage", "level": 1, "weight": 300, "id": "6b88cc" },
                     { "mod": "{40-60}% Increased Physical Attack Damage", "level": 3, "weight": 300, "id": "6d589f" },

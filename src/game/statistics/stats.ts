@@ -103,6 +103,7 @@ export function createPlayerStats(gameStats: GameStatCollection) {
         intelligence: new Statistic({ label: 'Intelligence', computed: true }),
 
         //Skills
+        maxAura: new Statistic({ computed: true }),
         auraDurationMultiplier: new Statistic({ computed: true }),
         insightCapacity: new Statistic({ computed: true }),
         maxArtifacts: new Statistic({ computed: true }),

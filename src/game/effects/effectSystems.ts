@@ -117,7 +117,7 @@ export class BleedSystem extends BaseEffectSystem<DOTEffectInstance> {
     constructor() {
         super('Bleed');
 
-        this.sort<DOTEffectInstance> = sortByDamage;
+        this.sort = sortByDamage;
     }
 
     get maxStacks() {
@@ -145,7 +145,7 @@ export class BurnSystem extends BaseEffectSystem<DOTEffectInstance> {
     readonly type = 'Burn';
     constructor() {
         super('Burn');
-        this.sort<DOTEffectInstance> = sortByDamage;
+        this.sort = sortByDamage;
     }
 
     get maxStacks() {
