@@ -3,21 +3,17 @@ import { Modifier } from 'src/game/mods/Modifier';
 import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
 import { combat, notifications, player } from 'src/game/game';
 import type * as GameSerialization from 'src/game/serialization';
-import { createItemListElement, type Item, getNextRankItem, createItem, getItemRankNumeral, getRankItemBaseName, createItemInfoElements, unlockItem, selectItemByName } from 'src/game/utils/itemUtils';
+import { createObjectListElement, type AssignableObject, getNextRankObject, createAssignableObject, getRankNumeral, getRankBaseName, createObjectInfoElements, unlockObject, selectObjectByName } from 'src/game/utils/objectUtils';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ROMAN_NUMERALS } from 'src/shared/utils/constants';
 import { assertDefined } from 'src/shared/utils/assert';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ENVIRONMENT } from '../../../../config';
 
-interface Artifact extends Item {
+interface Artifact extends AssignableObject {
     baseName: string;
-    name: string;
     data: GameConfig.Artifact;
-    exp: number;
-    maxExp: number;
-    unlocked: boolean;
-    assigned: boolean;
+    rankList: Artifact[];
 }
 
 export class Artifacts {
@@ -34,16 +30,16 @@ export class Artifacts {
         this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
 
         this.artifactList = data.artifactList.map(data => {
-            const baseName = getRankItemBaseName(data.name);
+            const baseName = getRankBaseName(data.name);
             if (!this.elementMap.has(baseName)) {
-                const element = createItemListElement(data);
+                const element = createObjectListElement(data);
                 element.addEventListener('click', this.selectArtifactByName.bind(this, data.name));
                 this.elementMap.set(baseName, element);
             }
-            return { baseName, data, unlocked: false, maxExp: 0, exp: 0, ...createItem({ type: 'Artifact', ...data }), assigned: false };
+            return { data, ...createAssignableObject(data), rankList: [] };
         });
         this.page.querySelectorStrict('[data-artifact-list]').append(...this.elementMap.values());
-        this.artifactList.filter(x => x.unlocked).forEach(x => unlockItem(x, this.elementMap));
+        this.artifactList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
 
         const firstArtifact = this.artifactList.find(x => x.unlocked);
         if (firstArtifact) {
@@ -60,7 +56,7 @@ export class Artifacts {
 
         this.onArtifactFound.listen(artifact => {
             const rankItems = this.artifactList.filter(x => x.unlocked && x.baseName === artifact.baseName);
-            const rankItem = rankItems.sort((a, b) => ROMAN_NUMERALS.indexOf(getItemRankNumeral(b.name) ?? 'I') - ROMAN_NUMERALS.indexOf(getItemRankNumeral(a.name) ?? 'I'))[0];
+            const rankItem = rankItems.sort((a, b) => ROMAN_NUMERALS.indexOf(getRankNumeral(b.name) ?? 'I') - ROMAN_NUMERALS.indexOf(getRankNumeral(a.name) ?? 'I'))[0];
             assertDefined(rankItem);
             if (rankItem.maxExp && rankItem.exp < rankItem.maxExp) {
                 rankItem.exp++;
@@ -75,7 +71,7 @@ export class Artifacts {
             window.addEventListener('Dev:AddArtifact', e => {
                 const artifact = this.artifactList.find(x => x.baseName.toLowerCase() === e.detail.toLowerCase());
                 if (artifact) {
-                    unlockItem(artifact, this.elementMap);
+                    unlockObject(artifact, this.elementMap);
                     this.onArtifactFound.invoke(artifact);
                     console.log(`You unlocked: ${artifact.name}`);
                 } else {
@@ -108,7 +104,7 @@ export class Artifacts {
     }
 
     private selectArtifactByName(name: string) {
-        const artifact = selectItemByName(name, this.artifactList, this.elementMap);
+        const artifact = selectObjectByName(name, this.artifactList, this.elementMap);
         this.showArtifact(artifact);
     }
 
@@ -140,8 +136,8 @@ export class Artifacts {
         }
 
         const rankList = this.artifactList.filter(x => x.baseName === artifact.baseName);
-        const itemInfoElements = createItemInfoElements({
-            item: artifact,
+        const itemInfoElements = createObjectInfoElements({
+            obj: artifact,
             modList: artifact.data.modList,
             rankList,
             onRankChange: (item) => this.showArtifact(item as Artifact)
@@ -188,14 +184,14 @@ export class Artifacts {
     }
 
     private tryUnlockArtifact() {
-        const candidates = this.artifactList.filter(x => x.probability && (getItemRankNumeral(x.name) ?? 'I') === 'I');
+        const candidates = this.artifactList.filter(x => x.probability && (getRankNumeral(x.name) ?? 'I') === 'I');
         candidates.forEach(x => x.probability = Math.ceil((x.data.probability || 0) / player.stats.explorationMultiplier.value));
         const artifact = pickOneFromPickProbability(candidates);
         if (!artifact) {
             return;
         }
         if (!artifact.unlocked) {
-            unlockItem(artifact, this.elementMap);
+            unlockObject(artifact, this.elementMap);
             notifications.addNotification({
                 title: `New Artifact: ${artifact.name}`,
                 elementId: artifact.id
@@ -205,11 +201,11 @@ export class Artifacts {
     }
 
     private tryUnlockNextArtifactRank(artifact: Artifact) {
-        const nextArtifact = getNextRankItem(artifact, this.artifactList);
+        const nextArtifact = getNextRankObject(artifact);
         if (!nextArtifact) {
             return;
         }
-        unlockItem(nextArtifact, this.elementMap);
+        unlockObject(nextArtifact, this.elementMap);
         notifications.addNotification({
             title: `New Artifact Rank: ${nextArtifact.name}`,
         });
@@ -228,7 +224,7 @@ export class Artifacts {
                 continue;
             }
             artifact.exp = artifact.maxExp * (data.expFac ?? 0);
-            unlockItem(artifact, this.elementMap);
+            unlockObject(artifact, this.elementMap);
             if (data.assigned) {
                 this.assignArtifact(artifact);
                 if (!this.selectedArtifact) {

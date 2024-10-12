@@ -127,7 +127,7 @@ export interface AuraSkill {
 export interface PassiveSkill {
     id: Id;
     name: Name;
-    insight: UnsignedInteger;
+    insight?: UnsignedInteger;
     modList: PlayerModList;
     probability?: Probability;
     exp?: UnsignedInteger;

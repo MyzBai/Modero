@@ -5,7 +5,7 @@ import type * as GameSerialization from 'src/game/serialization';
 import { assertDefined } from 'src/shared/utils/assert';
 import type { StatModifier } from 'src/game/mods/ModDB';
 import { isDefined } from 'src/shared/utils/utils';
-import { createItem, createItemListElement, createItemInfoElements, getRankItemBaseName, unlockItem } from 'src/game/utils/itemUtils';
+import { createAssignableObject, createObjectListElement, createObjectInfoElements, getRankBaseName, unlockObject } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { SkillPage, type AttackSkill } from './SkillPage';
 
@@ -23,16 +23,17 @@ export class AttackSkills extends SkillPage {
         this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
 
         this.skillList = data.attackSkillList.map(data => {
-            const baseName = getRankItemBaseName(data.name);
+            const baseName = getRankBaseName(data.name);
             if (!this.elementMap.has(baseName)) {
-                const element = createItemListElement(data);
+                const element = createObjectListElement(data);
                 element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
                 this.elementMap.set(baseName, element);
             }
-            return { type: 'Attack', baseName, data, active: false, unlocked: false, assigned: false, maxExp: 0, exp: 0, ...createItem(data) };
+            return { type: 'Attack', data, ...createAssignableObject(data), rankList: [] };
         });
+        this.skillList.forEach(x => x.rankList = this.skillList.filter(y => y.baseName === x.baseName));
         this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
-        this.skillList.filter(x => x.unlocked).forEach(x => unlockItem(x, this.elementMap));
+        this.skillList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
 
         const firstSkill = this.skillList.findStrict(x => x.probability === 0);
         assertDefined(firstSkill, 'no attack skill available, at least 1 attack skill must have a pickProbability of 0');
@@ -78,8 +79,8 @@ export class AttackSkills extends SkillPage {
             ['Mana Cost', skill.data.manaCost.toFixed()]
         ];
         const rankList = this.skillList.filter(x => x.baseName === skill.baseName);
-        const itemInfoElements = createItemInfoElements({
-            item: skill,
+        const itemInfoElements = createObjectInfoElements({
+            obj: skill,
             propertyList,
             modList: skill.data.modList,
             rankList: rankList.length > 1 ? rankList : undefined,
@@ -101,20 +102,9 @@ export class AttackSkills extends SkillPage {
         itemInfoElements.contentElement.appendChild(button);
     }
 
-    private clearActiveSkill() {
-        const element = this.elementMap.get(this.activeSkill.baseName)!;
-        element.removeAttribute('data-tag');
-        element.textContent = this.skillList.find(x => x.baseName === this.activeSkill.baseName)!.name;
-        this.activeSkill.selected = false;
-        this.activeSkill.assigned = false;
-    }
-
-    private assignSkill(skill: AttackSkill) {
-        this.clearActiveSkill();
-        const element = this.elementMap.get(skill.baseName)!;
-        element.setAttribute('data-tag', 'valid');
-        element.textContent = skill.name;
-        skill.assigned = true;
+    protected assignSkill(skill: AttackSkill) {
+        this.unassignSkill(this.activeSkill);
+        super.assignSkill(skill);
 
         const statModList: StatModifier[] = [
             ...Modifier.extractStatModifierList(...Modifier.modListFromTexts(skill.data.modList)),
@@ -123,15 +113,6 @@ export class AttackSkills extends SkillPage {
         ];
         player.stats.attackEffectiveness.set(skill.data.attackEffectiveness);
         player.modDB.replace('AttackSkill', statModList);
-
-        for (const [key, el] of this.elementMap.entries()) {
-            el.toggleAttribute('data-tag', key === skill.baseName);
-            if (key === skill.baseName) {
-                el.setAttribute('data-tag', 'valid');
-            } else {
-                el.textContent = this.skillList.find(x => x.baseName === key)!.name;
-            }
-        }
     }
 
     private updateSkillInfo() {
@@ -160,7 +141,7 @@ export class AttackSkills extends SkillPage {
             if (!skill) {
                 continue;
             }
-            unlockItem(skill, this.elementMap);
+            unlockObject(skill, this.elementMap);
             skill.exp = skill.maxExp * (skillData.expFac ?? 0);
         }
         this.selectSkillByName(this.activeSkill.name);

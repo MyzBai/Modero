@@ -1,6 +1,6 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Component } from '../Component';
-import { createItem, createItemInfoElements, createItemListElement, type Item } from 'src/game/utils/itemUtils';
+import { createAssignableObject, createObjectInfoElements, createObjectListElement, type AssignableObject } from 'src/game/utils/objectUtils';
 import { ascension, game, player } from 'src/game/game';
 import { Modifier } from 'src/game/mods/Modifier';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
@@ -12,7 +12,7 @@ import { combineModifiers } from '../../mods/utils';
 import { LevelElement } from '../../../shared/customElements/LevelElement';
 import { PlayerUpdateStatsFlag } from '../../Player';
 
-export interface GuildClass extends Item {
+export interface GuildClass extends AssignableObject {
     data: GameConfig.GuildClass;
     element: HTMLElement;
     ascensionCount: number;
@@ -69,10 +69,10 @@ export class GuildHall extends Component {
             })
             fragment.appendChild(element);
             for (const guildClass of this.data.guildClassList.filter(x => x.guildName === guild.name)) {
-                const element = createItemListElement(guildClass);
+                const element = createObjectListElement(guildClass);
                 element.classList.remove('hidden');
                 element.addEventListener('click', this.selectGuildClassByName.bind(this, guildClass.name));
-                const data: GuildClass = { data: guildClass, ...createItem(guildClass), ascensionCount: 0, unlocked: true, element };
+                const data: GuildClass = { data: guildClass, ...createAssignableObject(guildClass), ascensionCount: 0, unlocked: true, element };
                 this.guildClassList.push(data);
                 fragment.appendChild(element);
             }
@@ -195,8 +195,8 @@ export class GuildHall extends Component {
             return;
         }
         const modList = guildClass.data.modList[this.level - 1];
-        const elements = createItemInfoElements({
-            item: { name: guildClass.name },
+        const elements = createObjectInfoElements({
+            obj: { name: guildClass.name },
             propertyList: guildClass.ascensionCount > 0 ? [['Ascensions', guildClass.ascensionCount.toFixed()]] : [],
             modList
         });

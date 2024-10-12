@@ -576,7 +576,6 @@
       "additionalProperties": false,
       "required": [
         "id",
-        "insight",
         "modList",
         "name"
       ]

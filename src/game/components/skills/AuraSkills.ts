@@ -1,11 +1,11 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { combat, game, gameLoop, gameLoopAnim, player } from 'src/game/game';
-import { assertDefined, assertNonNullable, assertNullable } from 'src/shared/utils/assert';
+import { assertNonNullable, assertNullable } from 'src/shared/utils/assert';
 import { Modifier } from 'src/game/mods/Modifier';
 import type * as GameSerialization from 'src/game/serialization';
 import { compareNamesWithNumerals } from 'src/shared/utils/textParsing';
 import { isDefined } from 'src/shared/utils/utils';
-import { createItemListElement, createItem, createItemInfoElements, getRankItemBaseName, unlockItem } from 'src/game/utils/itemUtils';
+import { createObjectListElement, createAssignableObject, createObjectInfoElements, getRankBaseName, unlockObject } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { SkillPage, type AuraSkill } from './SkillPage';
@@ -35,16 +35,16 @@ export class AuraSkills extends SkillPage {
         this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
 
         this.skillList = data.auraSkillList.map(data => {
-            const baseName = getRankItemBaseName(data.name);
+            const baseName = getRankBaseName(data.name);
             if (!this.elementMap.has(baseName)) {
-                const element = createItemListElement(data);
+                const element = createObjectListElement(data);
                 element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
                 this.elementMap.set(baseName, element);
             }
-            return { type: 'Aura', baseName, data, unlocked: false, assigned: false, maxExp: 0, exp: 0, ...createItem(data) };
+            return { type: 'Aura', data, ...createAssignableObject(data), rankList: [] };
         });
         this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
-        this.skillList.filter(x => x.unlocked).forEach(x => unlockItem(x, this.elementMap));
+        this.skillList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
 
         this.skillSlotList[0]?.element.click();
         if (this.skillSlotList[0]) {
@@ -98,6 +98,7 @@ export class AuraSkills extends SkillPage {
         });
 
         player.stats.maxAura.addListener('change', this.updateSkillSlots.bind(this));
+        this.updateSkillSlots();
     }
 
     get selectedSkillSlot() {
@@ -254,8 +255,8 @@ export class AuraSkills extends SkillPage {
             ['Duration', skill.data.baseDuration.toFixed()],
             ['Mana Cost', skill.data.manaCost.toFixed()]
         ];
-        const itemInfoElements = createItemInfoElements({
-            item: skill,
+        const itemInfoElements = createObjectInfoElements({
+            obj: skill,
             propertyList,
             modList: skill.data.modList,
             rankList: this.skillList.filter(x => x.baseName === skill.baseName),
@@ -274,9 +275,9 @@ export class AuraSkills extends SkillPage {
         const button = document.createElement('button');
         button.addEventListener('click', () => {
             if (this.selectedSkillSlot?.skill === skill) {
-                this.unassignSkill(this.selectedSkillSlot);
+                this.clearSkillSlot(this.selectedSkillSlot);
             } else if (this.selectedSkillSlot) {
-                this.assignSkill(this.selectedSkillSlot, skill);
+                this.assignAuraSkillSlot(this.selectedSkillSlot, skill);
                 this.startActiveSkill(this.selectedSkillSlot);
             }
             updateButton();
@@ -296,24 +297,15 @@ export class AuraSkills extends SkillPage {
         }
     }
 
-    private assignSkill(skillSlot: SkillSlot, skill: AuraSkill) {
+    private assignAuraSkillSlot(skillSlot: SkillSlot, skill: AuraSkill) {
         if (skillSlot.skill) {
             this.clearSkillSlot(skillSlot);
         }
-        const element = this.elementMap.get(skill.baseName)!;
-        element.setAttribute('data-tag', 'valid');
-        element.textContent = skill.name;
-
+        super.assignSkill(skill);
         skillSlot.element.querySelectorStrict('[data-skill-name]').textContent = skill.name;
         skillSlot.element.classList.add('m-has-skill');
         skillSlot.skill = skill;
         skillSlot.duration = skill.data.baseDuration;
-        skill.assigned = true;
-    }
-
-    private unassignSkill(skillSlot: SkillSlot) {
-        assertDefined(skillSlot.skill);
-        this.clearSkillSlot(skillSlot);
     }
 
     private applySkillModifiers(skill: AuraSkill) {
@@ -336,7 +328,7 @@ export class AuraSkills extends SkillPage {
         for (const skillData of save?.skillList?.filter(isDefined) || []) {
             const skill = this.skillList.find(x => x.data.id === skillData?.id);
             if (skill) {
-                unlockItem(skill, this.elementMap);
+                unlockObject(skill, this.elementMap);
                 skill.exp = skill.maxExp * (skillData.expFac ?? 0);
             }
         }
@@ -347,7 +339,7 @@ export class AuraSkills extends SkillPage {
             const skillSlot = this.skillSlotList[i];
             const skill = this.skillList.find(x => x.data.id === skillSlotData.id);
             if (skillSlot && skill) {
-                this.assignSkill(skillSlot, skill);
+                this.assignAuraSkillSlot(skillSlot, skill);
                 const timePct = skillSlotData.timePct || 0;
                 if (timePct > 0) {
                     skillSlot.time = skillSlot.duration * (skillSlotData.timePct || 0);

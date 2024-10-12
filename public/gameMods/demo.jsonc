@@ -26,7 +26,7 @@
         }
     ],
     "playerStartModList": [
-        "Adds {1} To {3} Physical Damage",
+        // "Adds {1} To {3} Physical Damage",
         "+{1} Maximum Bleed Stack",
         "{3} Base Bleed Duration",
         "{70}% Base Bleed Damage Multiplier",
@@ -36,8 +36,8 @@
         "{1}% More Attack Damage Per {3} Strength",
         "{1}% More Attack Speed Per {7} Dexterity",
         "+{1}% Hit Chance Per {10} Dexterity",
-        "+{2} Maximum Mana Per {1} Intelligence",
-        "+{0.6}% Of Maximum Mana Regeneration"
+        "+{2} Maximum Mana Per {1} Intelligence"
+        // "+{0.6}% Of Maximum Mana Regeneration"
     ],
     "ascension": {
         "trial": {
@@ -63,6 +63,7 @@
                 {
                     "exp": 5,
                     "modList": [
+                        "+{0.5} Mana Regeneration",
                         "+{1} Additional Aura Slots",
                         "+{100} Maximum Insight",
                         "+{100} Maximum Mana"
@@ -111,7 +112,7 @@
                         "attackSpeed": 1,
                         "attackEffectiveness": 150,
                         "manaCost": 1,
-                        "modList": [ "+{80}% Hit Chance", "{50}% More Elemental Attack Damage" ]
+                        "modList": [ "+{80}% Hit Chance", "Adds {2} To {4} Elemental Damage", "{30}% More Elemental Attack Damage" ]
                     },
                     {
                         "id": "766797",
@@ -120,7 +121,7 @@
                         "attackSpeed": 1,
                         "attackEffectiveness": 175,
                         "manaCost": 3,
-                        "modList": [ "+{80}% Hit Chance", "{70}% More Elemental Attack Damage" ]
+                        "modList": [ "+{80}% Hit Chance", "Adds {5} To {9} Elemental Damage", "{50}% More Elemental Attack Damage" ]
                     },
                     {
                         "id": "dffc12",
@@ -128,7 +129,7 @@
                         "attackSpeed": 1,
                         "attackEffectiveness": 200,
                         "manaCost": 5,
-                        "modList": [ "+{70}% Hit Chance", "{90}% More Elemental Attack Damage" ]
+                        "modList": [ "+{70}% Hit Chance", "Adds {12} To {17} Elemental Damage", "{80}% More Elemental Attack Damage" ]
                     },
                     {
                         "id": "b823db",
@@ -136,8 +137,8 @@
                         "exp": 350,
                         "attackSpeed": 0.6,
                         "attackEffectiveness": 200,
-                        "manaCost": 2,
-                        "modList": [ "+{90}% Hit Chance", "+{20}% Chance To Bleed", "{50}% More Bleed Damage" ]
+                        "manaCost": 3,
+                        "modList": [ "+{70}% Hit Chance", "Adds {3} To {7} Physical Damage", "+{20}% Chance To Bleed", "{30}% More Bleed Damage" ]
                     },
                     {
                         "id": "914376",
@@ -145,16 +146,16 @@
                         "exp": 2000,
                         "attackSpeed": 0.6,
                         "attackEffectiveness": 230,
-                        "manaCost": 5,
-                        "modList": [ "+{90}% Hit Chance", "+{25}% Chance To Bleed", "{80}% More Bleed Damage" ]
+                        "manaCost": 7,
+                        "modList": [ "+{70}% Hit Chance", "Adds {9} To {13} Physical Damage", "+{25}% Chance To Bleed", "{50}% More Bleed Damage" ]
                     },
                     {
                         "id": "a16333",
                         "name": "Bleed Attack III",
                         "attackSpeed": 0.6,
                         "attackEffectiveness": 250,
-                        "manaCost": 8,
-                        "modList": [ "+{90}% Hit Chance", "+{30}% Chance To Bleed", "{120}% More Bleed Damage" ]
+                        "manaCost": 10,
+                        "modList": [ "+{70}% Hit Chance", "Adds {16} To {24} Physical Damage", "+{30}% Chance To Bleed", "{80}% More Bleed Damage" ]
                     },
                     {
                         "id": "218522",
@@ -162,8 +163,8 @@
                         "exp": 350,
                         "attackSpeed": 0.6,
                         "attackEffectiveness": 200,
-                        "manaCost": 2,
-                        "modList": [ "+{90}% Hit Chance", "+{20}% Chance To Burn", "{50}% More Burn Damage" ]
+                        "manaCost": 3,
+                        "modList": [ "+{70}% Hit Chance", "Adds {3} To {7} Elemental Damage", "+{20}% Chance To Burn", "{30}% More Burn Damage" ]
                     },
                     {
                         "id": "d0a3cd",
@@ -171,16 +172,16 @@
                         "exp": 2000,
                         "attackSpeed": 0.6,
                         "attackEffectiveness": 230,
-                        "manaCost": 5,
-                        "modList": [ "+{90}% Hit Chance", "+{25}% Chance To Burn", "{80}% More Burn Damage" ]
+                        "manaCost": 7,
+                        "modList": [ "+{70}% Hit Chance", "Adds {9} To {13} Elemental Damage", "+{25}% Chance To Burn", "{50}% More Burn Damage" ]
                     },
                     {
                         "id": "76afee",
                         "name": "Burn Attack III",
                         "attackSpeed": 0.6,
                         "attackEffectiveness": 250,
-                        "manaCost": 8,
-                        "modList": [ "+{90}% Hit Chance", "+{30}% Chance To Burn", "{120}% More Burn Damage" ]
+                        "manaCost": 10,
+                        "modList": [ "+{70}% Hit Chance", "Adds {16} To {24} Elemental Damage", "+{30}% Chance To Burn", "{80}% More Burn Damage" ]
                     }
                 ]
             },
@@ -278,102 +279,92 @@
                     {
                         "id": "068015",
                         "name": "Physical Attack Damage I",
+                        "insight": 200,
                         "exp": 600,
-                        "insight": 100,
                         "modList": [ "{20}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "4e8dfa",
                         "name": "Physical Attack Damage II",
-                        "exp": 1500,
-                        "insight": 200,
-                        "modList": [ "{50}% More Physical Attack Damage" ]
+                        "exp": 3000,
+                        "modList": [ "{30}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "2b3c9a",
                         "name": "Physical Attack Damage III",
-                        "insight": 300,
-                        "modList": [ "{80}% More Physical Attack Damage" ]
+                        "modList": [ "{40}% More Physical Attack Damage" ]
                     },
                     {
                         "id": "d5e6c1",
                         "name": "Elemental Attack Damage I",
                         "exp": 600,
-                        "insight": 100,
+                        "insight": 200,
                         "modList": [ "{20}% More Elemental Attack Damage" ]
                     },
                     {
                         "id": "78da2e",
                         "name": "Elemental Attack Damage II",
-                        "exp": 1500,
-                        "insight": 200,
-                        "modList": [ "{50}% More Elemental Attack Damage" ]
+                        "exp": 3000,
+                        "modList": [ "{30}% More Elemental Attack Damage" ]
                     },
                     {
                         "id": "e0005e",
                         "name": "Elemental Attack Damage III",
-                        "insight": 300,
-                        "modList": [ "{80}% More Elemental Attack Damage" ]
+                        "modList": [ "{40}% More Elemental Attack Damage" ]
                     },
                     {
                         "id": "87bd24",
                         "name": "Damage Over Time I",
                         "exp": 600,
                         "insight": 100,
-                        "modList": [ "{30}% More Damage Over Time" ]
+                        "modList": [ "{20}% More Damage Over Time" ]
                     },
                     {
                         "id": "eaa5ca",
                         "name": "Damage Over Time II",
-                        "exp": 1500,
-                        "insight": 200,
-                        "modList": [ "{80}% More Damage Over Time" ]
+                        "exp": 3000,
+                        "modList": [ "{30}% More Damage Over Time" ]
                     },
                     {
                         "id": "5dde79",
                         "name": "Damage Over Time III",
-                        "insight": 300,
-                        "modList": [ "{120}% More Damage Over Time" ]
+                        "modList": [ "{40}% More Damage Over Time" ]
                     },
                     {
                         "id": "710279",
                         "name": "Attack Speed I",
                         "exp": 600,
                         "probability": 300,
-                        "insight": 100,
+                        "insight": 300,
                         "modList": [ "{10}% More Attack Speed" ]
                     },
                     {
                         "id": "635f31",
                         "name": "Attack Speed II",
-                        "exp": 1500,
-                        "insight": 200,
-                        "modList": [ "{20}% More Attack Speed" ]
+                        "exp": 3000,
+                        "modList": [ "{15}% More Attack Speed" ]
                     },
                     {
                         "id": "f4f55b",
                         "name": "Attack Speed III",
-                        "insight": 300,
-                        "modList": [ "{30}% More Attack Speed" ]
+                        "modList": [ "{20}% More Attack Speed" ]
                     },
                     {
                         "id": "2d4245",
                         "name": "Critical Hit Chance I",
                         "exp": 600,
-                        "insight": 100,
+                        "insight": 300,
                         "modList": [ "+{10}% Critical Hit Chance" ]
                     },
                     {
                         "id": "4f9f8c",
                         "name": "Critical Hit Chance II",
-                        "exp": 2000,
-                        "insight": 300,
+                        "exp": 3000,
                         "modList": [ "+{20}% Critical Hit Chance" ]
                     },
                     {
                         "id": "c94907",
                         "name": "Critical Hit Chance III",
-                        "insight": 500,
                         "modList": [ "+{30}% Critical Hit Chance" ]
                     },
                     {
@@ -381,125 +372,113 @@
                         "name": "Critical Hit Multiplier I",
                         "exp": 600,
                         "probability": 500,
-                        "insight": 100,
-                        "modList": [ "+{80}% Critical Hit Multiplier" ]
+                        "insight": 300,
+                        "modList": [ "+{30}% Critical Hit Multiplier" ]
                     },
                     {
                         "id": "8e1348",
                         "name": "Critical Hit Multiplier II",
-                        "exp": 2000,
-                        "insight": 300,
-                        "modList": [ "+{120}% Critical Hit Multiplier" ]
+                        "exp": 3000,
+                        "modList": [ "+{50}% Critical Hit Multiplier" ]
                     },
                     {
                         "id": "85e6ca",
                         "name": "Critical Hit Multiplier III",
-                        "insight": 500,
-                        "modList": [ "+{60}% Critical Hit Multiplier" ]
+                        "modList": [ "+{80}% Critical Hit Multiplier" ]
                     },
                     {
                         "id": "0ca681",
                         "name": "Maximum Mana I",
                         "exp": 600,
                         "probability": 300,
-                        "insight": 100,
+                        "insight": 200,
                         "modList": [ "+{100} Maximum Mana" ]
                     },
                     {
                         "id": "aedb6e",
                         "name": "Maximum Mana II",
-                        "exp": 1500,
-                        "insight": 200,
+                        "exp": 3000,
                         "modList": [ "+{250} Maximum Mana" ]
                     },
                     {
                         "id": "c8ed79",
                         "name": "Maximum Mana III",
-                        "insight": 300,
                         "modList": [ "+{500} Maximum Mana" ]
                     },
                     {
                         "id": "1f81a4",
                         "name": "Mana Regeneration I",
                         "exp": 600,
-                        "insight": 50,
+                        "insight": 100,
                         "modList": [ "+{1} Mana Regeneration" ]
                     },
                     {
                         "id": "208812",
                         "name": "Mana Regeneration II",
-                        "exp": 1800,
-                        "insight": 150,
-                        "modList": [ "+{3} Mana Regeneration" ]
+                        "exp": 3000,
+                        "modList": [ "+{2} Mana Regeneration" ]
                     },
                     {
                         "id": "259d27",
                         "name": "Mana Regeneration III",
-                        "insight": 250,
-                        "modList": [ "+{5} Mana Regeneration" ]
+                        "modList": [ "+{3} Mana Regeneration" ]
                     },
                     {
                         "id": "ca2b79",
                         "name": "Strength I",
                         "exp": 600,
                         "probability": 100,
-                        "insight": 50,
-                        "modList": [ "+{30} Strength" ]
+                        "insight": 100,
+                        "modList": [ "+{20} Strength" ]
                     },
                     {
                         "id": "89cdd6",
                         "name": "Strength II",
-                        "exp": 1800,
-                        "insight": 150,
-                        "modList": [ "+{50} Strength", "{20}% Increased Strength" ]
+                        "exp": 3000,
+                        "modList": [ "+{30} Strength", "{10}% Increased Strength" ]
                     },
                     {
                         "id": "8c6c0e",
                         "name": "Strength III",
-                        "insight": 300,
-                        "modList": [ "+{80} Strength", "{30}% Increased Strength" ]
+                        "modList": [ "+{40} Strength", "{20}% Increased Strength" ]
                     },
                     {
                         "id": "a274a9",
                         "name": "Dexterity I",
                         "exp": 600,
                         "probability": 100,
-                        "insight": 50,
-                        "modList": [ "+{30} Dexterity" ]
+                        "insight": 100,
+                        "modList": [ "+{20} Dexterity" ]
                     },
                     {
                         "id": "d65c51",
                         "name": "Dexterity II",
-                        "exp": 1800,
-                        "insight": 150,
-                        "modList": [ "+{50} Dexterity", "{20}% Increased Dexterity" ]
+                        "exp": 3000,
+                        "modList": [ "+{30} Dexterity", "{10}% Increased Dexterity" ]
                     },
                     {
                         "id": "973f1c",
                         "name": "Dexterity III",
-                        "insight": 250,
-                        "modList": [ "+{80} Dexterity", "{30}% Increased Dexterity" ]
+                        "modList": [ "+{40} Dexterity", "{20}% Increased Dexterity" ]
                     },
                     {
                         "id": "530862",
                         "name": "Intelligence I",
                         "exp": 600,
                         "probability": 100,
-                        "insight": 50,
-                        "modList": [ "+{30} Intelligence" ]
+                        "insight": 100,
+                        "modList": [ "+{20} Intelligence" ]
                     },
                     {
                         "id": "06faab",
                         "name": "Intelligence II",
-                        "exp": 1800,
-                        "insight": 150,
-                        "modList": [ "+{50} Intelligence", "{20}% Increased Intelligence" ]
+                        "exp": 3000,
+                        "modList": [ "+{30} Intelligence", "{10}% Increased Intelligence" ]
                     },
                     {
                         "id": "bacb7e",
                         "name": "Intelligence III",
-                        "insight": 250,
-                        "modList": [ "+{80} Intelligence", "{30}% Increased Intelligence" ]
+                        "modList": [ "+{40} Intelligence", "{20}% Increased Intelligence" ]
                     }
                 ]
             }

@@ -4,7 +4,7 @@ import type * as GameSerialization from 'src/game/serialization';
 import { Modifier } from 'src/game/mods/Modifier';
 import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
 import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';
-import { createItemListElement, createItem, createItemInfoElements, getRankItemBaseName, unlockItem } from 'src/game/utils/itemUtils';
+import { createObjectListElement, createAssignableObject, createObjectInfoElements, getRankBaseName, unlockObject, getRankNumeral } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { SkillPage, type PassiveSkill } from './SkillPage';
 
@@ -34,16 +34,26 @@ export class Passives extends SkillPage {
         this.applyInsightCapacityEnhancersAsModifiers();
 
         this.skillList = data.passiveSkillList.map(data => {
-            const baseName = getRankItemBaseName(data.name);
+            const baseName = getRankBaseName(data.name);
             if (!this.elementMap.has(baseName)) {
-                const element = createItemListElement(data);
+                const element = createObjectListElement(data);
                 element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
                 this.elementMap.set(baseName, element);
             }
-            return { type: 'Passive', baseName, data, unlocked: false, assigned: false, maxExp: 0, exp: 0, ...createItem(data) };
+            return { type: 'Passive', data, ...createAssignableObject(data), rankList: [] };
         });
+        this.skillList.forEach(x => x.rankList = this.skillList.filter(y => y.baseName === x.baseName));
+
+        for (const passiveSkill of this.skillList) {
+            const rank = getRankNumeral(passiveSkill.name);
+            if (rank === 'I' || rank === undefined) {
+                continue;
+            }
+            const basePassive = this.skillList.find(x => x.baseName === passiveSkill.baseName);
+            passiveSkill.data.insight = basePassive?.data.insight ?? 0;
+        }
         this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
-        this.skillList.filter(x => x.unlocked).forEach(x => unlockItem(x, this.elementMap));
+        this.skillList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
 
         const firstPassive = this.skillList.find(x => x.unlocked);
         if (firstPassive) {
@@ -91,7 +101,7 @@ export class Passives extends SkillPage {
     }
 
     get insightAllocated() {
-        return this.skillList.filter(x => x.assigned).map(x => x.data.insight).reduce((a, b) => a += b, 0);
+        return this.skillList.filter(x => x.assigned).map(x => x.data.insight ?? 0).reduce((a, b) => a += b, 0);
     }
 
     private updateInsightValueElement() {
@@ -114,11 +124,12 @@ export class Passives extends SkillPage {
     }
 
     protected showSkill(passive: PassiveSkill) {
-        const propertyList = [
-            ['Insight', passive.data.insight.toFixed()],
-        ];
-        const itemInfoElements = createItemInfoElements({
-            item: passive,
+        const propertyList = [];
+        if (passive.data.insight) {
+            propertyList.push(['Insight', passive.data.insight.toFixed()]);
+        }
+        const itemInfoElements = createObjectInfoElements({
+            obj: passive,
             propertyList, modList: passive.data.modList,
             rankList: this.skillList.filter(x => x.baseName === passive.baseName),
             onRankChange: (item) => this.showSkill(item as PassiveSkill)
@@ -129,9 +140,7 @@ export class Passives extends SkillPage {
         const updateButton = () => {
             const rankList = this.skillList.filter(x => x.baseName === passive.baseName);
             let disabled = true;
-            if (passive.assigned) {
-                disabled = false;
-            } else if (rankList.every(x => !x.assigned) && this.insightRemaining >= passive.data.insight) {
+            if (rankList.some(x => x.assigned) || (passive.data.insight ?? 0) <= this.insightRemaining) {
                 disabled = false;
             }
             button.textContent = passive.assigned ? 'Deallocate' : 'Allocate';
@@ -139,10 +148,13 @@ export class Passives extends SkillPage {
             button.setAttribute('data-button', !passive.assigned ? 'valid' : '');
         };
         button.addEventListener('click', () => {
-            if (passive.assigned) {
-                this.deallocatePassive(passive);
-            } else {
-                this.allocatePassive(passive);
+            const rankList = this.skillList.filter(x => x.baseName === passive.baseName);
+            const allocatedPassive = rankList.find(x => x.assigned);
+            if (allocatedPassive) {
+                this.unassignSkill(allocatedPassive);
+            }
+            if (passive !== allocatedPassive) {
+                this.assignSkill(passive);
             }
             updateButton();
         });
@@ -165,24 +177,15 @@ export class Passives extends SkillPage {
         player.modDB.replace('Passive/InsightCapacityEnhancer', list.map(x => ({ name: 'Insight', value: x.curCount * x.data.insight, valueType: 'Base' })));
     }
 
-    private allocatePassive(passive: PassiveSkill) {
-        const element = this.elementMap.get(passive.baseName)!;
-        element.setAttribute('data-tag', 'valid');
-        element.classList.add('m-allocated');
-        element.textContent = passive.name;
-        passive.assigned = true;
-        const rankList = this.skillList.filter(x => x.baseName === passive.baseName);
-        rankList.forEach(x => x.assigned = x === passive);
+    protected assignSkill(passive: PassiveSkill) {
+        super.assignSkill(passive);
         this.updateInsightValueElement();
         player.modDB.add(`Passive/${passive.data.name}`, Modifier.extractStatModifierList(...Modifier.modListFromTexts(passive.data.modList)));
         this.fixNegativeInsightRemaining();
     }
 
-    private deallocatePassive(passive: PassiveSkill) {
-        const element = this.elementMap.get(passive.baseName)!;
-        element.classList.remove('m-allocated');
-        element.removeAttribute('data-tag');
-        passive.assigned = false;
+    protected unassignSkill(passive: PassiveSkill) {
+        super.unassignSkill(passive);
         this.updateInsightValueElement();
         player.modDB.removeBySource(`Passive/${passive.data.name}`);
     }
@@ -193,7 +196,7 @@ export class Passives extends SkillPage {
         }
         const passive = this.skillList.findLast(x => x.assigned);
         assertDefined(passive, 'cannot have negative insight without any allocated passives');
-        this.deallocatePassive(passive);
+        this.unassignSkill(passive);
         this.fixNegativeInsightRemaining();
     }
 
@@ -220,7 +223,7 @@ export class Passives extends SkillPage {
     }
 
     private clearPassives() {
-        this.skillList.filter(x => x.assigned).forEach(x => this.deallocatePassive(x));
+        this.skillList.filter(x => x.assigned).forEach(x => this.unassignSkill(x));
         if (this.selectedPassive) {
             this.showSkill(this.selectedPassive);
         }
@@ -248,11 +251,11 @@ export class Passives extends SkillPage {
                 continue;
             }
             passive.exp = passive.maxExp * (data.expFac ?? 0);
-            unlockItem(passive, this.elementMap);
-            if (data.allocated && passive.data.insight <= this.insightRemaining) {
-                this.allocatePassive(passive);
+            unlockObject(passive, this.elementMap);
+            if (data.allocated && (passive.data.insight ?? 0) <= this.insightRemaining) {
+                this.assignSkill(passive);
             }
         }
-        this.selectSkillByName(this.skillList.find(x => x.selected)?.name);
+        this.selectSkillByName(this.skillList.find(x => x.assigned)?.name);
     }
 }
