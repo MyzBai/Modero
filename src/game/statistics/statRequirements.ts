@@ -10,8 +10,8 @@ export function evaluateStatRequirements(requirement: Requirements | undefined, 
     if (requirement?.maxLevel) {
         requirements.push({ stat: game.stats.maxLevel, value: requirement.maxLevel });
     }
-    if (requirement?.ascensionCount) {
-        requirements.push({ stat: game.stats.ascensionMax, value: requirement.ascensionCount });
+    if (requirement?.trial) {
+        requirements.push({ stat: game.stats.trial, value: requirement.trial });
     }
 
     let count = 0;

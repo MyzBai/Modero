@@ -9,7 +9,7 @@ export interface GameConfig {
     enemyBaseLifeList: EnemyBaseLifeList;
     enemyBaseCountList: EnemyBaseCountList;
     enemyList: Enemy[];
-    ascension: Ascension;
+    trials: Trials;
     components?: {
         guildHall?: GuildHall;
         skills?: Skills;
@@ -22,7 +22,7 @@ export interface GameConfig {
 export interface Requirements {
     curLevel?: Level;
     maxLevel?: Level;
-    ascensionCount?: Level;
+    trial?: Level;
 }
 
 export interface Enemy {
@@ -33,21 +33,9 @@ export interface Enemy {
     modList?: EnemyModList;
 }
 
-export interface Ascension {
-    trial: AscensionTrial;
-    ascensionInstanceList?: AscensionInstance[];
-}
-export type AscensionEnemy = Omit<Enemy, 'level'>;
-export interface AscensionTrial {
-    /**@description Time in seconds before trial fails */
-    timeout?: UnsignedInteger;
-    /**@TJS-type integer @TJS-minimum 1 @TJS-default 1 */
-    enemyCount: number;
-    enemyList: AscensionEnemy[];
-}
-export interface AscensionInstance {
-    id: Id;
-    modList: AscensionInstanceModList;
+export interface Trials {
+    /**@TJS-minItems 1 */
+    trialList: { id: Id; modList: TrialModList; }[];
 }
 
 export interface Weapon {
@@ -172,7 +160,6 @@ export interface GuildClass {
     guildName: GuildName;
     name: Name;
     modList: PlayerModList[];
-    ascensionModList: PlayerModList[];
 }
 
 export interface Achievements {
@@ -189,8 +176,8 @@ export const SchemaOverrideSymbolNames = [
     'WeaponUpgradeMod',
     'WeaponCraftDescription',
     'TreasuryUpgradeMod',
-    'AscensionMod',
     'EnemyMod',
+    'TrialMod',
     'AchievementDescription',
     'EnemyBaseLife',
     'EnemyBaseCount'
@@ -208,7 +195,7 @@ type UnsignedInteger = number;
 
 /**
  * @TJS-type integer
- * @TJS-minimum 0
+ * @TJS-minimum 1
  * @default 1
  */
 type Level = number;
@@ -306,9 +293,7 @@ type AchievementDescription = string;
 /**@$ref #/definitions/WeaponCraftDescription */
 type WeaponCraftDescription = string;
 
-type AscensionMod = string;
-/**
-* @description these modifiers will be applied upon ascending
-* @items {"$ref": "#/definitions/AscensionMod"}
-*/
-type AscensionInstanceModList = AscensionMod[];
+/**@$ref #/definitions/TrialMod */
+type TrialMod = string;
+/**@items {"$ref": "#/definitions/TrialMod"} */
+type TrialModList = TrialMod[];

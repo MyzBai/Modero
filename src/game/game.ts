@@ -19,12 +19,12 @@ import { createCustomElement } from 'src/shared/customElements/customElements';
 import { initDevTools } from 'src/game/dev';
 import { loadGame, saveGame } from 'src/shared/utils/saveManager';
 import { Notifications } from './Notifications';
-import { Ascension } from './components/ascension/Ascension';
+import { Trials } from './trials/Trials';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { createModEntryInfoElement } from 'src/home/dom';
 
-export const mainMenuNames = ['combat', 'skills', 'weapon', 'treasury', 'guildHall', 'ascension', 'achievements', 'statistics', 'notifications'] as const;
+export const mainMenuNames = ['combat', 'skills', 'weapon', 'treasury', 'guildHall', 'trials', 'achievements', 'statistics', 'notifications'] as const;
 
 export const enum GameInitializationStage {
     None = 0,
@@ -154,11 +154,12 @@ export class Game {
         statistics.createGroup('General', this.stats);
 
         this._initializationStage = GameInitializationStage.Init;
+
+
         //Init
         statistics.init();
         combat.init();
         player.init();
-        ascension.init();
         this.components.init();
 
         //UI
@@ -171,6 +172,8 @@ export class Game {
         }
 
         this._initializationStage = GameInitializationStage.Setup;
+
+        trials.setup();
         //Setup
         player.setup();
         world.setup();
@@ -232,7 +235,6 @@ export class Game {
         world.reset();
         combat.reset();
         player.reset();
-        ascension.reset();
         statistics.reset();
         notifications.reset();
     }
@@ -248,7 +250,6 @@ export class Game {
 
         const newSave: UnsafeSerialization = {
             ...save.meta,
-            ascension: save.ascension,
             guildHall: { ...save.guildHall, classId: undefined },
             game: { stats: save.game?.stats }
         };
@@ -336,7 +337,6 @@ export class Game {
         world.serialize(save);
         statistics.serialize(save);
         player.serialize(save);
-        ascension.serialize(save);
         combat.effectHandler.serialize(save);
         notifications.serialize(save);
         this.components.serialize(save);
@@ -360,7 +360,6 @@ export class Game {
 
         this.components.deserialize(save);
 
-        ascension.deserialize(save);
         world.deserialize(save);
 
         combat.effectHandler.deserialize(save);
@@ -379,7 +378,7 @@ export const combat = new Combat();
 export const world = new World();
 export const player = new Player();
 export const notifications = new Notifications();
-export const ascension = new Ascension();
+export const trials = new Trials();
 
 export async function init(args: [...Parameters<typeof game['init']>]) {
     await game.init(args[0], args[1], args[2]);

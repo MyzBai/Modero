@@ -4,11 +4,11 @@
 @use 'combat';
 @use 'statistics';
 @use 'notifications';
+@use 'trials/trials';
 @use 'components/guildHall/guildHall';
 @use 'components/skills/skills';
 @use 'components/weapon/weapon';
 @use 'components/treasury/treasury';
-@use 'components/ascension/ascension';
 @use 'components/achievements/achievements';
 
 .p-game {

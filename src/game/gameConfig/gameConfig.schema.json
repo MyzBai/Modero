@@ -31,8 +31,8 @@
         "$ref": "#/definitions/Enemy"
       }
     },
-    "ascension": {
-      "$ref": "#/definitions/Ascension"
+    "trials": {
+      "$ref": "#/definitions/Trials"
     },
     "components": {
       "type": "object",
@@ -58,11 +58,11 @@
   },
   "additionalProperties": false,
   "required": [
-    "ascension",
     "enemyBaseCountList",
     "enemyBaseLifeList",
     "enemyList",
     "playerStartModList",
+    "trials",
     "version"
   ],
   "definitions": {
@@ -78,7 +78,7 @@
         },
         "level": {
           "type": "integer",
-          "minimum": 0,
+          "minimum": 1,
           "default": 1
         },
         "weight": {
@@ -108,96 +108,36 @@
         }
       ]
     },
-    "Ascension": {
+    "Trials": {
       "type": "object",
       "properties": {
-        "trial": {
-          "$ref": "#/definitions/AscensionTrial"
-        },
-        "ascensionInstanceList": {
+        "trialList": {
+          "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/AscensionInstance"
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/Id"
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/TrialMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "modList"
+            ]
           }
         }
       },
       "additionalProperties": false,
       "required": [
-        "trial"
-      ]
-    },
-    "AscensionTrial": {
-      "type": "object",
-      "properties": {
-        "timeout": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Time in seconds before trial fails"
-        },
-        "enemyCount": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
-        },
-        "enemyList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AscensionEnemy"
-          }
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "enemyCount",
-        "enemyList"
-      ]
-    },
-    "AscensionEnemy": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "pattern": "^[A-Za-z 0-9]{3,32}$",
-          "type": "string"
-        },
-        "id": {
-          "$ref": "#/definitions/Id"
-        },
-        "weight": {
-          "type": "integer",
-          "minimum": 0,
-          "default": 100
-        },
-        "modList": {
-          "items": {
-            "$ref": "#/definitions/EnemyMod"
-          },
-          "type": "array"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "name"
-      ]
-    },
-    "AscensionInstance": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/Id"
-        },
-        "modList": {
-          "description": "these modifiers will be applied upon ascending",
-          "items": {
-            "$ref": "#/definitions/AscensionMod"
-          },
-          "type": "array"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "modList"
+        "trialList"
       ]
     },
     "GuildHall": {
@@ -247,17 +187,17 @@
       "properties": {
         "curLevel": {
           "type": "integer",
-          "minimum": 0,
+          "minimum": 1,
           "default": 1
         },
         "maxLevel": {
           "type": "integer",
-          "minimum": 0,
+          "minimum": 1,
           "default": 1
         },
-        "ascensionCount": {
+        "trial": {
           "type": "integer",
-          "minimum": 0,
+          "minimum": 1,
           "default": 1
         }
       },
@@ -314,20 +254,10 @@
             },
             "type": "array"
           }
-        },
-        "ascensionModList": {
-          "type": "array",
-          "items": {
-            "items": {
-              "$ref": "#/definitions/PlayerMod"
-            },
-            "type": "array"
-          }
         }
       },
       "additionalProperties": false,
       "required": [
-        "ascensionModList",
         "guildName",
         "id",
         "modList",
@@ -679,7 +609,7 @@
         },
         "level": {
           "type": "integer",
-          "minimum": 0,
+          "minimum": 1,
           "default": 1
         },
         "weight": {
@@ -1275,9 +1205,6 @@
           "body": "Reach Level {${1:#}}"
         },
         {
-          "body": "Ascend {${1:#}} Times"
-        },
-        {
           "body": "Deal {${1:#}} Total Physical Attack Damage"
         },
         {
@@ -1305,9 +1232,6 @@
       "oneOf": [
         {
           "pattern": "^Reach Level \\{(([0-9]+)([-]([0-9]+))?)\\}$"
-        },
-        {
-          "pattern": "^Ascend \\{(([0-9]+)([-]([0-9]+))?)\\} Times?$"
         },
         {
           "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Physical Attack Damage$"
@@ -2615,26 +2539,6 @@
         }
       ]
     },
-    "AscensionMod": {
-      "type": "string",
-      "pattern": "^[^#]*$",
-      "defaultSnippets": [
-        {
-          "body": "{${1:#}}% More Enemy Life"
-        },
-        {
-          "body": "{${1:#}}% More Enemies"
-        }
-      ],
-      "oneOf": [
-        {
-          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemy Life$"
-        },
-        {
-          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemies$"
-        }
-      ]
-    },
     "EnemyMod": {
       "type": "string",
       "pattern": "^[^#]*$",
@@ -2664,6 +2568,26 @@
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Life$"
+        }
+      ]
+    },
+    "TrialMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% More Enemy Life"
+        },
+        {
+          "body": "{${1:#}}% More Enemies"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemy Life$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemies$"
         }
       ]
     },

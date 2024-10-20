@@ -14,8 +14,7 @@ export function createGameStats(parent?: StatCollection) {
     const statList = {
         timePlayed: new Statistic({ label: 'Time Played', isTime: true }),
         maxLevel: new Statistic(),
-        ascension: new Statistic({ defaultValue: 0 }),
-        ascensionMax: new Statistic({ defaultValue: 0 }),
+        trial: new Statistic({ defaultValue: 1 }),
         totalDamage: new Statistic(),
         totalAttackDamage: new Statistic(),
         totalDamageOverTime: new Statistic(),

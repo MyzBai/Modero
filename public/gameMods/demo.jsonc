@@ -39,22 +39,12 @@
         "+{2} Maximum Mana Per {1} Intelligence"
         // "+{0.6}% Of Maximum Mana Regeneration"
     ],
-    "ascension": {
-        "trial": {
-            "enemyCount": 1,
-            "timeout": 60,
-            "enemyList": [
-                {
-                    "id": "fba86b",
-                    "name": "Guard"
-                    // "modList": [ "{95}% Reduced Damage Taken" ]
-                }
-            ]
-        },
-        "ascensionInstanceList": [
-            { "id": "b0cfcb", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life" ] },
-            { "id": "37d4dd", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life" ] },
-            { "id": "c3f79c", "modList": [ "{20}% More Enemies", "{30}% More Enemy Life" ] }
+    "trials": {
+        "trialList": [
+            { "id": "eee1c2", "modList": [ ] },
+            { "id": "b0cfcb", "modList": [ "{50}% More Enemies", "{30}% More Enemy Life" ] },
+            { "id": "37d4dd", "modList": [ "{80}% More Enemies", "{50}% More Enemy Life" ] },
+            { "id": "c3f79c", "modList": [ "{150}% More Enemies", "{80}% More Enemy Life" ] }
         ]
     },
     "components": {
@@ -494,7 +484,7 @@
                 }
             ],
             "crafting": {
-                "advReforgeRequirements": { "ascensionCount": 1, "curLevel": 3 },
+                "advReforgeRequirements": { "trial": 2, "curLevel": 3 },
                 "craftList": [
                     { "desc": "Reforge item with new random modifiers", "probability": 5, "startCount": 3, "successRates": { "min": 100, "max": 100 } },
                     { "desc": "Add new modifier", "probability": 50, "successRates": { "min": 75, "max": 95 } },
@@ -504,18 +494,6 @@
                 ]
             },
             "modLists": [
-                // [
-                //     { "mod": "Adds {2-3} To {4-5} Physical Damage", "level": 1, "weight": 500, "id": "4fc5e5" },
-                //     { "mod": "Adds {4-7} To {8-12} Physical Damage", "level": 3, "weight": 500, "id": "a40645" },
-                //     { "mod": "Adds {8-13} To {16-20} Physical Damage", "level": 5, "weight": 400, "id": "096093" },
-                //     { "mod": "Adds {15-20} To {23-28} Physical Damage", "level": 7, "weight": 300, "id": "967461" }
-                // ],
-                // [
-                //     { "mod": "Adds {2-3} To {4-5} Elemental Damage", "level": 1, "weight": 500, "id": "947f0a" },
-                //     { "mod": "Adds {4-7} To {8-12} Elemental Damage", "level": 3, "weight": 500, "id": "3fe294" },
-                //     { "mod": "Adds {8-13} To {16-20} Elemental Damage", "level": 5, "weight": 400, "id": "c19de7" },
-                //     { "mod": "Adds {15-20} To {23-28} Elemental Damage", "level": 7, "weight": 300, "id": "8afa7c" }
-                // ],
                 [
                     { "mod": "{20-35}% Increased Physical Attack Damage", "level": 1, "weight": 300, "id": "6b88cc" },
                     { "mod": "{40-60}% Increased Physical Attack Damage", "level": 3, "weight": 300, "id": "6d589f" },
@@ -760,13 +738,6 @@
                         [ "{50}% More Physical Attack Damage", "+{50} Strength", "{2}% More Attack Damage Per {5} Strength" ],
                         [ "{80}% More Physical Attack Damage", "+{60} Strength", "{2}% More Attack Damage Per {5} Strength" ],
                         [ "{100}% More Physical Attack Damage", "+{80} Strength", "{3}% More Attack Damage Per {5} Strength" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% More Physical Attack Damage", "+{5} Strength" ],
-                        [ "{10}% More Physical Attack Damage", "+{10} Strength" ],
-                        [ "{15}% More Physical Attack Damage", "+{15} Strength" ],
-                        [ "{20}% More Physical Attack Damage", "+{20} Strength" ],
-                        [ "{25}% More Physical Attack Damage", "+{25} Strength" ]
                     ]
                 },
                 {
@@ -779,13 +750,6 @@
                         [ "{50}% More Attack Damage", "+{50} Dexterity", "{30}% Increased Dexterity" ],
                         [ "{80}% More Attack Damage", "+{60} Dexterity", "{35}% Increased Dexterity" ],
                         [ "{100}% More Attack Damage", "+{80} Dexterity", "{40}% Increased Dexterity" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% More Attack Damage", "+{5} Dexterity" ],
-                        [ "{10}% More Attack Damage", "+{10} Dexterity" ],
-                        [ "{15}% More Attack Damage", "+{15} Dexterity" ],
-                        [ "{20}% More Attack Damage", "+{20} Dexterity" ],
-                        [ "{25}% More Attack Damage", "+{25} Dexterity" ]
                     ]
                 },
                 {
@@ -798,13 +762,6 @@
                         [ "{50}% More Elemental Attack Damage", "+{50} Intelligence" ],
                         [ "{80}% More Elemental Attack Damage", "+{50} Intelligence" ],
                         [ "{100}% More Elemental Attack Damage", "+{80} Intelligence" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% More Elemental Attack Damage", "+{10} Intelligence" ],
-                        [ "{10}% More Elemental Attack Damage", "+{15} Intelligence" ],
-                        [ "{15}% More Elemental Attack Damage", "+{20} Intelligence" ],
-                        [ "{20}% More Elemental Attack Damage", "+{25} Intelligence" ],
-                        [ "{25}% More Elemental Attack Damage", "+{30} Intelligence" ]
                     ]
                 },
                 {
@@ -817,13 +774,6 @@
                         [ "{50}% More Damage Over Time", "{30}% Increased Ailment Duration", "+{50} Dexterity" ],
                         [ "{60}% More Damage Over Time", "{40}% Increased Ailment Duration", "+{60} Dexterity" ],
                         [ "{70}% More Damage Over Time", "{50}% Increased Ailment Duration", "+{70} Dexterity" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% More Damage Over Time", "+{5} Dexterity" ],
-                        [ "{10}% More Damage Over Time", "+{10} Dexterity" ],
-                        [ "{15}% More Damage Over Time", "+{15} Dexterity" ],
-                        [ "{20}% More Damage Over Time", "+{20} Dexterity" ],
-                        [ "{25}% More Damage Over Time", "+{25} Dexterity" ]
                     ]
                 },
                 {
@@ -836,13 +786,6 @@
                         [ "+{25}% Critical Hit Chance", "+{130}% Critical Hit Multiplier" ],
                         [ "+{30}% Critical Hit Chance", "+{150}% Critical Hit Multiplier" ],
                         [ "+{35}% Critical Hit Chance", "+{180}% Critical Hit Multiplier" ]
-                    ],
-                    "ascensionModList": [
-                        [ "+{3}% Critical Hit Chance", "+{20}% Critical Hit Multiplier", "+{1}% Hit Chance Per {30} Dexterity" ],
-                        [ "+{5}% Critical Hit Chance", "+{25}% Critical Hit Multiplier", "+{1}% Hit Chance Per {27} Dexterity" ],
-                        [ "+{6}% Critical Hit Chance", "+{30}% Critical Hit Multiplier", "+{1}% Hit Chance Per {25} Dexterity" ],
-                        [ "+{8}% Critical Hit Chance", "+{40}% Critical Hit Multiplier", "+{1}% Hit Chance Per {23} Dexterity" ],
-                        [ "+{10}% Critical Hit Chance", "+{50}% Critical Hit Multiplier", "+{1}% Hit Chance Per {20} Dexterity" ]
                     ]
                 },
                 {
@@ -855,13 +798,6 @@
                         [ "{50}% More Bleed Damage", "+{25}% Chance To Bleed" ],
                         [ "{80}% More Bleed Damage", "+{30}% Chance To Bleed" ],
                         [ "{100}% More Bleed Damage", "+{35}% Chance To Bleed" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% More Bleed Damage", "{5}% Increased Bleed Duration" ],
-                        [ "{10}% More Bleed Damage", "{10}% Increased Bleed Duration" ],
-                        [ "{15}% More Bleed Damage", "{15}% Increased Bleed Duration" ],
-                        [ "{20}% More Bleed Damage", "{20}% Increased Bleed Duration" ],
-                        [ "{25}% More Bleed Damage", "{25}% Increased Bleed Duration" ]
                     ]
                 },
                 {
@@ -874,13 +810,6 @@
                         [ "{50}% More Elemental Damage", "+{50} Intelligence" ],
                         [ "{80}% More Elemental Damage", "+{60} Intelligence" ],
                         [ "{100}% More Elemental Damage", "+{80} Intelligence" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% More Elemental Damage", "+{5} Intelligence" ],
-                        [ "{10}% More Elemental Damage", "+{10} Intelligence" ],
-                        [ "{15}% More Elemental Damage", "+{15} Intelligence" ],
-                        [ "{20}% More Elemental Damage", "+{20} Intelligence" ],
-                        [ "{25}% More Elemental Damage", "+{25} Intelligence" ]
                     ]
                 },
                 {
@@ -893,13 +822,6 @@
                         [ "{40}% Increased Mana Regeneration", "+{50} Dexterity", "+{1}% Hit Chance Per {15} Dexterity" ],
                         [ "{50}% Increased Mana Regeneration", "+{60} Dexterity", "+{1}% Hit Chance Per {13} Dexterity" ],
                         [ "{60}% Increased Mana Regeneration", "+{80} Dexterity", "+{1}% Hit Chance Per {10} Dexterity" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% Increased Mana Regeneration", "+{5} Dexterity" ],
-                        [ "{8}% Increased Mana Regeneration", "+{10} Dexterity" ],
-                        [ "{10}% Increased Mana Regeneration", "+{15} Dexterity" ],
-                        [ "{13}% Increased Mana Regeneration", "+{20} Dexterity" ],
-                        [ "{15}% Increased Mana Regeneration", "+{25} Dexterity" ]
                     ]
                 },
                 {
@@ -912,13 +834,6 @@
                         [ "{50}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
                         [ "{80}% More Burn Damage", "{40}% Increased Burn Duration", "Burn Lingers" ],
                         [ "{100}% More Burn Damage", "{50}% Increased Burn Duration", "Burn Lingers" ]
-                    ],
-                    "ascensionModList": [
-                        [ "{5}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
-                        [ "{10}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
-                        [ "{15}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
-                        [ "{20}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ],
-                        [ "{25}% More Burn Damage", "{30}% Increased Burn Duration", "Burn Lingers" ]
                     ]
                 }
             ]
@@ -926,7 +841,6 @@
         "achievements": {
             "achievementList": [
                 { "description": "Reach Level {10}" },
-                { "description": "Ascend {1} Time" },
                 { "description": "Deal {1000000} Total Physical Attack Damage" },
                 { "description": "Deal {1000000} Total Elemental Attack Damage" },
                 { "description": "Deal {1000000} Total Bleed Damage" },

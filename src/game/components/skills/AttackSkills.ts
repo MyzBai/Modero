@@ -89,7 +89,7 @@ export class AttackSkills extends SkillPage {
         this.page.querySelector('[data-item-info]')?.replaceWith(itemInfoElements.element) ?? this.page.appendChild(itemInfoElements.element);
 
         const button = document.createElement('button');
-        button.setAttribute('data-button', 'valid');
+        button.setAttribute('data-tag', 'valid');
         button.textContent = 'Assign';
         const updateButton = () => {
             button.toggleAttribute('disabled', skill === this.activeSkill);

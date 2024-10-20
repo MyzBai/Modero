@@ -1,0 +1,15 @@
+@use 'variables' as *;
+.p-trials {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: $default-gap;
+
+    .label {
+        text-align: center;
+        padding: 0.3em;
+    }
+
+    ul {
+        border: $default-border;
+    }
+}

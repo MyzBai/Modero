@@ -28,12 +28,5 @@
         progress-element {
             @include progress-multi-bar;
         }
-
-        [data-button] {
-            color: $color-tag-invalid;
-            &[data-button='valid'] {
-                color: $color-tag-valid;
-            }
-        }
     }
 }

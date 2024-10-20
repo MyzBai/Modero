@@ -17,7 +17,6 @@ export interface Serialization {
     weapon?: Weapon;
     skills?: Skills;
     treasury?: Treasury;
-    ascension?: Ascension;
     elementHighlightIdList?: string[];
 }
 
@@ -94,10 +93,6 @@ export interface GuildHall {
     exp?: number;
     training?: boolean;
     classId?: string;
-    guildClassList: {
-        classId: string;
-        ascensionCount: number;
-    }[];
 }
 
 export interface Weapon {
@@ -155,11 +150,4 @@ export interface Treasury {
             expFac: number;
         }[];
     }
-}
-
-export interface Ascension {
-    ascensionInstanceId?: string;
-    state?: string;
-    combatArea?: CombatArea;
-    timeout?: number;
 }

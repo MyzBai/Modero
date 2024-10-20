@@ -143,9 +143,13 @@ export class Passives extends SkillPage {
             if (rankList.some(x => x.assigned) || (passive.data.insight ?? 0) <= this.insightRemaining) {
                 disabled = false;
             }
-            button.textContent = passive.assigned ? 'Deallocate' : 'Allocate';
+            button.textContent = 'Allocate';
+            button.setAttribute('data-tag', 'valid');
+            if (passive.assigned) {
+                button.textContent = 'Unassign';
+                button.setAttribute('data-tag', 'invalid');
+            }
             button.toggleAttribute('disabled', disabled);
-            button.setAttribute('data-button', !passive.assigned ? 'valid' : '');
         };
         button.addEventListener('click', () => {
             const rankList = this.skillList.filter(x => x.baseName === passive.baseName);

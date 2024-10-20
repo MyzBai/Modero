@@ -1,5 +1,5 @@
 import 'src/extensions/arrayExtensions';
-import { ascensionModTemplateList } from '../src/game/mods/modTemplates';
+import { trialModTemplateList } from '../src/game/mods/modTemplates';
 import { integerRangeRegex, numberRangeRegex, symbolsRegex } from '../src/shared/utils/textParsing';
 import { generateSchema, buildGenerator, type PartialArgs, type Definition, type JsonSchemaGenerator, getProgramFromFiles } from 'typescript-json-schema';
 import { writeFile } from 'fs/promises';
@@ -78,8 +78,9 @@ function createSchemaOverrideProperties(generator: JsonSchemaGenerator) {
     createStringSchemaOverride(generator, { symbolName: 'SkillsUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'WeaponUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'TreasuryUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
-    createStringSchemaOverride(generator, { symbolName: 'AscensionMod', descriptions: ascensionModTemplateList.map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'TrialMod', descriptions: trialModTemplateList.map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'EnemyMod', descriptions: enemyModTemplateList.map(x => x.desc) });
+
     createStringSchemaOverride(generator, { symbolName: 'WeaponCraftDescription', descriptions: craftTemplates.map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'AchievementDescription', descriptions: taskTemplates.map(x => x.desc) });
 

@@ -1,12 +1,13 @@
 import { assertUniqueStringList } from 'src/shared/utils/assert';
 import { type ModTemplate } from './types';
 import { areaModTemplateList } from './areaModTemplates';
-import { playerModTemplateList } from './playerModTemplates';
+import { persistentPlayerModTemplateList, playerModTemplateList } from './playerModTemplates';
 import { enemyModTemplateList } from './enemyModTemplates';
 
 export type ModDescription = typeof modTemplateList[number]['desc'];
 
-export const ascensionModTemplateList = [
+export const trialModTemplateList = [
+    ...persistentPlayerModTemplateList,
     ...areaModTemplateList
 ] as const satisfies readonly ModTemplate[];
 

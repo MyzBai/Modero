@@ -1,21 +1,19 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Component } from '../Component';
 import { createAssignableObject, createObjectInfoElements, createObjectListElement, type AssignableObject } from 'src/game/utils/objectUtils';
-import { ascension, game, player } from 'src/game/game';
+import { player } from 'src/game/game';
 import { Modifier } from 'src/game/mods/Modifier';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { createCustomElement } from '../../../shared/customElements/customElements';
 import { createHelpIcon } from '../../../shared/utils/dom';
 import { ModalElement } from '../../../shared/customElements/ModalElement';
 import { createModListElement } from '../../utils/dom';
-import { combineModifiers } from '../../mods/utils';
 import { LevelElement } from '../../../shared/customElements/LevelElement';
 import { PlayerUpdateStatsFlag } from '../../Player';
 
 export interface GuildClass extends AssignableObject {
     data: GameConfig.GuildClass;
     element: HTMLElement;
-    ascensionCount: number;
     unlocked: boolean;
 }
 export interface Guild {
@@ -72,7 +70,7 @@ export class GuildHall extends Component {
                 const element = createObjectListElement(guildClass);
                 element.classList.remove('hidden');
                 element.addEventListener('click', this.selectGuildClassByName.bind(this, guildClass.name));
-                const data: GuildClass = { data: guildClass, ...createAssignableObject(guildClass), ascensionCount: 0, unlocked: true, element };
+                const data: GuildClass = { data: guildClass, ...createAssignableObject(guildClass), unlocked: true, element };
                 this.guildClassList.push(data);
                 fragment.appendChild(element);
             }
@@ -84,20 +82,6 @@ export class GuildHall extends Component {
 
         this.guildClassList.find(x => x.unlocked)?.element.click();
         this.page.querySelector<HTMLElement>('[data-class-list] li')?.click();
-
-        ascension.ascendEvent.listen(listElements => {
-            if (!this.activeGuildClass) {
-                return;
-            }
-            this.activeGuildClass.ascensionCount += 1;
-            const element = document.createElement('div');
-            const text = `${this.activeGuildClass.name} has reached ascension ${game.stats.ascension.value} and now provides global modifiers`;
-            const modList = this.getAscensionModList(this.activeGuildClass.name) ?? [];
-            const modListElement = createModListElement(modList);
-            element.insertAdjacentHTML('beforeend', `<span>${text}</span>`);
-            element.appendChild(modListElement);
-            listElements.push(element);
-        });
     }
 
     get level() {
@@ -145,10 +129,6 @@ export class GuildHall extends Component {
         return guild.modList[index]!;
     }
 
-    private getAscensionModList(guildClassName: string) {
-        return this.data.guildClassList.findStrict(x => x.name === guildClassName).ascensionModList[game.stats.ascension.value - 1];
-    }
-
     private selectGuildClassByName(name: string) {
         const guildClass = this.guildClassList.findStrict(x => x.data.name === name);
         this.guildClassList.forEach(x => x.element.classList.toggle('selected', x === guildClass));
@@ -173,14 +153,6 @@ export class GuildHall extends Component {
                 element.appendChild(fieldset);
             }
         }
-        if (game.stats.ascensionMax.value > 0) {
-            const fieldset = document.createElement('fieldset');
-            fieldset.insertAdjacentHTML('beforeend', '<legend>Global Ascension Modifiers</legend>');
-            const modTextList = this.guildClassList.filter(x => x.ascensionCount > 0).flatMap(x => x.data.ascensionModList[x.ascensionCount - 1] ?? []).flatMap(x => x);
-            const modList = combineModifiers(Modifier.modListFromTexts(modTextList));
-            fieldset.appendChild(createModListElement(modList));
-            element.appendChild(fieldset);
-        }
         if (element.childElementCount === 0) {
             modal.setBodyText('Nothing to view yet.');
             return;
@@ -197,7 +169,6 @@ export class GuildHall extends Component {
         const modList = guildClass.data.modList[this.level - 1];
         const elements = createObjectInfoElements({
             obj: { name: guildClass.name },
-            propertyList: guildClass.ascensionCount > 0 ? [['Ascensions', guildClass.ascensionCount.toFixed()]] : [],
             modList
         });
         elements.element.classList.add('guild-class-info');
@@ -205,32 +176,33 @@ export class GuildHall extends Component {
         element?.replaceWith(elements.element) ?? this.page.appendChild(elements.element);
 
         const button = document.createElement('button');
-        button.textContent = 'Assign';
-        button.toggleAttribute('disabled', !!this.activeGuildClass || !guildClass.unlocked);
+        const updateLabel = () => {
+            button.textContent = 'Assign';
+            button.setAttribute('data-tag', 'valid');
+            if (player.stats.guildClass.getText() === guildClass.name) {
+                button.textContent = 'Unassign';
+                button.setAttribute('data-tag', 'invalid');
+            }
+        };
+        updateLabel();
+        button.toggleAttribute('disabled', !guildClass.unlocked);
         button.addEventListener('click', () => {
             this.assignClass(guildClass);
-            button.setAttribute('disabled', '');
+            updateLabel();
         });
         elements.contentElement.appendChild(button);
-
-        if (!guildClass.unlocked) {
-            elements.contentElement.insertAdjacentHTML('beforeend', '<span data-tag="invalid" style="text-align: center;">You have not completed previous ascension with this class</span>');
-        } else if (game.stats.ascension.value < guildClass.ascensionCount) {
-            elements.contentElement.insertAdjacentHTML('beforeend', '<span class="m-text-yellow" style="text-align: center;">This class has already completed this ascension</span>');
-        }
     }
 
     private assignClass(guildClass: GuildClass) {
         this.activeGuildClass = guildClass;
         player.stats.guildClass.setText(guildClass.name);
         player.modDB.replace('GuildClass', Modifier.extractStatModifierList(...Modifier.modListFromTexts(guildClass.data.modList[this.level - 1] ?? [])));
-        this.page.querySelectorStrict(`[data-guild-class-list] [data-id="${guildClass.id}"]`).setAttribute('data-tag', 'valid');
+
+        this.page.querySelectorAll('[data-guild-class-list] [data-id]').forEach(x => x.classList.toggle('m-text-green', x.getAttribute('data-id') === guildClass.id));
 
         const guild = this.data.guildList.findStrict(x => x.name === guildClass.data.guildName);
         const modList = guild.modList[this.level - 1] ?? [];
         player.modDB.replace('Guild', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
-
-        player.modDB.replace('GuildClassGlobal', Modifier.extractStatModifierList(...Modifier.modListFromTexts(guildClass.data.ascensionModList[game.stats.ascension.value - 1] ?? [])));
     }
 
     serialize(save: Serialization) {
@@ -239,7 +211,6 @@ export class GuildHall extends Component {
             training: this.isTraining,
             level: this.level,
             exp: this.levelElement?.curExp,
-            guildClassList: this.guildClassList.filter(x => x.ascensionCount > 0).map(x => ({ classId: x.data.id, ascensionCount: x.ascensionCount }))
         }
     }
 
@@ -258,16 +229,7 @@ export class GuildHall extends Component {
             this.assignClass(guildClass);
             this.selectGuildClassByName(guildClass.name);
         }
-        for (const serializedGuildClass of save?.guildClassList ?? []) {
-            const guildClass = this.guildClassList.find(x => x.data.id === serializedGuildClass?.classId);
-            if (!guildClass) {
-                continue;
-            }
-            guildClass.ascensionCount = serializedGuildClass?.ascensionCount ?? 0;
-        }
-        for (const guildClass of this.guildClassList) {
-            guildClass.unlocked = guildClass.ascensionCount >= game.stats.ascension.value;
-        }
+
         this.selectGuildClassByName(this.data.guildClassList[0]?.name!);
     }
 }

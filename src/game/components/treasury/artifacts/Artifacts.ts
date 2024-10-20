@@ -154,7 +154,7 @@ export class Artifacts {
             }
             button.textContent = artifact.assigned ? 'Unassign' : 'Assign';
             button.toggleAttribute('disabled', disabled);
-            button.setAttribute('data-button', !artifact.assigned ? 'valid' : '');
+            button.setAttribute('data-tag', !artifact.assigned ? 'valid' : '');
         };
         button.addEventListener('click', () => {
             if (artifact.assigned) {

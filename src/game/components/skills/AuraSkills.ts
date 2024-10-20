@@ -177,10 +177,7 @@ export class AuraSkills extends SkillPage {
             return;
         }
         this.stopActiveSkill(skillSlot);
-
-        const element = this.elementMap.get(skillSlot.skill.baseName)!;
-        element.textContent = this.skillList.find(x => x.baseName === skillSlot.skill!.baseName)!.name;
-        element.removeAttribute('data-tag');
+        super.unassignSkill(skillSlot.skill);
 
         skillSlot.element.classList.remove('m-has-skill');
         skillSlot.element.querySelectorStrict('[data-skill-name]').textContent = '[Empty Slot]';
@@ -268,9 +265,13 @@ export class AuraSkills extends SkillPage {
             const conditions = [this.selectedSkillSlot?.skill && this.selectedSkillSlot.skill !== skill, this.selectedSkillSlot?.skill !== skill && this.skillSlotList.length > 0 && this.skillSlotList.some(x => x.skill && compareNamesWithNumerals(x.skill?.name, skill.name))];
             const disabled = conditions.some(x => x);
             const isAssigned = this.selectedSkillSlot?.skill === skill;
-            button.textContent = isAssigned ? 'Remove' : 'Assign';
+            button.textContent = 'Assign';
+            button.setAttribute('data-tag', 'valid');
+            if (isAssigned) {
+                button.textContent = 'Remove';
+                button.setAttribute('data-tag', 'invalid');
+            }
             button.toggleAttribute('disabled', disabled && !(this.selectedSkillSlot?.skill === skill));
-            button.setAttribute('data-button', !isAssigned ? 'valid' : '');
         };
         const button = document.createElement('button');
         button.addEventListener('click', () => {
