@@ -11,28 +11,8 @@
       },
       "type": "array"
     },
-    "enemyBaseLifeList": {
-      "description": "Enemy life for each level starting at level 1. This will determine the max level. Max Level == array.length + 1.",
-      "items": {
-        "$ref": "#/definitions/EnemyBaseLife"
-      },
-      "type": "array"
-    },
-    "enemyBaseCountList": {
-      "description": "Number of enemies for each level starting at level 1",
-      "items": {
-        "$ref": "#/definitions/EnemyBaseCount"
-      },
-      "type": "array"
-    },
-    "enemyList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Enemy"
-      }
-    },
-    "trials": {
-      "$ref": "#/definitions/Trials"
+    "worlds": {
+      "$ref": "#/definitions/Worlds"
     },
     "components": {
       "type": "object",
@@ -58,14 +38,76 @@
   },
   "additionalProperties": false,
   "required": [
-    "enemyBaseCountList",
-    "enemyBaseLifeList",
-    "enemyList",
     "playerStartModList",
-    "trials",
-    "version"
+    "version",
+    "worlds"
   ],
   "definitions": {
+    "Worlds": {
+      "type": "object",
+      "properties": {
+        "enemyBaseLifeList": {
+          "description": "Enemy life for each level starting at level 1. This will determine the max level. Max Level == array.length + 1.",
+          "items": {
+            "$ref": "#/definitions/EnemyBaseLife"
+          },
+          "type": "array"
+        },
+        "enemyBaseCountList": {
+          "description": "Number of enemies for each level starting at level 1",
+          "items": {
+            "$ref": "#/definitions/EnemyBaseCount"
+          },
+          "type": "array"
+        },
+        "worldList": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/Id"
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/WorldMod"
+                },
+                "type": "array"
+              },
+              "enemyList": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Enemy"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "enemyList",
+              "id",
+              "modList"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "enemyBaseCountList",
+        "enemyBaseLifeList",
+        "worldList"
+      ]
+    },
+    "Id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{6}$",
+      "defaultSnippets": [
+        {
+          "body": "${RANDOM_HEX}"
+        }
+      ]
+    },
     "Enemy": {
       "type": "object",
       "properties": {
@@ -97,47 +139,6 @@
       "required": [
         "id",
         "name"
-      ]
-    },
-    "Id": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{6}$",
-      "defaultSnippets": [
-        {
-          "body": "${RANDOM_HEX}"
-        }
-      ]
-    },
-    "Trials": {
-      "type": "object",
-      "properties": {
-        "trialList": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/definitions/Id"
-              },
-              "modList": {
-                "items": {
-                  "$ref": "#/definitions/TrialMod"
-                },
-                "type": "array"
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "id",
-              "modList"
-            ]
-          }
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "trialList"
       ]
     },
     "GuildHall": {
@@ -190,15 +191,9 @@
           "minimum": 1,
           "default": 1
         },
-        "maxLevel": {
+        "world": {
           "type": "integer",
-          "minimum": 1,
-          "default": 1
-        },
-        "trial": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
+          "minimum": 1
         }
       },
       "additionalProperties": false
@@ -554,8 +549,17 @@
         "crafting": {
           "type": "object",
           "properties": {
-            "advReforgeRequirements": {
-              "$ref": "#/definitions/Requirements"
+            "advancedReforge": {
+              "type": "object",
+              "properties": {
+                "requirements": {
+                  "$ref": "#/definitions/Requirements"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "requirements"
+              ]
             },
             "craftList": {
               "type": "array",
@@ -566,6 +570,7 @@
           },
           "additionalProperties": false,
           "required": [
+            "advancedReforge",
             "craftList"
           ]
         }
@@ -2571,10 +2576,22 @@
         }
       ]
     },
-    "TrialMod": {
+    "WorldMod": {
       "type": "string",
       "pattern": "^[^#]*$",
       "defaultSnippets": [
+        {
+          "body": "+{${1:#}} Maximum Artifacts"
+        },
+        {
+          "body": "+{${1:#}} Additional Aura Slots"
+        },
+        {
+          "body": "+{${1:#}} Maximum Insight"
+        },
+        {
+          "body": "+{${1:#}} Additional Weapon Modifiers"
+        },
         {
           "body": "{${1:#}}% More Enemy Life"
         },
@@ -2583,6 +2600,18 @@
         }
       ],
       "oneOf": [
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Artifacts$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Aura Slots$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Maximum Insight$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Additional Weapon Modifiers$"
+        },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemy Life$"
         },

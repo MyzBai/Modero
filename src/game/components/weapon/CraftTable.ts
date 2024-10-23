@@ -15,7 +15,7 @@ import { createHelpIcon } from 'src/shared/utils/dom';
 import type { Requirements } from 'src/game/gameConfig/GameConfig';
 import { player } from '../../game';
 import { ModDB } from '../../mods/ModDB';
-import { calcPlayerStats, extractStats } from '../../calc/calcStats';
+import { calcPlayerCombatStats, extractStats } from '../../calc/calcStats';
 import { Weapon } from './Weapon';
 import { ENVIRONMENT } from '../../../config';
 
@@ -370,7 +370,7 @@ export class CraftTable {
         assertDefined(this.ctxCopy);
 
         const stats = extractStats(player.stats);
-        const curDps = calcPlayerStats({ stats, modDB: player.modDB }).dps;
+        const curDps = calcPlayerCombatStats({ stats, modDB: player.modDB }).dps;
 
         const modDB = new ModDB(player.modDB);
         let lastDps = curDps;
@@ -378,7 +378,7 @@ export class CraftTable {
         for (let i = 0; i < 100; i++) {
             const newModList = this.craftManager.reforge(this.ctx.candidateModList, [0, 0, 0, 0, 0, 1]);
             modDB.replace(Weapon.sourceName, Modifier.extractStatModifierList(...newModList));
-            const dps = calcPlayerStats({ stats, modDB }).dps;
+            const dps = calcPlayerCombatStats({ stats, modDB }).dps;
             if (dps > lastDps || modList.length === 0) {
                 modList = newModList;
                 lastDps = dps;
@@ -473,11 +473,11 @@ export class CraftTable {
 
         {
             const stats = extractStats(player.stats);
-            const dps1 = calcPlayerStats({ stats, modDB: player.modDB }).dps;
+            const dps1 = calcPlayerCombatStats({ stats, modDB: player.modDB }).dps;
 
             const modDB = new ModDB(player.modDB);
             modDB.replace(Weapon.sourceName, Modifier.extractStatModifierList(...this.ctxCopy.modList));
-            const dps2 = calcPlayerStats({ stats, modDB }).dps;
+            const dps2 = calcPlayerCombatStats({ stats, modDB }).dps;
             const dpsCompareElement = document.createElement('div');
             dpsCompareElement.classList.add('dps-compare');
 

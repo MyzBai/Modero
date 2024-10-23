@@ -24,6 +24,8 @@ export class Enemy {
         this.modDB.add('EnemyMod', Modifier.extractStatModifierList(...this.modList));
         this.stats.maxLife.set(1);
         this.stats.life.set(this.stats.maxLife.value);
+
+        this.updateStats();
     }
 
     get life() {
@@ -39,19 +41,14 @@ export class Enemy {
         return this.stats.maxLife.value;
     }
 
-    get lifeFrac() {
+    get lifeRatio() {
         return clamp(this.life / this.maxLife, 0, 1);
     }
 
     updateStats() {
-        const lifeFrac = this.lifeFrac;
+        const lifeFrac = this.lifeRatio;
         calcEnemyStats(this);
         this.life = this.maxLife * lifeFrac;
-    }
-
-    updateModifiers(modList: Modifier[]) {
-        this.modDB.replace('AreaMod', Modifier.extractStatModifierList(...modList));
-        this.updateStats();
     }
 
     getConditionFlags(): number {
@@ -68,14 +65,14 @@ export class Enemy {
 
     serialize(): GameSerialization.EnemyInstance {
         return {
-            lifeFraction: this.lifeFrac,
+            lifeRatio: this.lifeRatio,
             modList: this.modList.map(x => ({ srcId: x.template.id, values: x.values }))
         };
     }
 
     deserialize(save: DeepPartial<GameSerialization.EnemyInstance>) {
-        if (isNumber(save.lifeFraction)) {
-            this.life = this.stats.maxLife.value * save.lifeFraction;
+        if (isNumber(save.lifeRatio)) {
+            this.life = this.stats.maxLife.value * save.lifeRatio;
         }
         if (save.modList) {
             for (const serializedMod of save.modList.filter(isDefined)) {

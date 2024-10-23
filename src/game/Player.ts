@@ -1,5 +1,5 @@
-import { game, statistics, combat, gameLoop, gameLoopAnim, GameInitializationStage } from './game';
-import { applyStatValues, calcPlayerStats, extractStats, type PlayerOptions } from './calc/calcStats';
+import { game, statistics, gameLoop, gameLoopAnim, GameInitializationStage } from './game';
+import { applyStatValues, calcPlayerCombatStats, calcPlayerPersistantStats, extractStats, type PlayerOptions } from './calc/calcStats';
 import { Modifier } from './mods/Modifier';
 import { createPlayerStats, deserializeStats, serializeStats } from './statistics/stats';
 import { ModDB } from './mods/ModDB';
@@ -7,6 +7,7 @@ import type * as GameSerialization from './serialization';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ENVIRONMENT } from 'src/config';
 import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
+import { hasAnyFlag } from '../shared/utils/utils';
 
 export enum PlayerUpdateStatsFlag {
     None = 0,
@@ -111,19 +112,22 @@ export class Player {
         }, { once: true });
     }
 
-    updateStatsDirect(flags?: PlayerUpdateStatsFlag) {
+    updateStatsDirect(updateFlags: PlayerUpdateStatsFlag = PlayerUpdateStatsFlag.All) {
         const playerOptions: PlayerOptions = {
-            flags: flags ?? PlayerUpdateStatsFlag.All,
             modDB: this.modDB,
             stats: extractStats(this.stats),
-            enemy: combat.enemy ? {
-                stats: combat.enemy.stats,
-                conditionFlags: combat.enemy.getConditionFlags(),
-                modDB: combat.enemy.modDB
-            } : undefined
         };
-        const result = calcPlayerStats(playerOptions);
-        applyStatValues(this.stats, result);
+
+        if (hasAnyFlag(updateFlags, PlayerUpdateStatsFlag.Combat)) {
+            const result = calcPlayerCombatStats(playerOptions);
+            applyStatValues(this.stats, result);
+        }
+
+        if (hasAnyFlag(updateFlags, PlayerUpdateStatsFlag.Persistent)) {
+            const result = calcPlayerPersistantStats(playerOptions);
+            applyStatValues(this.stats, result);
+        }
+
         statistics.updateStats('Player');
     }
 

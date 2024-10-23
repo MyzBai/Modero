@@ -13,8 +13,7 @@ export type EnemyStatCollection = ReturnType<typeof createEnemyStats>;
 export function createGameStats(parent?: StatCollection) {
     const statList = {
         timePlayed: new Statistic({ label: 'Time Played', isTime: true }),
-        maxLevel: new Statistic(),
-        trial: new Statistic({ defaultValue: 1 }),
+        world: new Statistic({ defaultValue: 1 }),
         totalDamage: new Statistic(),
         totalAttackDamage: new Statistic(),
         totalDamageOverTime: new Statistic(),
@@ -46,6 +45,7 @@ export function createCombatStats() {
 }
 
 export function createPlayerStats(gameStats: GameStatCollection) {
+    const maxLevel = new Statistic();
     const maxMana = new Statistic({ defaultValue: Infinity, computed: true });
     const minPhysicalDamage = new Statistic({ computed: true });
     const maxPhysicalDamage = new Statistic({ computed: true });
@@ -54,7 +54,8 @@ export function createPlayerStats(gameStats: GameStatCollection) {
     return {
         activity: new Statistic({ label: 'Activity', type: 'text', computed: true, hiddenBeforeMutation: true }),
         guildClass: new Statistic({ label: 'Player Class', type: 'text', computed: true, hiddenBeforeMutation: true }),
-        level: new Statistic({ label: 'Level', sticky: true, defaultValue: 1 }),
+        level: new Statistic({ sticky: true, label: 'Level', defaultValue: 1, statFormat: self => [self, '/', maxLevel] }),
+        maxLevel,
         dps: new Statistic({ label: 'DPS', sticky: true, computed: true, decimals: 1, hoverTip: 'Damage Per Second' }),
         totalHitCount: new Statistic({ accumulators: [gameStats.totalHitCount] }),
         hitChance: new Statistic({ label: 'Hit Chance', sticky: true, computed: true, multiplier: 100, suffix: '%' }),

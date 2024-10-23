@@ -6,10 +6,7 @@ export type ComponentName = keyof Components;
 export interface GameConfig {
     version: typeof GAME_CONFIG_VERSION;
     playerStartModList: PlayerStartModList;
-    enemyBaseLifeList: EnemyBaseLifeList;
-    enemyBaseCountList: EnemyBaseCountList;
-    enemyList: Enemy[];
-    trials: Trials;
+    worlds: Worlds;
     components?: {
         guildHall?: GuildHall;
         skills?: Skills;
@@ -21,8 +18,9 @@ export interface GameConfig {
 
 export interface Requirements {
     curLevel?: Level;
-    maxLevel?: Level;
-    trial?: Level;
+    // maxLevel?: Level;
+    /**@TJS-minimum 1 */
+    world?: UnsignedInteger;
 }
 
 export interface Enemy {
@@ -33,9 +31,16 @@ export interface Enemy {
     modList?: EnemyModList;
 }
 
-export interface Trials {
+export interface Worlds {
+    enemyBaseLifeList: EnemyBaseLifeList;
+    enemyBaseCountList: EnemyBaseCountList;
     /**@TJS-minItems 1 */
-    trialList: { id: Id; modList: TrialModList; }[];
+    worldList: {
+        id: Id;
+        modList: WorldModList;
+        /**@TJS-minItems 1 */
+        enemyList: Enemy[];
+    }[];
 }
 
 export interface Weapon {
@@ -46,7 +51,9 @@ export interface Weapon {
     weaponTypeList?: WeaponType[];
     modLists: WeaponMod[][];
     crafting: {
-        advReforgeRequirements?: Requirements;
+        advancedReforge: {
+            requirements: Requirements;
+        };
         craftList: WeaponCraft[];
     };
 }
@@ -177,7 +184,7 @@ export const SchemaOverrideSymbolNames = [
     'WeaponCraftDescription',
     'TreasuryUpgradeMod',
     'EnemyMod',
-    'TrialMod',
+    'WorldMod',
     'AchievementDescription',
     'EnemyBaseLife',
     'EnemyBaseCount'
@@ -293,7 +300,7 @@ type AchievementDescription = string;
 /**@$ref #/definitions/WeaponCraftDescription */
 type WeaponCraftDescription = string;
 
-/**@$ref #/definitions/TrialMod */
-type TrialMod = string;
-/**@items {"$ref": "#/definitions/TrialMod"} */
-type TrialModList = TrialMod[];
+/**@$ref #/definitions/WorldMod */
+type WorldMod = string;
+/**@items {"$ref": "#/definitions/WorldMod"} */
+type WorldModList = WorldMod[];

@@ -1,4 +1,4 @@
-import { combat, game, player, statistics } from '../../game/game';
+import { game, player, statistics } from '../../game/game';
 import type { PlayerActivityName } from '../../game/Player';
 import { EventEmitter } from '../utils/EventEmitter';
 import { CustomElement } from './CustomElement';
@@ -35,7 +35,6 @@ export class LevelElement extends CustomElement {
         this.updateProgressBar();
         if (this.maxExp === Infinity) {
             this.stopAction();
-            combat.startArea(null);
             statistics.updateStats('Player');
             this.upgradeButton!.style.visibility = 'hidden';
         }
@@ -44,7 +43,6 @@ export class LevelElement extends CustomElement {
     startAction() {
         this.active = true;
         game.tickSecondsEvent.listen(this.performAction);
-        combat.stopArea();
         player.setActivity(this.actionName!, true);
         this.upgradeButton?.classList.add('m-text-green');
         statistics.updateStats('Player');
@@ -97,7 +95,6 @@ export class LevelElement extends CustomElement {
         this.upgradeButton?.addEventListener('click', () => {
             if (this.active) {
                 this.stopAction();
-                combat.startArea(null);
                 statistics.updateStats('Player');
             } else {
                 this.startAction();

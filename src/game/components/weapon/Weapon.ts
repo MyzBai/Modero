@@ -48,7 +48,7 @@ export class Weapon extends Component {
             modGroupsList: this.modGroupsList,
             weaponTypes: this.data.weaponTypeList,
             candidateModList: this.candidateModList,
-            advReforgeRequirements: this.data.crafting.advReforgeRequirements,
+            advReforgeRequirements: this.data.crafting.advancedReforge.requirements,
             getMaxModCount: () => 6,
 
         });

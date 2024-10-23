@@ -1,4 +1,4 @@
-import { calcCombatAreaStats as calcCombatAreaStats } from '../calc/calcStats';
+import { calcCombatContextStats as calcCombatContextStats } from '../calc/calcStats';
 import { ModDB } from '../mods/ModDB';
 import { Modifier } from '../mods/Modifier';
 import { Enemy, type EnemyData } from './Enemy';
@@ -7,7 +7,7 @@ import { assertDefined } from 'src/shared/utils/assert';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import type * as GameSerialization from '../serialization';
 import { combat, player } from '../game';
-import { areaModTemplateList } from '../mods/areaModTemplates';
+import { combatCtxModTemplateList } from '../mods/combatCtxModTemplates';
 
 export interface EnemyCandidate {
     id: string;
@@ -17,45 +17,40 @@ export interface EnemyCandidate {
     modList?: string[];
 }
 
-export interface CombatAreaOptions {
+export interface CombatContextOptions {
     readonly name: string;
     readonly enemyBaseLife: number;
     readonly enemyBaseCount: number;
     readonly enemyCountOverride?: number;
     readonly candidates: EnemyCandidate[];
-    readonly areaModList?: string[];
-    readonly excludeGlobalAreaMods?: boolean;
-    readonly interruptable?: boolean;
+    readonly combatModList?: string[];
+    readonly interruptable: boolean;
 }
 
-export class CombatArea {
-    private static globalAreaModListMap: Map<string, Modifier[]> = new Map();
+export class CombatContext {
     readonly name: string;
     readonly modDB: ModDB;
-    readonly onComplete: EventEmitter<CombatArea>;
-    readonly localModList: Modifier[];
+    readonly onComplete: EventEmitter<CombatContext>;
+    readonly modList: Modifier[];
     private _modList: Modifier[] = [];
     private _completed = false;
     private _enemy: Enemy;
     private _enemyCount: number;
     private _maxEnemyCount: number;
-    constructor(readonly data: CombatAreaOptions) {
+    active = false;
+    constructor(private readonly data: CombatContextOptions) {
         this.name = data.name;
         this.modDB = new ModDB();
-        this.onComplete = new EventEmitter<CombatArea>();
+        this.onComplete = new EventEmitter<CombatContext>();
 
-        this.localModList = Modifier.modListFromTexts(data.areaModList ?? []);
+        this.modList = Modifier.modListFromTexts(data.combatModList ?? []);
 
-        this._enemyCount = 0;
+        this._enemyCount = 1;
         this._maxEnemyCount = 0;
 
         this._enemy = this.generateEnemy();
 
         this.updateModifiers();
-    }
-
-    get modList() {
-        return this._modList;
     }
 
     get completed() {
@@ -78,21 +73,22 @@ export class CombatArea {
         return Math.ceil(this._maxEnemyCount);
     }
 
+    get interruptable() {
+        return this.data.interruptable ?? false;
+    }
+
     private updateModifiers() {
-        const globalModifiers = [...CombatArea.globalAreaModListMap.values()].flatMap(x => x);
-        this._modList = [...this.localModList, ...globalModifiers];
-        const areaModList = this._modList.filter(x => areaModTemplateList.find(y => y === x.template && !y.target));
-        this.modDB.replace('Area', Modifier.extractStatModifierList(...areaModList));
-        const enemyModList = this._modList.filter(x => areaModTemplateList.find(y => y === x.template && y.target === 'Enemy'));
-        this.enemy.updateModifiers(enemyModList);
+        const combatModList = this._modList.filter(x => combatCtxModTemplateList.find(y => y === x.template && !y.target));
+        this.modDB.replace('Combat', Modifier.extractStatModifierList(...combatModList));
+        const enemyModList = this._modList.filter(x => combatCtxModTemplateList.find(y => y === x.template && y.target === 'Enemy'));
+        this.enemy.modDB.replace('Combat', Modifier.extractStatModifierList(...enemyModList));
+        const playerModList = this._modList.filter(x => combatCtxModTemplateList.find(y => y === x.template && y.target === 'Player'));
+        player.modDB.replace('Combat', Modifier.extractStatModifierList(...playerModList));
         this.calcStats();
-        if (combat.area === this) {
-            combat.startArea(this);
-        }
     }
 
     private calcStats() {
-        const { maxEnemyCount } = calcCombatAreaStats({ stats: { baseEnemyCount: this.data.enemyBaseCount }, modDB: this.modDB });
+        const { maxEnemyCount } = calcCombatContextStats({ stats: { baseEnemyCount: this.data.enemyBaseCount }, modDB: this.modDB });
         this._maxEnemyCount = this.data.enemyCountOverride ?? maxEnemyCount;
     }
 
@@ -136,16 +132,16 @@ export class CombatArea {
         this.updateModifiers();
     }
 
-    serialize(): GameSerialization.CombatArea {
+    serialize(): GameSerialization.CombatContext {
         return {
-            active: combat.area === this,
+            active: this.active,
             enemyId: this._enemy.enemyData.id,
             enemyCount: this.enemyCount,
             enemy: this._enemy?.serialize()
         };
     }
 
-    deserialize(save: DeepPartial<GameSerialization.CombatArea>) {
+    deserialize(save: DeepPartial<GameSerialization.CombatContext>) {
         this._enemyCount = Math.floor(Math.min(save.enemyCount || this._maxEnemyCount, this._maxEnemyCount));
         const enemyRef = this.data.candidates.find(x => x.id === save.enemyId);
         if (save.enemy && enemyRef) {
@@ -153,16 +149,7 @@ export class CombatArea {
             this._enemy.deserialize(save.enemy);
         }
         if (save.active) {
-            combat.startArea(this);
+            combat.startCombat(this);
         }
-    }
-
-    static addGlobalAreaModifiers(key: string, ...modList: Modifier[]) {
-        this.globalAreaModListMap.set(key, modList);
-        combat.area?.updateModifiers();
-    }
-
-    static clearGlobalAreaModList() {
-        this.globalAreaModListMap.clear();
     }
 }

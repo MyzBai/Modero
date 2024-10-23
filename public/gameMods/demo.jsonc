@@ -1,30 +1,5 @@
 {
     "version": "v0",
-    "enemyBaseLifeList": [ 50, 80, 100, 200, 500, 800, 1000, 1300, 2000 ],
-    "enemyBaseCountList": [ 30, 50, 70, 100, 150, 200, 300, 400, 600 ],
-    "enemyList": [
-        {
-            "id": "ef2fe4",
-            "name": "Enemy 1",
-            "level": 1,
-            "weight": 1000,
-            "modList": [ ]
-        },
-        {
-            "id": "059434",
-            "name": "Enemy 2",
-            "level": 2,
-            "weight": 70,
-            "modList": [ "+{50}% Evade Chance", "{50}% Reduced Life" ]
-        },
-        {
-            "id": "444c62",
-            "name": "Enemy 3",
-            "level": 2,
-            "weight": 50,
-            "modList": [ "{250}% Increased Life" ]
-        }
-    ],
     "playerStartModList": [
         // "Adds {1} To {3} Physical Damage",
         "+{1} Maximum Bleed Stack",
@@ -39,12 +14,72 @@
         "+{2} Maximum Mana Per {1} Intelligence"
         // "+{0.6}% Of Maximum Mana Regeneration"
     ],
-    "trials": {
-        "trialList": [
-            { "id": "eee1c2", "modList": [ ] },
-            { "id": "b0cfcb", "modList": [ "{50}% More Enemies", "{30}% More Enemy Life" ] },
-            { "id": "37d4dd", "modList": [ "{80}% More Enemies", "{50}% More Enemy Life" ] },
-            { "id": "c3f79c", "modList": [ "{150}% More Enemies", "{80}% More Enemy Life" ] }
+    "worlds": {
+        // "enemyBaseLifeList": [ 50, 80, 100, 200, 500, 800, 1000, 1300, 2000 ],
+        // "enemyBaseCountList": [ 30, 50, 70, 100, 150, 200, 300, 400, 600 ],
+        "enemyBaseLifeList": [ 10, 10, 10, 10, 10, 10, 10, 10, 10 ],
+        "enemyBaseCountList": [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        "worldList": [
+            {
+                "id": "eee1c2",
+                "enemyList": [
+                    {
+                        "id": "ef2fe4",
+                        "name": "Enemy 1",
+                        "level": 1,
+                        "weight": 1000,
+                        "modList": [ ]
+                    }
+                ],
+                "modList": [ ]
+            },
+            {
+                "id": "b0cfcb",
+                "enemyList": [
+                    {
+                        "id": "ef2fe4",
+                        "name": "Enemy 1",
+                        "level": 1,
+                        "weight": 1000,
+                        "modList": [ ]
+                    },
+                    {
+                        "id": "059434",
+                        "name": "Enemy 2",
+                        "level": 2,
+                        "weight": 100,
+                        "modList": [ "+{90}% Evade Chance", "{50}% Reduced Life" ]
+                    }
+                ],
+                "modList": [ "{50}% More Enemies", "{30}% More Enemy Life" ]
+            },
+            {
+                "id": "37d4dd",
+                "enemyList": [
+                    {
+                        "id": "ef2fe4",
+                        "name": "Enemy 1",
+                        "level": 1,
+                        "weight": 1000,
+                        "modList": [ ]
+                    },
+                    {
+                        "id": "086556",
+                        "name": "Enemy 2",
+                        "level": 2,
+                        "weight": 100,
+                        "modList": [ "+{90}% Evade Chance", "{50}% Reduced Life" ]
+                    },
+                    {
+                        "id": "112108",
+                        "name": "Enemy 3",
+                        "level": 2,
+                        "weight": 50,
+                        "modList": [ "{90}% Reduced Damage Taken", "{250}% Increased Life" ]
+                    }
+                ],
+                "modList": [ "{80}% More Enemies", "{50}% More Enemy Life" ]
+            }
         ]
     },
     "components": {
@@ -484,7 +519,11 @@
                 }
             ],
             "crafting": {
-                "advReforgeRequirements": { "trial": 2, "curLevel": 3 },
+                "advancedReforge": {
+                    "requirements": {
+                        "world": 2
+                    }
+                },
                 "craftList": [
                     { "desc": "Reforge item with new random modifiers", "probability": 5, "startCount": 3, "successRates": { "min": 100, "max": 100 } },
                     { "desc": "Add new modifier", "probability": 50, "successRates": { "min": 75, "max": 95 } },

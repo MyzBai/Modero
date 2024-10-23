@@ -1,6 +1,6 @@
 import type { Statistic, StatisticOptions } from './Statistic';
 import { isNumber, isString, toDecimals } from 'src/shared/utils/utils';
-import { game, gameLoopAnim, player } from '../game';
+import { game, gameLoopAnim } from '../game';
 import type * as GameSerialization from '../serialization';
 import { type StatCollection } from './stats';
 import { assertDefined } from 'src/shared/utils/assert';
@@ -29,13 +29,13 @@ export class Statistics {
 
     init() {
         gameLoopAnim.registerCallback(this.updateAll.bind(this), { delay: 1000 });
-        const statList = [game.stats.maxLevel, player.stats.level];
-        Object.entries(statList).forEach(([statName, stat]) => stat.addListener('change', () => {
-            const group = [...this.statisticsGroups].find(([_, group]) => group.statCollection[statName])?.[1];
-            if (group) {
-                this.updateGroup(group, { [statName]: stat });
-            }
-        }));
+        // const statList = [player.stats.maxLevel, player.stats.level];
+        // Object.entries(statList).forEach(([statName, stat]) => stat.addListener('change', () => {
+        //     const group = [...this.statisticsGroups].find(([_, group]) => group.statCollection[statName])?.[1];
+        //     if (group) {
+        //         this.updateGroup(group, { [statName]: stat });
+        //     }
+        // }));
     }
 
     updateAll() {

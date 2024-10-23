@@ -2,7 +2,6 @@ import '../extensions/arrayExtensions';
 import '../extensions/DOMExtensions';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import gameModRegistry from './gameConfig/gameModRegistry.json';
-import { World } from './combat/World';
 import { Combat } from './combat/Combat';
 import { Components } from './components/Components';
 import { Player } from './Player';
@@ -19,12 +18,12 @@ import { createCustomElement } from 'src/shared/customElements/customElements';
 import { initDevTools } from 'src/game/dev';
 import { loadGame, saveGame } from 'src/shared/utils/saveManager';
 import { Notifications } from './Notifications';
-import { Trials } from './trials/Trials';
+import { Worlds } from './worlds/Worlds';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { createModEntryInfoElement } from 'src/home/dom';
 
-export const mainMenuNames = ['combat', 'skills', 'weapon', 'treasury', 'guildHall', 'trials', 'achievements', 'statistics', 'notifications'] as const;
+export const mainMenuNames = ['combat', 'skills', 'weapon', 'treasury', 'guildHall', 'worlds', 'achievements', 'statistics', 'notifications'] as const;
 
 export const enum GameInitializationStage {
     None = 0,
@@ -137,11 +136,6 @@ export class Game {
         return this._initializationStage;
     }
 
-    get maxLevel() {
-        assertDefined(this._gameConfig);
-        return this._gameConfig.enemyBaseLifeList.length + 1;
-    }
-
     async init(gameConfig: GameConfig, gameConfigId: string, save?: UnsafeSerialization) {
 
         if (this._gameConfig) {
@@ -155,11 +149,13 @@ export class Game {
 
         this._initializationStage = GameInitializationStage.Init;
 
+        player.stats.maxLevel.set(gameConfig.worlds.enemyBaseLifeList.length + 1);
 
         //Init
         statistics.init();
         combat.init();
         player.init();
+        worlds.init();
         this.components.init();
 
         //UI
@@ -173,19 +169,16 @@ export class Game {
 
         this._initializationStage = GameInitializationStage.Setup;
 
-        trials.setup();
+        worlds.setup();
         //Setup
         player.setup();
-        world.setup();
+        worlds.setup();
         combat.effectHandler.setup();
         this.components.setup();
 
         this.saveGame();
 
         statistics.updateAll();
-
-        //Events
-        player.stats.level.addListener('change', ({ curValue }) => this.stats.maxLevel.set(Math.max(curValue, this.stats.maxLevel.value)));
 
         //Per second loop
         gameLoop.registerCallback(() => {
@@ -232,7 +225,7 @@ export class Game {
         gameLoop.reset();
         gameLoopAnim.reset();
         Object.values(this.stats).forEach(x => x.reset());
-        world.reset();
+        worlds.reset();
         combat.reset();
         player.reset();
         statistics.reset();
@@ -334,9 +327,10 @@ export class Game {
 
     serialize(save: Serialization) {
         save.game = { stats: serializeStats(this.stats) };
-        world.serialize(save);
+        worlds.serialize(save);
         statistics.serialize(save);
         player.serialize(save);
+        worlds.serialize(save);
         combat.effectHandler.serialize(save);
         notifications.serialize(save);
         this.components.serialize(save);
@@ -357,10 +351,10 @@ export class Game {
         deserializeStats(game.stats, save.game?.stats || {});
         statistics.deserialize(save);
         player.deserialize(save);
-
+        worlds.deserialize(save);
         this.components.deserialize(save);
 
-        world.deserialize(save);
+        worlds.deserialize(save);
 
         combat.effectHandler.deserialize(save);
         notifications.deserialize(save);
@@ -375,10 +369,10 @@ export const gameLoopAnim = new Loop('Animation');
 export const game = new Game();
 export const statistics = new Statistics();
 export const combat = new Combat();
-export const world = new World();
+// export const world = new World();
 export const player = new Player();
 export const notifications = new Notifications();
-export const trials = new Trials();
+export const worlds = new Worlds();
 
 export async function init(args: [...Parameters<typeof game['init']>]) {
     await game.init(args[0], args[1], args[2]);

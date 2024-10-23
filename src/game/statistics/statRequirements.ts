@@ -7,11 +7,11 @@ export function evaluateStatRequirements(requirement: Requirements | undefined, 
     if (requirement?.curLevel) {
         requirements.push({ stat: player.stats.level, value: requirement.curLevel });
     }
-    if (requirement?.maxLevel) {
-        requirements.push({ stat: game.stats.maxLevel, value: requirement.maxLevel });
-    }
-    if (requirement?.trial) {
-        requirements.push({ stat: game.stats.trial, value: requirement.trial });
+    // if (requirement?.maxLevel) {
+    //     requirements.push({ stat: game.stats.maxLevel, value: requirement.maxLevel });
+    // }
+    if (requirement?.world) {
+        requirements.push({ stat: game.stats.world, value: requirement.world });
     }
 
     let count = 0;

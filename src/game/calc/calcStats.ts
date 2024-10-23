@@ -1,4 +1,4 @@
-import { clamp, avg, isNumber, isDefined, hasAnyFlag } from 'src/shared/utils/utils';
+import { clamp, avg, isNumber, isDefined } from 'src/shared/utils/utils';
 import { calcBaseAttackDamage, calcAilmentBaseDamage } from './calcDamage';
 import { calcModBase, calcModFlag, calcModIncMore, calcModTotal, type Configuration, type EnemyConfiguration, type PlayerConfiguration } from './calcMod';
 import { ModifierFlags } from '../mods/types';
@@ -12,7 +12,7 @@ export interface PlayerOptions {
     flags?: PlayerUpdateStatsFlag;
     stats: Record<keyof PlayerStatCollection, number>;
     conditionFlags?: number;
-    modDB?: ModDB;
+    modDB: ModDB;
     enemy?: EnemyOptions;
 }
 export interface EnemyOptions {
@@ -20,7 +20,7 @@ export interface EnemyOptions {
     conditionFlags?: number;
     modDB?: ModDB;
 }
-export interface CombatAreaOptions {
+export interface CombatContextOptions {
     stats: Record<'baseEnemyCount', number>;
     modDB?: ModDB;
 }
@@ -48,31 +48,15 @@ export function applyStatValues<T extends StatCollection>(stats: T, values: Reco
     }
 }
 
-export function calcPlayerStats(player: PlayerOptions) {
-    player.flags = player.flags ?? 0;
+export function calcPlayerCombatStats(player: PlayerOptions) {
     const stats = player.stats;
     const config: PlayerConfiguration = {
-        flags: 0,
         source: {
             type: 'Player',
-            stats,
+            ...player,
             modDB: player.modDB,
-            conditionFlags: player.conditionFlags || 0,
         }
     };
-
-    if (hasAnyFlag(player.flags, PlayerUpdateStatsFlag.Combat)) {
-        calcPlayerCombatStats(player.stats, config, player.enemy);
-    }
-
-    if (hasAnyFlag(player.flags, PlayerUpdateStatsFlag.Persistent)) {
-        calcPlayerPersistantStats(player.stats, config);
-    }
-
-    return stats;
-}
-
-function calcPlayerCombatStats(stats: PlayerOptions['stats'], config: PlayerConfiguration, enemy?: EnemyOptions) {
     config.flags = config.flags ?? 0;
     //Attributes
     stats.strength = calcModTotal(['Attribute', 'Strength'], config);
@@ -87,8 +71,13 @@ function calcPlayerCombatStats(stats: PlayerOptions['stats'], config: PlayerConf
     config.flags &= ~ModifierFlags.Skill;
 
     //create target
-    if (enemy) {
-        config.target = { type: 'Enemy', stats: extractStats(enemy.stats || {} as StatCollection), conditionFlags: enemy.conditionFlags, modDB: enemy.modDB };
+    if (config.target) {
+        config.target = {
+            type: 'Enemy',
+            stats: extractStats((config.target.stats || {}) as StatCollection),
+            conditionFlags: config.target.conditionFlags,
+            modDB: config.target.modDB
+        };
     }
 
     config.flags = ModifierFlags.Attack;
@@ -164,21 +153,33 @@ function calcPlayerCombatStats(stats: PlayerOptions['stats'], config: PlayerConf
 
     stats.lingeringBurn = calcModFlag('LingeringBurn', config);
 
+    return stats;
 }
 
-function calcPlayerPersistantStats(stats: PlayerOptions['stats'], config: PlayerConfiguration) {
+export function calcPlayerPersistantStats(player: PlayerOptions) {
+    const stats = player.stats;
+    const config: PlayerConfiguration = {
+        source: {
+            type: 'Player',
+            ...player,
+            modDB: player.modDB,
+        }
+    };
+    config.flags = config.flags ?? 0;
     stats.maxAura = calcModBase('AuraSlot', config);
     stats.maxArtifacts = calcModBase('MaxArtifact', config);
     stats.insightCapacity = calcModBase('Insight', config);
+
+    return stats;
 }
 
-export function calcCombatAreaStats(area: CombatAreaOptions) {
+export function calcCombatContextStats(ctx: CombatContextOptions) {
     const config: Configuration = {
         flags: 0,
-        source: { modDB: area.modDB, stats: area.stats }
+        source: { modDB: ctx.modDB, stats: ctx.stats }
     };
 
-    const baseEnemyCount = area.stats.baseEnemyCount + calcModBase('EnemyCount', config);
+    const baseEnemyCount = ctx.stats.baseEnemyCount + calcModBase('EnemyCount', config);
     const maxEnemyCount = calcModIncMore('EnemyCount', baseEnemyCount, config);
 
     return { maxEnemyCount };

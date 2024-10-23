@@ -8,6 +8,7 @@ export interface Serialization {
     meta: Meta;
     game?: Game;
     player?: Player;
+    worlds?: Worlds;
     world?: World;
     statistics?: Statistics;
     effects?: Effects;
@@ -35,10 +36,14 @@ export interface Player {
 }
 
 export interface World {
-    area?: CombatArea;
+    combatCtx?: CombatContext;
 }
 
-export interface CombatArea {
+export interface Worlds {
+    combatCtx?: CombatContext;
+}
+
+export interface CombatContext {
     enemyCount: number;
     enemy?: EnemyInstance;
     enemyId?: string;
@@ -50,7 +55,7 @@ export interface Enemy {
 }
 
 export interface EnemyInstance {
-    lifeFraction: number;
+    lifeRatio: number;
     modList: Omit<SerializedModifier, 'text'>[];
 }
 
