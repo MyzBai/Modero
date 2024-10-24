@@ -45,7 +45,7 @@ export class TextInputDropdownElement extends CustomElement {
         const element = document.createElement('div');
         element.classList.add('s-dropdown-content');
         element.setAttribute('data-dropdown-content', '');
-        window.addEventListener('resize', this.updateDropdownContentElementPosition.bind(this));
+        // window.addEventListener('resize', this.updateDropdownContentElementPosition.bind(this));
         this.appendChild(element);
         return element;
     }
@@ -77,7 +77,7 @@ export class TextInputDropdownElement extends CustomElement {
             this.abortController = new AbortController();
             this.updateDropdownContentElementPosition();
             document.addEventListener('mousedown', this.closeDropdownContentElement, { signal: this.abortController.signal });
-            window.addEventListener('resize', this.updateDropdownContentElementPosition, { signal: this.abortController.signal });
+            // window.addEventListener('resize', this.updateDropdownContentElementPosition, { signal: this.abortController.signal });
         }
     }
 
