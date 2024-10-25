@@ -36,7 +36,7 @@ export class Worlds {
 
     get enemyBaseLife() {
         const enemyBaseLifeList = game.gameConfig.worlds.enemyBaseLifeList;
-        const index = clamp(0, enemyBaseLifeList.length - 1, player.level - 1);
+        const index = clamp(player.level - 1, 0, enemyBaseLifeList.length - 1);
         return enemyBaseLifeList[index]!;
     }
 
