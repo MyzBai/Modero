@@ -165,8 +165,9 @@ export class TextInputDropdownElement extends CustomElement {
     setDropdownList(items: string[]) {
         this.dropdownList = items;
         const value = items[0];
-        this.setInputText(value);
-        this.prevValue = value;
+        if (!this.input.value) {
+            this.setInputText(value);
+        }
     }
 
     setInputAnchor(position: typeof this.inputAnchor) {
