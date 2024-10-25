@@ -65,6 +65,10 @@ export class Worlds {
             if (curValue === player.stats.maxLevel.value) {
                 if (game.stats.world.value !== game.gameConfig.worlds.worldList.length) {
                     this.page.querySelectorStrict<HTMLElement>('[data-next-world-button]').style.visibility = 'visible';
+                    if (!this.combatCtx?.completed) {
+                        this.combatCtx = this.createCombatContext();
+                        combat.startCombat(this.combatCtx);
+                    }
                     return;
                 }
             }
