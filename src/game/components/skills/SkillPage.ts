@@ -71,12 +71,12 @@ export abstract class SkillPage {
         notifications.addNotification({
             title: `New ${skill.type} Skill Rank: ${nextSkill.name}`,
         });
-        if (skill.rankList.some(x => x.assigned)) {
-            this.assignSkill(nextSkill);
-        }
-        if (skill.rankList.some(x => x.selected)) {
-            this.selectSkillByName(nextSkill.name);
-        }
+        // if (skill.rankList.some(x => x.assigned)) {
+        //     this.assignSkill(nextSkill);
+        // }
+        // if (skill.rankList.some(x => x.selected)) {
+        //     this.selectSkillByName(nextSkill.name);
+        // }
     }
 
     protected abstract showSkill(skill: Skill): void;
