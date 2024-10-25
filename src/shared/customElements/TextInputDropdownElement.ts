@@ -19,9 +19,14 @@ export class TextInputDropdownElement extends CustomElement {
         this.input = document.createElement('input');
         this.input.setAttribute('spellcheck', 'false');
         this.input.setAttribute('type', 'text');
-        this.input.addEventListener('click', () => {
-            this.openContent();
-        });
+        this.input.addEventListener('mouseup', (e) => {
+            e.stopPropagation();
+            if (!this.isOpen) {
+                this.openContent();
+            } else {
+                this.closeDropdownContentElement();
+            }
+        }, { capture: true });
         this.input.addEventListener('input', () => {
             for (const child of this.dropdownContentElement.children) {
                 const include = child.textContent?.toLowerCase().includes(this.input.value.toLowerCase());
@@ -38,12 +43,16 @@ export class TextInputDropdownElement extends CustomElement {
     }
 
     get dropdownContentElement() {
-        return this.closest('[data-page-content]')?.querySelector<HTMLElement>('[data-dropdown-content]') ?? this.createDropdownContentElement();
+        return this.querySelector<HTMLElement>('[data-dropdown-content]') ?? this.createDropdownContentElement();
+    }
+
+    get isOpen() {
+        return !this.dropdownContentElement.classList.contains('hidden');
     }
 
     private createDropdownContentElement() {
         const element = document.createElement('div');
-        element.classList.add('s-dropdown-content');
+        element.classList.add('s-dropdown-content', 'hidden');
         element.setAttribute('data-dropdown-content', '');
         // window.addEventListener('resize', this.updateDropdownContentElementPosition.bind(this));
         this.appendChild(element);
@@ -63,7 +72,7 @@ export class TextInputDropdownElement extends CustomElement {
             li.classList.add('g-list-item');
             li.textContent = item;
 
-            li.addEventListener('mousedown', () => {
+            li.addEventListener('mouseup', () => {
                 this.input.value = li.textContent || '';
                 this.input.dispatchEvent(new Event('change', { bubbles: true }));
                 this.closeDropdownContentElement();
@@ -76,7 +85,11 @@ export class TextInputDropdownElement extends CustomElement {
         if (elements.length > 0) {
             this.abortController = new AbortController();
             this.updateDropdownContentElementPosition();
-            document.addEventListener('mousedown', this.closeDropdownContentElement, { signal: this.abortController.signal });
+            document.addEventListener('mouseup', e => {
+                if (e.currentTarget !== this) {
+                    this.closeDropdownContentElement();
+                }
+            }, { signal: this.abortController.signal });
             // window.addEventListener('resize', this.updateDropdownContentElementPosition, { signal: this.abortController.signal });
         }
     }
@@ -90,8 +103,7 @@ export class TextInputDropdownElement extends CustomElement {
                 e.stopPropagation();
             }
         }
-        this.dropdownContentElement.classList.add('hidden');
-
+        this.dropdownContentElement.remove();
         this.abortController?.abort();
 
         this.updateBackgroundState();
