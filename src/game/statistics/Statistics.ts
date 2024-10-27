@@ -29,13 +29,6 @@ export class Statistics {
 
     init() {
         gameLoopAnim.registerCallback(this.updateAll.bind(this), { delay: 1000 });
-        // const statList = [player.stats.maxLevel, player.stats.level];
-        // Object.entries(statList).forEach(([statName, stat]) => stat.addListener('change', () => {
-        //     const group = [...this.statisticsGroups].find(([_, group]) => group.statCollection[statName])?.[1];
-        //     if (group) {
-        //         this.updateGroup(group, { [statName]: stat });
-        //     }
-        // }));
     }
 
     updateAll() {
@@ -164,7 +157,8 @@ export class Statistics {
                 group.stickyGroup.content.querySelectorStrict(`[data-stat="${statName}"] [data-stat-value]`).textContent = statValueText;
             }
         }
-        group.stickyGroup.classList.toggle('hidden', Object.values(group.statCollection).every(x => !x.sticky));
+        group.stickyGroup.classList.toggle('hidden', Object.values(group.statCollection).every(x => !x.sticky || !x.visible));
+        group.pageGroup.classList.toggle('hidden', Object.values(group.statCollection).every(x => !x.visible));
     }
 
     private formatVariableText(statistic: Statistic) {

@@ -7,8 +7,8 @@ import { Components } from './components/Components';
 import { Player } from './Player';
 import { Statistics } from './statistics/Statistics';
 import type { Serialization, UnsafeSerialization } from './serialization';
-import { createGameStats, deserializeStats, serializeStats } from './statistics/stats';
-import { GAME_CONFIG_VERSION, type GameConfig } from './gameConfig/GameConfig';
+import { createGameStats, createResources, deserializeStats, serializeStats } from './statistics/stats';
+import { GAME_CONFIG_VERSION, type Config } from './gameConfig/GameConfig';
 import { Loop } from '../shared/utils/Loop';
 import { TabMenuElement } from 'src/shared/customElements/TabMenuElement';
 import { isNonNullable } from 'src/shared/utils/utils';
@@ -22,6 +22,8 @@ import { Worlds } from './worlds/Worlds';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { createModEntryInfoElement } from 'src/home/dom';
+import type GameConfig from './gameConfig/GameConfigExport';
+import type { Statistic } from './statistics/Statistic';
 
 export const mainMenuNames = ['combat', 'skills', 'weapon', 'treasury', 'guildHall', 'worlds', 'achievements', 'statistics', 'notifications'] as const;
 
@@ -38,9 +40,10 @@ export class Game {
     readonly page: HTMLElement;
     readonly components = new Components();
     readonly tickSecondsEvent = new EventEmitter<void>();
-    private _gameConfig: GameConfig | null = null;
+    private _gameConfig?: GameConfig.Config;
     private _gameConfigId?: string;
     readonly stats = createGameStats();
+    private _resources?: Record<string, Statistic>;
     private _initializationStage = GameInitializationStage.None;
     constructor() {
 
@@ -116,8 +119,7 @@ export class Game {
     }
 
     get gameConfig() {
-        assertDefined(this._gameConfig, 'gameConfig is not available');
-        return this._gameConfig;
+        return this._gameConfig!;
     }
 
     get hasGameConfig() {
@@ -136,7 +138,11 @@ export class Game {
         return this._initializationStage;
     }
 
-    async init(gameConfig: GameConfig, gameConfigId: string, save?: UnsafeSerialization) {
+    get resources() {
+        return this._resources!;
+    }
+
+    async init(gameConfig: Config, gameConfigId: string, save?: UnsafeSerialization) {
 
         if (this._gameConfig) {
             this.reset();
@@ -146,6 +152,11 @@ export class Game {
         this._gameConfig = gameConfig;
 
         statistics.createGroup('General', this.stats);
+
+        if (gameConfig.resources) {
+            this._resources = createResources(gameConfig.resources);
+            statistics.createGroup('Resources', this._resources);
+        }
 
         this._initializationStage = GameInitializationStage.Init;
 
@@ -326,7 +337,10 @@ export class Game {
     }
 
     serialize(save: Serialization) {
-        save.game = { stats: serializeStats(this.stats) };
+        save.game = {
+            stats: serializeStats(this.stats),
+            resources: serializeStats(this.resources)
+        };
         worlds.serialize(save);
         statistics.serialize(save);
         player.serialize(save);
@@ -349,6 +363,7 @@ export class Game {
         }
 
         deserializeStats(game.stats, save.game?.stats || {});
+        deserializeStats(game.resources, save.game?.resources || {});
         statistics.deserialize(save);
         player.deserialize(save);
         worlds.deserialize(save);

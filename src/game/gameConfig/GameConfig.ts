@@ -1,11 +1,12 @@
 export const GAME_CONFIG_VERSION = 'v0' as const;
 
-export type Components = Required<GameConfig>['components'];
+export type Components = Required<Config>['components'];
 export type ComponentName = keyof Components;
 
-export interface GameConfig {
+export interface Config {
     version: typeof GAME_CONFIG_VERSION;
     playerStartModList: PlayerStartModList;
+    resources?: Resource[];
     worlds: Worlds;
     components?: {
         guildHall?: GuildHall;
@@ -21,6 +22,13 @@ export interface Requirements {
     // maxLevel?: Level;
     /**@TJS-minimum 1 */
     world?: UnsignedInteger;
+}
+
+export interface Resource {
+    id: Id;
+    name: ResourceName;
+    sticky: boolean;
+    hiddenBeforeMutation: boolean;
 }
 
 export interface Enemy {
@@ -191,9 +199,6 @@ export const SchemaOverrideSymbolNames = [
 ] as const satisfies readonly string[];
 export type SchemaOverrideSymbolName = typeof SchemaOverrideSymbolNames[number];
 
-export const WeaponTypeNames = ['One Handed Sword', 'Two Handed Axe', 'Wand', 'Staff'] as const satisfies readonly Name[];
-export type WeaponTypeName = typeof WeaponTypeNames[number] extends undefined ? Name : typeof WeaponTypeNames[number];
-
 /**
  * @TJS-type integer
  * @TJS-minimum 0
@@ -304,3 +309,13 @@ type WeaponCraftDescription = string;
 type WorldMod = string;
 /**@items {"$ref": "#/definitions/WorldMod"} */
 type WorldModList = WorldMod[];
+
+
+export const ReferenceNames = ['Resource'] as const;
+
+//User Override
+export const WeaponTypeNames = ['One Handed Sword', 'Two Handed Axe', 'Wand', 'Staff'] as const satisfies readonly Name[];
+export type WeaponTypeName = typeof WeaponTypeNames[number] extends undefined ? Name : typeof WeaponTypeNames[number];
+
+export const ResourceNames = ['Gold', 'Silver', 'Copper'] as const satisfies readonly Name[];
+export type ResourceName = typeof ResourceNames[number] extends undefined ? Name : typeof ResourceNames[number];

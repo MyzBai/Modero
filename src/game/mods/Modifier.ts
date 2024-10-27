@@ -1,9 +1,9 @@
-import { assertType } from 'src/shared/utils/assert';
-import { type ModTemplate } from './types';
+import { type ModTemplate, type ModTemplateStat } from './types';
 import { modTemplateList } from './modTemplates';
-import { parseTextValues } from 'src/shared/utils/textParsing';
+import { parseTextReferences as parseTextReference, parseTextValues } from 'src/shared/utils/textParsing';
 import type { StatModifier } from './ModDB';
-import { isNumber, randomRangeInt, toDecimals } from 'src/shared/utils/utils';
+import { randomRangeInt, toDecimals } from 'src/shared/utils/utils';
+import { assertDefined } from '../../shared/utils/assert';
 
 export interface PopupOptions {
     title?: string;
@@ -33,14 +33,11 @@ export class Modifier {
     constructor(
         readonly text: string,
         readonly template: ModTemplate,
-        readonly rangeValues: ModValueRange[]) { }
+        readonly rangeValues: ModValueRange[],
+        readonly reference?: ModTemplateStat['reference']) { }
 
     get desc() {
-        return Modifier.parseDescription(this.template.desc, this.rangeValues.map(x => x.value));
-    }
-
-    get rawDesc() {
-        return this.text.replace(/\{([^}]+)\}/g, '($1)');
+        return Modifier.parseDescription(this);
     }
 
     get values() {
@@ -53,6 +50,9 @@ export class Modifier {
             const value = stat.valueType === 'Flag' ? { value: 1, min: 1, max: 1, decimals: 0 } : this.rangeValues[index];
             if (!value) {
                 continue;
+            }
+            if (this.reference) {
+                stat.reference = this.reference;
             }
             const newStat: StatModifier = { ...stat, ...value };
             for (const tag of newStat.extends || []) {
@@ -74,15 +74,22 @@ export class Modifier {
         return this.modFromText(text).desc;
     }
 
-    static parseDescription(desc: ModTemplate['desc'], values: number[]) {
+    static parseDescription(mod: Modifier) {
+        const regex = /(@\w+|#+)/g;
         let i = 0;
-        return desc.replace(/#+/g, (x) => {
-            let value = values[i++];
-            assertType(value, isNumber);
-            const decimals = x.length - 1;
-            value = toDecimals(value, decimals);
-            return value.toString() || '#';
-        });
+        const replacer: (_: string, $1: string) => string = (_, $1) => {
+            if ($1.startsWith('@')) {
+                assertDefined(mod.reference?.name, 'mod is missing a name in reference property');
+                return mod.reference.name;
+            } else if ($1.startsWith('#')) {
+                let value = mod.values[i++]!;
+                const decimals = $1.length - 1;
+                value = toDecimals(value, decimals);
+                return value.toString();
+            }
+            throw new Error('failed parsing mod description');
+        };
+        return mod.template.desc.replace(regex, replacer);
     }
 
     static modListFromTexts(texts: string[]) {
@@ -98,12 +105,13 @@ export class Modifier {
         }
         const values = parseTextValues(text);
         const ranges: ModValueRange[] = values.map((x, i) => ({ min: x.min, max: x.max, value: x.min, decimalCount: Math.max(0, (template.desc.match(/#+/g)?.[i]?.length || 0) - 1) }));
-        return new Modifier(text, template, ranges);
+        const references = parseTextReference(text);
+        return new Modifier(text, template, ranges, references);
     }
 
     static getTemplate(text: string) {
-        const desc = text.replace(/{[^}]+}/g, '#');
-        return modTemplateList.find(x => x.desc.replace(/#+/g, '#') === desc);
+        const desc = text.replace(/@(\w+){\w+}/, '@$1').replace(/{[^}]+}/g, '#');
+        return modTemplateList.find(x => x.desc.replace(/#+/g, '#').replace(/@\w+{}/, '') === desc);
     }
 
     sort(other: Modifier) {
@@ -126,14 +134,6 @@ export class Modifier {
         const copy = Modifier.modFromText(this.text);
         copy.setValues(this.values);
         return copy;
-    }
-
-    createHTMLElement(desc?: 'raw'): HTMLElement {
-        const li = document.createElement('li');
-        li.classList.add('g-mod-desc');
-        li.setAttribute('data-mod-desc', '');
-        li.textContent = desc === 'raw' ? this.rawDesc : this.desc;
-        return li;
     }
 
     setValues(values: number[]) {

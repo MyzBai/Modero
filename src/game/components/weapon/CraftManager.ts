@@ -3,7 +3,7 @@ import { ModifierTagList, type ModTemplate, type ModifierTag } from 'src/game/mo
 import { createModTags } from 'src/game/mods/utils';
 import { getRandomWeightedIndex, getRandomWeightedItem, remap } from 'src/shared/utils/utils';
 import { assertDefined } from 'src/shared/utils/assert';
-import type { Craft, CraftContext, ModGroupList, WeaponModifierCandidate } from './CraftTable';
+import type { Craft, CraftContext, ModGroupList } from './CraftTable';
 import { calcModTier, getModGroupList } from './utils';
 
 export interface ModifierCandidate {
@@ -21,13 +21,13 @@ export interface CraftSuccessRates {
 
 export class CraftManager {
 
-    reforge(candidateModList: WeaponModifierCandidate[], weights: number[]) {
+    reforge(candidateModList: ModifierCandidate[], weights: number[]) {
         const reforgeModCount = getRandomWeightedIndex(weights) + 1;
         const newModList = this.generateMods([], candidateModList, reforgeModCount);
         return newModList;
     }
 
-    addModifier(modList: Modifier[], candidateModList: WeaponModifierCandidate[]) {
+    addModifier(modList: Modifier[], candidateModList: ModifierCandidate[]) {
         const mod = this.generateMods(modList, candidateModList, 1)[0];
         assertDefined(mod, 'failed generating modifier');
         return mod;

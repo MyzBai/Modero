@@ -29,13 +29,3 @@ export function assertType<T>(value: T | null | undefined, func: (arg?: T | null
         throw new TypeError(msg);
     }
 }
-
-export function assertUniqueStringList(stringList: string[], msg?: string): asserts stringList is string[] {
-    const set = new Set();
-    for (const str of stringList) {
-        if (set.has(str)) {
-            throw new Error(`${msg}\nNon-unique string: ${str}`);
-        }
-        set.add(str);
-    }
-}

@@ -10,7 +10,13 @@
         "{1}% More Attack Damage Per {3} Strength",
         "{1}% More Attack Speed Per {7} Dexterity",
         "+{1}% Hit Chance Per {10} Dexterity",
-        "+{2} Maximum Mana Per {1} Intelligence"
+        "+{2} Maximum Mana Per {1} Intelligence",
+        "Adds {1} To {2} Elemental Damage"
+    ],
+    "resources": [
+        { "id": "b70657", "name": "Copper", "hiddenBeforeMutation": true, "sticky": true },
+        { "id": "5a0a61", "name": "Silver", "hiddenBeforeMutation": true, "sticky": true },
+        { "id": "60030f", "name": "Gold", "hiddenBeforeMutation": true, "sticky": true }
     ],
     "worlds": {
         "enemyBaseLifeList": [ 50, 80, 100, 200, 500, 800, 1000, 1300, 2000 ],
@@ -24,7 +30,11 @@
                         "name": "Enemy 1",
                         "level": 1,
                         "weight": 1000,
-                        "modList": [ ]
+                        "modList": [
+                            "{20}% Chance To Drop {1} @Resource{Gold} On Death",
+                            "{50}% Chance To Drop {1} @Resource{Silver} On Death",
+                            "{100}% Chance To Drop {1} @Resource{Copper} On Death"
+                        ]
                     }
                 ],
                 "modList": [ ]

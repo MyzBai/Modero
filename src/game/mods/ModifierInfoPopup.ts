@@ -19,12 +19,11 @@ export class ModifierInfoPopup {
         this.addTags(body, [...createModTags(mod.template.stats)]);
         this.addAdditionalProperties(body, additionalProperties);
 
-        this.addDesc(body, mod.rawDesc);
+        this.addDesc(body, mod);
         modal.setBodyElement(body);
     }
 
     private addTags(body: HTMLElement, tags: readonly ModifierTag[]) {
-
         body.insertAdjacentHTML('beforeend', `<div>Tags: ${tags.map(x => getFormattedTag(x)).join(', ')}</div>`);
     }
 
@@ -34,7 +33,8 @@ export class ModifierInfoPopup {
         }
     }
 
-    private addDesc(body: HTMLElement, desc: string) {
+    private addDesc(body: HTMLElement, mod: Modifier) {
+        const desc = mod.text.replace(/@\w+(\{([^\}])\})|\{([^\}])\}/g, '$1');
         body.insertAdjacentHTML('beforeend', `<div class="g-mod-desc" style="text-align: center; padding-top: 0.3em;">${desc}</div>`);
     }
 }

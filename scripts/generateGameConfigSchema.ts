@@ -1,15 +1,16 @@
 import 'src/extensions/arrayExtensions';
-import { worldModTemplateList } from '../src/game/mods/modTemplates';
+import { modTemplateList, worldModTemplateList } from '../src/game/mods/modTemplates';
 import { integerRangeRegex, numberRangeRegex, symbolsRegex } from '../src/shared/utils/textParsing';
 import { generateSchema, buildGenerator, type PartialArgs, type Definition, type JsonSchemaGenerator, getProgramFromFiles } from 'typescript-json-schema';
 import { writeFile } from 'fs/promises';
 import { assertNonNullable } from '../src/shared/utils/assert';
-import { SchemaOverrideSymbolNames, type SchemaOverrideSymbolName } from '../src/game/gameConfig/GameConfig';
+import { ReferenceNames, ResourceNames, SchemaOverrideSymbolNames, type SchemaOverrideSymbolName } from '../src/game/gameConfig/GameConfig';
 import { isDefined } from '../src/shared/utils/utils';
 import { taskTemplates } from '../src/game/tasks/taskTemplates';
 import { craftTemplates } from '../src/game/components/weapon/craftTemplates';
 import { generalPlayerModTemplateList, persistentPlayerModTemplateList, playerStartModTemplateList } from '../src/game/mods/playerModTemplates';
 import { enemyModTemplateList } from '../src/game/mods/enemyModTemplates';
+import { assertUniqueStringList } from './utils';
 
 interface SchemaOverride {
     oneOf?: { pattern: string; }[];
@@ -56,7 +57,7 @@ function createSchema() {
 
         createSchemaOverrideProperties(generator);
 
-        const schema = generateSchema(program, 'GameConfig', settings, [GAME_CONFIG_PATH], generator);
+        const schema = generateSchema(program, 'Config', settings, [GAME_CONFIG_PATH], generator);
         assertNonNullable(schema, 'generating schema failed');
         schema.definitions = {
             ...schema?.definitions,
@@ -72,6 +73,11 @@ function createSchema() {
 }
 
 function createSchemaOverrideProperties(generator: JsonSchemaGenerator) {
+
+    assertUniqueStringList(modTemplateList.map(x => x.id), 'modTemplates contains duplicate ids');
+    assertUniqueStringList(craftTemplates.map(x => x.id), 'weaponCrafTemplates contains duplicate ids');
+
+
     //strings which can be referenced throughout the config file
     createStringSchemaOverride(generator, { symbolName: 'PlayerMod', descriptions: generalPlayerModTemplateList.map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'PlayerStartMod', descriptions: playerStartModTemplateList.map(x => x.desc) });
@@ -95,10 +101,9 @@ function createSchemaOverrideProperties(generator: JsonSchemaGenerator) {
 function createStringSchemaOverride(generator: JsonSchemaGenerator, opts: StringSchemaOverrideOptions) {
     const createDefaultSnippet = (text: string) => {
         let count = 1;
-        text = text.replace(/\{#+\}/g, () => {
-            return `{\${${count++}:#}}`;
+        return text.replace(/\{([^\}])\}/g, (_, $1) => {
+            return `{\${${count++}:${$1}}}`;
         });
-        return text;
     };
 
     const definitions = createDefinitions(opts);
@@ -120,9 +125,10 @@ function createDefinitions(opts: StringSchemaOverrideOptions) {
     return opts.descriptions.map(x => createDefinition(x, opts));
 }
 
-function createDefinition(desc: string, opts: StringSchemaOverrideOptions) {
+function createDefinition(desc: string, _opts: StringSchemaOverrideOptions) {
     let pattern: string | undefined = replaceSymbol(desc);
-    pattern = replaceHash(pattern, opts.valueOptions);
+    pattern = replaceHash(pattern);
+    pattern = replaceReference(pattern, [['Resource', ResourceNames]]);
     pattern = removeGroupNames(pattern);
     pattern = insertQuestionMarkForPluralization(pattern);
 
@@ -131,7 +137,7 @@ function createDefinition(desc: string, opts: StringSchemaOverrideOptions) {
     } else {
         pattern = `^${pattern}$`;
     }
-    desc = desc.replace(/(#+)/g, '{#}').replace(/@(\w+)/g, '@{$1}');
+    desc = desc.replace(/(#+)/g, '{$1}').replace(new RegExp(`@(${ReferenceNames.join('|')})`), '@$1{#}');
     return { pattern: pattern ?? desc, desc };
 }
 
@@ -143,13 +149,20 @@ function replaceSymbol(text: string) {
     return text.replace(new RegExp(symbolsRegex, 'g'), symbolsRegex.source);
 }
 
-function replaceHash(text: string, opts?: ValueOptions) {
-    return text.replace(/(#+)/g, (a) => {
-        const pattern = a.length > 1 ? numberRangeRegex.source : integerRangeRegex.source;
-        if (!opts?.excludeBrackets) {
-            return `\\{${pattern}\\}`;
+function replaceHash(text: string, valueOpts?: ValueOptions) {
+    return text.replace(/(#+)/g, str => {
+        let pattern = str.length > 1 ? numberRangeRegex.source : integerRangeRegex.source;
+        if (valueOpts?.excludeBrackets) {
+            return pattern;
         }
-        return pattern;
+        return `\\{${pattern}\\}`;
+    });
+}
+
+function replaceReference(text: string, referenceTable: [typeof ReferenceNames[number], readonly string[]][]) {
+    return text.replace(new RegExp(`@(${ReferenceNames.join('|')})`), (_, $1) => {
+        const refList = referenceTable.findStrict(x => x[0] === $1)[1];
+        return `@${$1}\\{(${refList.join('|')})\\}`;
     });
 }
 

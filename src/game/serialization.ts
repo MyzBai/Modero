@@ -29,6 +29,7 @@ export interface Meta {
 
 export interface Game {
     stats: Record<keyof GameStatCollection, Statistic>;
+    resources: Record<string, Statistic>;
 }
 
 export interface Player {

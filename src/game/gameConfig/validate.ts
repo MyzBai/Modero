@@ -1,13 +1,13 @@
 import { type ErrorObject } from 'ajv';
-import { type GameConfig } from './GameConfig';
+import { type Config } from './GameConfig';
 import { ENVIRONMENT, resolveGamePathFromVersion } from 'src/config';
 
 type ErrorMessage = string;
 const removeComments = (str: string) => str.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '').trim();
 
-export async function validateGameConfig(gameConfigText: string): Promise<GameConfig | ErrorMessage> {
+export async function validateGameConfig(gameConfigText: string): Promise<Config | ErrorMessage> {
     gameConfigText = removeComments(gameConfigText);
-    const gameConfig = JSON.parse(gameConfigText) as DeepPartial<GameConfig>;
+    const gameConfig = JSON.parse(gameConfigText) as DeepPartial<Config>;
 
     let version: string = 'v0';
     if (Object.hasOwn(gameConfig, 'version') && typeof gameConfig.version === 'string') {
@@ -25,7 +25,7 @@ export async function validateGameConfig(gameConfigText: string): Promise<GameCo
         }
         return [...createErrorMessage(errors)].filter(x => x).join('\n');
     }
-    return gameConfig as GameConfig;
+    return gameConfig as Config;
 }
 
 function* createErrorMessage(errors: Partial<ErrorObject>[]): Generator<string> {

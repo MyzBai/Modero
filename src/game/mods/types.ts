@@ -1,5 +1,6 @@
 import type { DamageType } from '../calc/calcDamage';
 import type { AilmentType, EffectType } from '../effects/Effects';
+import type { ReferenceNames } from '../gameConfig/GameConfig';
 import type { PlayerStatCollection, StatCollection } from '../statistics/stats';
 
 
@@ -27,7 +28,9 @@ export type StatName =
     | 'Insight' | 'AuraSlot'
     | `${'Attack' | 'Aura' | 'Passive'}SkillExpMultiplier`
     | EnemyStatNames
-    | AreaStatNames;
+    | AreaStatNames
+    | 'ResourceChanceOnEnemyDeath' | 'ResourceAmountOnEnemyDeath'
+    ;
 
 export type DamageStatName =
     | 'Damage'
@@ -92,6 +95,7 @@ export interface ModTemplateStat {
     modFlagsAny?: number;
     modFlagsAll?: number;
     extends?: ReadonlyArray<StatModTag>;
+    reference?: { type: typeof ReferenceNames[number]; name?: string; };
 }
 export type ModTemplateTarget = 'Player' | 'Enemy';
 export interface ModTemplate {

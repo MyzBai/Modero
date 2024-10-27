@@ -1,12 +1,13 @@
-import { clamp, avg, isNumber, isDefined } from 'src/shared/utils/utils';
+import { clamp, avg, isNumber, isDefined, randomRange } from 'src/shared/utils/utils';
 import { calcBaseAttackDamage, calcAilmentBaseDamage } from './calcDamage';
 import { calcModBase, calcModFlag, calcModIncMore, calcModTotal, type Configuration, type EnemyConfiguration, type PlayerConfiguration } from './calcMod';
 import { ModifierFlags } from '../mods/types';
 import type { EnemyStatCollection, PlayerStatCollection, StatCollection } from '../statistics/stats';
-import type { Statistic } from '../statistics/Statistic';
+import { Statistic } from '../statistics/Statistic';
 import { compareValueTypes } from '../utils/utils';
 import type { ModDB } from '../mods/ModDB';
-import { PlayerUpdateStatsFlag } from '../Player';
+import type { PlayerUpdateStatsFlag } from '../Player';
+import type GameConfig from '../gameConfig/GameConfigExport';
 
 export interface PlayerOptions {
     flags?: PlayerUpdateStatsFlag;
@@ -199,4 +200,22 @@ export function calcEnemyStats(enemy: EnemyOptions) {
     stats.reducedDamageTakenMultiplier = calcModIncMore('DamageTaken', 1, config);
 
     applyStatValues(enemy.stats || {} as StatCollection, stats);
+}
+
+export function calcEnemyResourceDrop(enemy: EnemyOptions, resources: GameConfig.Resource[]) {
+    const stats = extractStats(enemy.stats || {} as StatCollection);
+
+    const out: Partial<Record<string, number>> = {};
+    for (const resource of resources) {
+        const config: EnemyConfiguration = {
+            source: { type: 'Enemy', conditionFlags: enemy.conditionFlags, modDB: enemy.modDB, stats },
+            reference: { type: 'Resource', name: resource.name },
+        };
+
+        const resourceChance = calcModTotal('ResourceChanceOnEnemyDeath', config);
+        if (resourceChance >= randomRange(0, 100)) {
+            out[resource.id] = calcModTotal('ResourceAmountOnEnemyDeath', config);
+        }
+    }
+    return out;
 }

@@ -3,6 +3,7 @@ import { assertDefined } from 'src/shared/utils/assert';
 import type * as GameSerialization from '../serialization';
 import { isDefined } from 'src/shared/utils/utils';
 import { compareValueTypes } from '../utils/utils';
+import GameConfig from '../gameConfig/GameConfigExport';
 
 export type StatCollection = Readonly<Record<string, Statistic>>;
 export type GameStatCollection = ReturnType<typeof createGameStats>;
@@ -35,6 +36,19 @@ export function createGameStats(parent?: StatCollection) {
         });
     }
     return statList;
+}
+
+export function createResources(resources: GameConfig.Resource[]) {
+    const resourceStats: Statistic[] = [];
+    for (const resource of resources) {
+        const stat = new Statistic({ label: resource.name, sticky: resource.sticky, hiddenBeforeMutation: resource.hiddenBeforeMutation });
+        resourceStats.push(stat);
+    }
+    return resourceStats.reduce((a, c) => {
+        const key = resources.findStrict(x => x.name === c.options.label).id;
+        a[key] = c;
+        return a;
+    }, {} as Record<string, Statistic>);
 }
 
 export function createCombatStats() {

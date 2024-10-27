@@ -1,4 +1,3 @@
-import { assertUniqueStringList } from 'src/shared/utils/assert';
 import { type ModTemplate } from './types';
 import { combatCtxModTemplateList } from './combatCtxModTemplates';
 import { persistentPlayerModTemplateList, playerModTemplateList } from './playerModTemplates';
@@ -17,5 +16,3 @@ export const modTemplateList = [
     ...enemyModTemplateList,
     ...combatCtxModTemplateList,
 ];
-
-assertUniqueStringList(modTemplateList.map(x => x.id), 'modTemplates contains non-unique ids');

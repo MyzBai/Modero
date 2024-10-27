@@ -25,6 +25,7 @@ export interface Configuration {
     source?: Source;
     target?: Source;
     flags?: ModifierFlags;
+    reference?: { type: string; name: string; };
 }
 
 export interface OffenceConfiguration extends Omit<Configuration, 'source' | 'target'> {
@@ -79,9 +80,6 @@ export function calcModSum(valueType: StatModifierValueType, names: StatName | S
     }
 
     for (const mod of modList) {
-        if (!evalMod(mod, config)) {
-            continue;
-        }
         const value = evalMod(mod, config);
         switch (valueType) {
             case 'More': result *= 1 + (value / 100); break;
@@ -97,6 +95,17 @@ function evalMod(mod: StatModifier, config: Configuration) {
     }
     if (!hasAnyFlag(config.flags || 0, mod.modFlagsAny || 0)) {
         return 0;
+    }
+    if (mod.reference) {
+        if (!config.reference) {
+            return 0;
+        }
+        if (mod.reference.type !== config.reference.type) {
+            return 0;
+        }
+        if (mod.reference.name && mod.reference.name !== config.reference.name) {
+            return 0;
+        }
     }
     const conditionsPassed = evalConditions(mod.extends?.filter(isConditionTag) || [], config);
     if (!conditionsPassed) {

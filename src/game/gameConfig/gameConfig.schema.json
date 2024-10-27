@@ -11,6 +11,12 @@
       },
       "type": "array"
     },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Resource"
+      }
+    },
     "worlds": {
       "$ref": "#/definitions/Worlds"
     },
@@ -43,6 +49,47 @@
     "worlds"
   ],
   "definitions": {
+    "Resource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "name": {
+          "$ref": "#/definitions/ResourceName"
+        },
+        "sticky": {
+          "type": "boolean"
+        },
+        "hiddenBeforeMutation": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "hiddenBeforeMutation",
+        "id",
+        "name",
+        "sticky"
+      ]
+    },
+    "Id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{6}$",
+      "defaultSnippets": [
+        {
+          "body": "${RANDOM_HEX}"
+        }
+      ]
+    },
+    "ResourceName": {
+      "enum": [
+        "Copper",
+        "Gold",
+        "Silver"
+      ],
+      "type": "string"
+    },
     "Worlds": {
       "type": "object",
       "properties": {
@@ -97,15 +144,6 @@
         "enemyBaseCountList",
         "enemyBaseLifeList",
         "worldList"
-      ]
-    },
-    "Id": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{6}$",
-      "defaultSnippets": [
-        {
-          "body": "${RANDOM_HEX}"
-        }
       ]
     },
     "Enemy": {
@@ -702,13 +740,13 @@
           "body": "+{${1:#}} Maximum Mana"
         },
         {
-          "body": "+{${1:#}} Mana Regeneration"
+          "body": "+{##} Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Mana Regeneration"
         },
         {
-          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+          "body": "+{##}% Of Maximum Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Aura Duration"
@@ -1320,10 +1358,10 @@
           "body": "+{${1:#}} Maximum Mana"
         },
         {
-          "body": "+{${1:#}} Mana Regeneration"
+          "body": "+{##} Mana Regeneration"
         },
         {
-          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+          "body": "+{##}% Of Maximum Mana Regeneration"
         }
       ],
       "oneOf": [
@@ -1442,13 +1480,13 @@
           "body": "+{${1:#}} Maximum Mana"
         },
         {
-          "body": "+{${1:#}} Mana Regeneration"
+          "body": "+{##} Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Mana Regeneration"
         },
         {
-          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+          "body": "+{##}% Of Maximum Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Aura Duration"
@@ -1828,13 +1866,13 @@
           "body": "+{${1:#}} Maximum Mana"
         },
         {
-          "body": "+{${1:#}} Mana Regeneration"
+          "body": "+{##} Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Mana Regeneration"
         },
         {
-          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+          "body": "+{##}% Of Maximum Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Aura Duration"
@@ -2214,13 +2252,13 @@
           "body": "+{${1:#}} Maximum Mana"
         },
         {
-          "body": "+{${1:#}} Mana Regeneration"
+          "body": "+{##} Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Mana Regeneration"
         },
         {
-          "body": "+{${1:#}}% Of Maximum Mana Regeneration"
+          "body": "+{##}% Of Maximum Mana Regeneration"
         },
         {
           "body": "{${1:#}}% Increased Aura Duration"
@@ -2559,6 +2597,9 @@
         },
         {
           "body": "{${1:#}}% Reduced Life"
+        },
+        {
+          "body": "{${1:#}}% Chance To Drop {${2:#}} @Resource{${3:#}} On Death"
         }
       ],
       "oneOf": [
@@ -2573,6 +2614,9 @@
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Life$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Drop \\{(([0-9]+)([-]([0-9]+))?)\\} @Resource\\{(Gold|Silver|Copper)\\} On Death$"
         }
       ]
     },
@@ -2597,6 +2641,9 @@
         },
         {
           "body": "{${1:#}}% More Enemies"
+        },
+        {
+          "body": "Enemies Drop {${1:#}}% More Resources On Death"
         }
       ],
       "oneOf": [
@@ -2617,6 +2664,9 @@
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Enemies$"
+        },
+        {
+          "pattern": "^Enemies Drop \\{(([0-9]+)([-]([0-9]+))?)\\}% More Resources On Death$"
         }
       ]
     },

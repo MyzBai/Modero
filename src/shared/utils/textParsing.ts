@@ -1,3 +1,4 @@
+import { ReferenceNames } from '../../game/gameConfig/GameConfig';
 import { assertDefined } from './assert';
 import { ROMAN_NUMERALS } from './constants';
 
@@ -6,10 +7,11 @@ export const integerRangeRegex = /((?<min>[0-9]+)([-](?<max>[0-9]+))?)/;
 export const numberRegex = /([0-9]+(\.[0-9]+)?)/;
 export const integerRegex = /([0]|[1-9][0-9]+)/;
 export const symbolsRegex = /([-+])/;
-export const referenceRegex = /(@\{(?<name>\w+)\})/;
+export const referenceRegex = new RegExp(`@(?<type>${ReferenceNames.join('|')}){(?<name>\\w+)}`);
 export const costRegex = new RegExp(`(?<value>${integerRegex.source}) (?<name>\\w+)`);
 export const rankNumeralsRegex = new RegExp(`\\b(?<rank>${ROMAN_NUMERALS.join('|')})$`);
 export const strToPascal = (str: string) => str[0]?.toLowerCase() + str.replace(/(\w)(\w*)/g, (_, g1: string, g2: string) => `${g1.toUpperCase()}${g2.toLowerCase()}`).replaceAll(' ', '').substring(1);
+export const strToCamel = (str: string) => str.toLowerCase().split(' ').map((v, i) => i === 0 ? v : v[0]?.toUpperCase() + v.substring(1)).join('');
 export const strToKebab = (str: string) => str.split(' ').join('-').toLowerCase();
 export const camelToKebab = (str: string) => str.replace(/(?=[A-Z])/g, '-').toLowerCase();
 
@@ -31,6 +33,16 @@ export function parseTextValues(text: string) {
         });
     }
     return values;
+}
+
+export function parseTextReferences(text: string) {
+    const match = text.match(referenceRegex);
+    if (!match || !match.groups) {
+        return;
+    }
+    const type = match.groups['type']! as typeof ReferenceNames[number];
+    const name = match.groups['name']!;
+    return { type, name };
 }
 
 export function pluralizeWords(text: string) {

@@ -11,6 +11,7 @@ import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { Modifier } from '../mods/Modifier';
 import { playerModTemplateList } from '../mods/playerModTemplates';
 import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
+import { calcEnemyResourceDrop } from '../calc/calcStats';
 
 interface CombatEventData {
     ctx: CombatContext;
@@ -75,6 +76,14 @@ export class Combat {
 
     private processEnemyDeath() {
         assertDefined(this._ctx);
+
+        if (game.gameConfig.resources) {
+            const resources = calcEnemyResourceDrop(this._ctx.enemy, game.gameConfig.resources);
+            for (const [id, value] of Object.entries(resources)) {
+                game.resources[id]?.add(value ?? 0);
+                statistics.updateStats('Resources');
+            }
+        }
 
         const removeBurn = player.stats.lingeringBurn.value === 0;
         const effectTypesToRemove = [...effectTypes];
