@@ -1,12 +1,11 @@
 import { Component } from 'src/game/components/Component';
-import { combat, player } from 'src/game/game';
+import { player } from 'src/game/game';
 import { Modifier } from '../../mods/Modifier';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { modTemplateList } from 'src/game/mods/modTemplates';
 import { CraftTable, type ModGroupList, type WeaponModifierCandidate } from './CraftTable';
-import { craftTemplates, type CraftTemplateDescription } from './craftTemplates';
-import { isDefined, isNumber, isString, pickManyFromPickProbability } from 'src/shared/utils/utils';
+import { isDefined, isNumber, isString } from 'src/shared/utils/utils';
 import { createHelpIcon } from 'src/shared/utils/dom';
 import { LevelElement } from '../../../shared/customElements/LevelElement';
 import { createCustomElement } from '../../../shared/customElements/customElements';
@@ -44,6 +43,7 @@ export class Weapon extends Component {
 
         this.craftTable = new CraftTable({
             element: this.page.querySelectorStrict('[data-weapon]'),
+            data: data.crafting.craftList,
             modList: this.modList,
             modGroupsList: this.modGroupsList,
             weaponTypes: this.data.weaponTypeList,
@@ -53,15 +53,6 @@ export class Weapon extends Component {
 
         });
         this.page.appendChild(this.craftTable.element);
-
-        for (const craftData of data.crafting.craftList) {
-            const template = craftTemplates.find(x => x.desc === craftData.desc);
-            if (!template) {
-                console.error(`invalid craft desc: ${craftData.desc}`);
-                continue;
-            }
-            this.craftTable.addCraft(template, craftData.successRates, craftData.startCount ?? 0);
-        }
 
         for (const modList of data.modLists) {
             const groupList: ModGroupList = [];
@@ -75,15 +66,8 @@ export class Weapon extends Component {
             }
         }
 
-        this.craftTable.updateCraftList();
-
         this.craftTable.craftConfirmed.listen(() => {
             this.applyModifiers();
-        });
-
-        combat.events.enemyDeath.listen(() => {
-            const candidates = this.data.crafting.craftList;
-            pickManyFromPickProbability(candidates).forEach(x => this.craftTable.addCraftCount(x.desc as CraftTemplateDescription, 1));
         });
     }
 

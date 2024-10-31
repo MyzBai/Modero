@@ -1,9 +1,9 @@
 import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';
-import { type CraftTemplate, type CraftTemplateDescription } from './craftTemplates';
+import { craftTemplates, devCraftTemplates, type CraftTemplate, type CraftTemplateDescription } from './craftTemplates';
 import { Modifier } from 'src/game/mods/Modifier';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
-import { clamp, isDefined, isNumber, randomRangeInt } from 'src/shared/utils/utils';
+import { isDefined, isNumber, randomRangeInt } from 'src/shared/utils/utils';
 import { CraftManager, type ModifierCandidate } from './CraftManager';
 import { calcModTier, generateModListElements, getModGroupList } from './utils';
 import type { Serialization, WeaponCrafting } from 'src/game/serialization';
@@ -12,18 +12,20 @@ import { evaluateStatRequirements } from 'src/game/statistics/statRequirements';
 import { TextInputDropdownElement } from 'src/shared/customElements/TextInputDropdownElement';
 import { createHelpIcon } from 'src/shared/utils/dom';
 import type { Requirements } from 'src/game/gameConfig/GameConfig';
-import { player } from '../../game';
+import { game, GameInitializationStage, player } from '../../game';
 import { ModDB } from '../../mods/ModDB';
 import { calcPlayerCombatStats, extractStats } from '../../calc/calcStats';
 import { Weapon } from './Weapon';
 import { ENVIRONMENT } from '../../../config';
+import type GameConfig from '../../gameConfig/GameConfigExport';
+import { evalCost, subtractCost } from '../../utils/utils';
 
 export interface Craft {
     template: CraftTemplate;
     desc: CraftTemplateDescription;
     element: HTMLElement;
-    count: number;
     successRates: { min: number; max: number; };
+    cost?: GameConfig.Cost;
 }
 
 interface AdvancedReforge {
@@ -31,8 +33,9 @@ interface AdvancedReforge {
     modItems: { text: string; tier: number; }[];
 }
 
-type ContextCopy = Pick<CraftContext, 'modList' | 'weaponType'>;
+type CraftContextCopy = Pick<CraftContext, 'modList' | 'weaponType'>;
 export interface CraftContext {
+    data: GameConfig.WeaponCraft[];
     readonly weaponTypes?: { id: string; name: string; }[];
     weaponType?: Required<CraftContext>['weaponTypes'][number];
     modList: Modifier[];
@@ -59,8 +62,8 @@ export class CraftTable {
     private readonly craftListElement: HTMLElement;
     private craftList: Craft[] = [];
     private selectedCraft: Craft | null = null;
-    private ctxCopy: ContextCopy | null = null;
-    private abortController?: AbortController;
+    private ctxCopy: CraftContextCopy | null = null;
+    private abortController?: AbortController | null = null;
     private advReforge?: AdvancedReforge;
 
     constructor(private readonly ctx: CraftContext) {
@@ -72,14 +75,32 @@ export class CraftTable {
         this.craftListElement = document.createElement('ul');
         this.craftListElement.classList.add('s-craft-list', 'g-scroll-list-v');
         this.craftListElement.setAttribute('data-craft-list', '');
+        this.craftListElement.insertAdjacentHTML('beforeend', '<li><div>Description</div><div data-cost>Cost</div><div data-resource>Resource</div></li>');
         this.element.appendChild(this.craftListElement);
 
         this.craftManager = new CraftManager();
         this.stopCrafting();
 
         if (ENVIRONMENT === 'development') {
-            this.addCraft({ id: 'c71a6a', desc: '[Dev] Reforge High DPS' }, { min: 100, max: 100 }, Infinity);
+            this.addCraft({ desc: '[Dev] Reforge High DPS', successRates: { min: 100, max: 100 } });
         }
+        for (const craftData of ctx.data) {
+            this.addCraft(craftData);
+        }
+
+        this.updateCraftListItemStates();
+
+        Object.values(game.resources).forEach(x => x.addListener('change', () => {
+            if (game.initializationStage >= GameInitializationStage.Done) {
+                this.updateCraftListItemStates();
+            }
+        }));
+
+        new IntersectionObserver((entries) => {
+            if (entries[0]?.isIntersecting) {
+                this.updateCraftList();
+            }
+        }).observe(this.craftListElement);
     }
 
     private createToolbar() {
@@ -105,6 +126,8 @@ export class CraftTable {
 
         toolbarElement.append(compareButton, confirmButton, cancelButton);
 
+        this.element.appendChild(toolbarElement);
+
         evaluateStatRequirements(this.ctx.advReforgeRequirements, () => {
             const advReforgeElement = document.createElement('button');
             advReforgeElement.classList.add('advanced');
@@ -116,11 +139,6 @@ export class CraftTable {
             toolbarElement.appendChild(advReforgeElement);
         });
 
-        this.element.appendChild(toolbarElement);
-    }
-
-    private createContextCopy() {
-        this.ctxCopy = { modList: [...this.ctx.modList], weaponType: this.ctx.weaponType };
     }
 
     private updateCraftItemWeaponTypeElement() {
@@ -146,36 +164,27 @@ export class CraftTable {
     private updateCraftListItemStates() {
         for (const craft of this.craftList) {
             craft.element.classList.toggle('selected', craft === this.selectedCraft);
-            if (craft.count === 0) {
-                craft.element.toggleAttribute('disabled', true);
-                continue;
-            }
-            if (craft.count === Infinity) {
-                craft.element.toggleAttribute('disabled', false);
-                continue;
-            }
+            let ctx = this.ctxCopy || this.ctx;
+            let disabled = true;
 
-            if (craft.template.desc as CraftTemplateDescription === 'Reforge item with new random modifiers') {
-                craft.element.removeAttribute('disabled');
-            } else {
-                craft.element.toggleAttribute('disabled', !this.ctxCopy);
-            }
-            if (!this.ctxCopy) {
-                continue;
-            }
-            switch (craft.template.desc as CraftTemplateDescription) {
-                case 'Reforge item with new random modifiers':
-                    craft.element.toggleAttribute('disabled', false);
+            switch (craft.template.type) {
+                case 'Reforge':
+                    disabled = false;
                     break;
-                case 'Add new modifier':
-                    craft.element.toggleAttribute('disabled', this.ctxCopy.modList.length >= this.ctx.getMaxModCount() || this.craftManager.generateMods(this.ctxCopy.modList, this.ctx.candidateModList, 1).length === 0);
+                case 'Add':
+                    disabled = !this.ctxCopy && (ctx.modList.length >= this.ctx.getMaxModCount() || this.craftManager.generateMods(ctx.modList, this.ctx.candidateModList, 1).length === 0);
                     break;
-                case 'Remove modifier':
-                case 'Upgrade modifier':
-                case 'Randomize numerical values':
-                    craft.element.toggleAttribute('disabled', this.ctxCopy.modList.length === 0);
+                case 'Remove':
+                case 'Upgrade':
+                case 'Randomize Numericals':
+                    disabled = !this.ctxCopy && ctx.modList.length === 0;
                     break;
+
             }
+            if (craft.cost && !evalCost(craft.cost, game.gameConfig.resources ?? [], game.resources)) {
+                disabled = true;
+            }
+            craft.element.toggleAttribute('disabled', disabled);
         }
     }
 
@@ -209,8 +218,6 @@ export class CraftTable {
     private selectCraftById(id: string | null) {
         this.selectedCraft = this.craftList.find(x => x.template.id === id) ?? null;
 
-        this.updateCraftListItemStates();
-
         const modListElement = this.ctx.element.querySelectorStrict<HTMLElement>('[data-mod-list]');
         modListElement.toggleAttribute('data-craft-area', !!this.selectedCraft);
 
@@ -227,18 +234,17 @@ export class CraftTable {
 
         this.abortController = new AbortController();
 
-        const desc = this.selectedCraft.template.desc as CraftTemplateDescription;
-        if (desc === '[Dev] Reforge High DPS') {
-            modListElement.setAttribute('data-craft', '');
+        switch (this.selectedCraft.template.target) {
+            case 'All':
+                modListElement.setAttribute('data-craft', '');
+                break;
+            case 'Single':
+                this.ctx.element.querySelectorAll<HTMLElement>('[data-mod]').forEach(x => x.setAttribute('data-craft', ''));
+                break;
         }
-        if (desc === 'Reforge item with new random modifiers' || desc === 'Add new modifier') {
-            modListElement.setAttribute('data-craft', '');
-        }
-        if (desc === 'Remove modifier' || desc === 'Randomize numerical values') {
-            this.ctx.element.querySelectorAll<HTMLElement>('[data-mod]').forEach(x => x.setAttribute('data-craft', ''));
-        }
-        if (desc === 'Upgrade modifier') {
-            assertDefined(this.ctxCopy);
+
+        if (this.selectedCraft.template.type === 'Upgrade') {
+            assertNonNullable(this.ctxCopy);
             const modElementList = [...this.ctx.element.querySelectorAll<HTMLElement>('[data-mod]')];
             for (const modElement of modElementList) {
                 const id = modElement.getAttribute('data-mod');
@@ -248,8 +254,8 @@ export class CraftTable {
                 modElement.setAttribute('data-craft', String(craftable));
             }
         }
-        if (desc === 'Randomize numerical values') {
-            assertDefined(this.ctxCopy);
+        if (this.selectedCraft.template.type === 'Randomize Numericals') {
+            assertNonNullable(this.ctxCopy);
             const modElementList = [...this.ctx.element.querySelectorAll<HTMLElement>('[data-mod]')];
             for (const modElement of modElementList) {
                 const id = modElement.getAttribute('data-mod');
@@ -259,18 +265,27 @@ export class CraftTable {
             }
         }
         this.ctx.element.querySelectorAll<HTMLElement>('[data-craft]').forEach(x => {
-            assertDefined(this.abortController);
+            assertNonNullable(this.abortController);
             x.addEventListener('mouseover', this.updateSuccessRateAttribute.bind(this), { signal: this.abortController.signal });
             x.addEventListener('click', this.performCraft.bind(this), { capture: true, signal: this.abortController.signal });
         });
         this.createBackdrop();
     }
 
+    private beginCrafting() {
+        if (this.ctxCopy) {
+            return;
+        }
+        this.ctxCopy = { modList: [...this.ctx.modList], weaponType: this.ctx.weaponType };
+        this.element.querySelectorStrict('[data-compare-button]').removeAttribute('disabled');
+        this.element.querySelectorStrict('[data-confirm-button]').removeAttribute('disabled');
+        this.element.querySelectorStrict('[data-cancel-button]').removeAttribute('disabled');
+    }
+
     private performCraft(e: MouseEvent) {
         e.stopPropagation();
         assertDefined(this.selectedCraft, 'no craft selected');
 
-        this.updateCraftCount();
 
         const modId = e.target instanceof HTMLElement ? e.target.getAttribute('data-mod') : undefined;
         const mod = modId ? this.ctxCopy?.modList.findStrict(x => x.template.id === modId) : undefined;
@@ -281,60 +296,41 @@ export class CraftTable {
             return;
         }
 
-        const desc = this.selectedCraft.template.desc as CraftTemplateDescription;
-        if (desc === '[Dev] Reforge High DPS') {
-            this.beginCrafting();
-            this.performReforgeDevCraft();
-        } else if (desc === 'Reforge item with new random modifiers') {
-            this.beginCrafting();
-            this.performReforgeCraft();
-        } else {
-            this.selectedCraft.count--;
-            if (desc === 'Add new modifier') {
-                assertNonNullable(this.ctxCopy);
-                const mod = this.craftManager.addModifier(this.ctxCopy.modList, this.ctx.candidateModList);
-                this.ctxCopy.modList.push(mod);
-            } else if (desc === 'Remove modifier') {
-                assertNonNullable(this.ctxCopy);
-                assertNonNullable(mod);
-                this.ctxCopy?.modList.remove(mod);
-            } else if (desc === 'Upgrade modifier') {
-                assertNonNullable(this.ctxCopy);
-                assertNonNullable(mod);
-                const index = this.ctxCopy.modList.indexOf(mod);
-                const newMod = this.craftManager.upgradeModifier(mod, this.ctx.modGroupsList);
-                this.ctxCopy.modList[index] = newMod;
-            } else if (desc === 'Randomize numerical values') {
-                assertNonNullable(mod);
-                mod.randomizeValues();
-            }
+        const template = this.selectedCraft.template;
+        const desc = template.desc as CraftTemplateDescription;
+
+        this.beginCrafting();
+        assertNonNullable(this.ctxCopy, 'no craft context copy exists');
+
+        if (desc as CraftTemplateDescription === '[Dev] Reforge High DPS') {
+            this.performReforgeDevCraft(this.ctxCopy);
+        } else if (template.type === 'Reforge') {
+            this.performReforgeCraft(this.ctxCopy);
+        } else if (template.type === 'Add') {
+            this.performAddModCraft(this.ctxCopy);
+        } else if (template.type === 'Remove') {
+            assertDefined(mod);
+            this.performRemoveModCraft(mod, this.ctxCopy);
+        } else if (template.type === 'Randomize Numericals') {
+            this.performRandomizeNumericalsCraft(this.ctxCopy);
         }
 
-        this.updateCraftCount();
+        if (this.selectedCraft.cost) {
+            subtractCost(this.selectedCraft.cost, game.gameConfig.resources ?? [], game.resources);
+        }
+
         this.syncCraftItem();
-        this.updateCraftCount();
+
         this.ctx.element.querySelectorStrict<HTMLElement>('[data-craft-backdrop]').click();
     }
 
-    private beginCrafting() {
-        this.createContextCopy();
-        this.element.querySelectorStrict('[data-compare-button]').removeAttribute('disabled');
-        this.element.querySelectorStrict('[data-confirm-button]').removeAttribute('disabled');
-        this.element.querySelectorStrict('[data-cancel-button]').removeAttribute('disabled');
-    }
-
-    private performReforgeCraft() {
-        assertNonNullable(this.ctxCopy);
-        const reforgeCraft = this.craftList.findStrict(x => x.desc === 'Reforge item with new random modifiers');
+    private performReforgeCraft(ctx: CraftContextCopy) {
         const reforgeWeights = [0, 0, 10, 30, 60, 20];
-        let craftCount = reforgeCraft.count;
-        craftCount = clamp(craftCount, 1, this.advReforge?.maxReforgeCount ?? 1);
+        const reforgeCount = (this.advReforge?.maxReforgeCount ?? 1);
         const useAdvReforge = !!this.advReforge && this.advReforge.maxReforgeCount > 0;
-        for (let i = 0; i < craftCount; i++) {
+        for (let i = 0; i < reforgeCount; i++) {
             const newModList = this.craftManager.reforge(this.ctx.candidateModList, reforgeWeights);
-            this.ctxCopy.modList.splice(0, this.ctxCopy.modList.length, ...newModList);
-
-            reforgeCraft.count--;
+            ctx.modList.splice(0, ctx.modList.length, ...newModList);
 
             const evaluateAdvReforge = () => {
                 assertDefined(this.advReforge);
@@ -365,9 +361,7 @@ export class CraftTable {
         }
     }
 
-    private performReforgeDevCraft() {
-        assertDefined(this.ctxCopy);
-
+    private performReforgeDevCraft(ctx: CraftContextCopy) {
         const stats = extractStats(player.stats);
         const curDps = calcPlayerCombatStats({ stats, modDB: player.modDB }).dps;
 
@@ -383,7 +377,20 @@ export class CraftTable {
                 lastDps = dps;
             }
         }
-        this.ctxCopy.modList.splice(0, this.ctxCopy.modList.length, ...modList);
+        ctx.modList.splice(0, ctx.modList.length, ...modList);
+    }
+
+    private performAddModCraft(ctx: CraftContextCopy) {
+        const mod = this.craftManager.addModifier(ctx.modList, this.ctx.candidateModList);
+        ctx.modList.push(mod);
+    }
+
+    private performRemoveModCraft(mod: Modifier, ctx: CraftContextCopy) {
+        ctx.modList.remove(mod);
+    }
+
+    private performRandomizeNumericalsCraft(ctx: CraftContextCopy) {
+        ctx.modList.forEach(x => x.randomizeValues());
     }
 
     private confirm() {
@@ -462,7 +469,7 @@ export class CraftTable {
     }
 
     private openCompareModal() {
-        assertDefined(this.ctxCopy);
+        assertNonNullable(this.ctxCopy);
 
         const modal = createCustomElement(ModalElement);
         modal.setTitle('Compare');
@@ -599,40 +606,49 @@ export class CraftTable {
         this.element.appendChild(modal);
     }
 
-    addCraft(craftTemplate: CraftTemplate, successRates: Craft['successRates'], startCount = 0) {
+    addCraft(craftData: GameConfig.WeaponCraft) {
+        const template = [...craftTemplates, ...devCraftTemplates].findStrict(x => x.desc === craftData.desc);
         const element = document.createElement('li');
-        element.classList.add('g-list-item', 'g-field');
-        element.setAttribute('data-craft-id', craftTemplate.id);
-        element.insertAdjacentHTML('beforeend', `<div>${craftTemplate.desc}</div><var data-count>0</var>`);
-        element.addEventListener('click', this.selectCraftById.bind(this, craftTemplate.id));
+        element.classList.add('g-list-item');
+        element.setAttribute('data-craft-id', template.id);
+        const resource = this.craftList.length === 0 ? 'A Very Long Resource Name' : 'Gold';
+        element.insertAdjacentHTML('beforeend', `<div>${template.desc}</div><var data-cost>0</var><var data-resource>${resource}</var>`);
+        element.addEventListener('click', this.selectCraftById.bind(this, template.id));
         this.craftListElement.appendChild(element);
         const craft: Craft = {
-            template: craftTemplate,
-            desc: craftTemplate.desc as CraftTemplateDescription,
+            template: template,
+            desc: template.desc as CraftTemplateDescription,
             element,
-            successRates,
-            count: startCount,
+            successRates: craftData.successRates,
+            cost: craftData.cost
         };
         this.craftList.push(craft);
-        this.updateCraftCount(craft);
-    }
-
-    addCraftCount(desc: CraftTemplateDescription, count: number) {
-        const craft = this.craftList.findStrict(x => x.template.desc === desc);
-        craft.count += count;
-        this.updateCraftCount(craft);
-        this.updateCraftListItemStates();
-    }
-
-    private updateCraftCount(craft?: Craft) {
-        const craftList = craft ? [craft] : this.craftList;
-        for (const craft of craftList) {
-            craft.element.querySelectorStrict('[data-count]').textContent = craft.count.toFixed();
-        }
+        this.updateCraftList();
     }
 
     updateCraftList() {
-        this.selectCraftById(this.selectedCraft?.template.id ?? null);
+        // this.selectCraftById(null);
+        this.craftListElement.querySelectorAll('[data-craft-id]').forEach(x => {
+            const id = x.getAttribute('data-craft-id')!;
+            const cost = this.craftList.findStrict(x => x.template.id === id).cost;
+            x.querySelectorStrict('[data-resource]').textContent = cost ? cost.name : '';
+            x.querySelectorStrict('[data-cost]').textContent = cost ? cost.value.toFixed() : '';
+        });
+
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                const calcWidth = (elements: HTMLElement[]) => {
+                    let maxWidth = 0;
+                    for (const element of elements) {
+                        maxWidth = Math.max(maxWidth, element.offsetWidth);
+                    }
+                    elements.forEach(x => x.style.minWidth = CSS.px(maxWidth).toString());
+                    return maxWidth;
+                };
+                calcWidth([...this.craftListElement.querySelectorAll<HTMLElement>('[data-cost]')]);
+                calcWidth([...this.craftListElement.querySelectorAll<HTMLElement>('[data-resource]')]);
+            }, 100);
+        });
     }
 
     syncCraftItem() {
@@ -642,7 +658,6 @@ export class CraftTable {
 
     serialize(modDataList: { id: string; text: string; }[]): Required<Serialization>['weapon']['crafting'] {
         return {
-            craftList: this.craftList.map(x => ({ id: x.template.id, count: x.count })),
             modList: this.ctxCopy?.modList.map(x => ({ srcId: modDataList.findStrict(y => y.text === x.text).id, values: x.values }))
         };
     }
@@ -666,17 +681,6 @@ export class CraftTable {
             }
             this.syncCraftItem();
         }
-        if (save.craftList) {
-            for (const serializedCraft of save.craftList.filter(isDefined)) {
-                const craft = this.craftList.find(x => x.template.id === serializedCraft.id);
-                if (!craft) {
-                    continue;
-                }
-                craft.count = serializedCraft.count === null ? Infinity : serializedCraft.count ?? 0;
-            }
-            this.updateCraftCount();
-            this.updateCraftListItemStates();
-        }
-
+        this.updateCraftListItemStates();
     }
 }

@@ -156,6 +156,7 @@ export class Game {
         if (gameConfig.resources) {
             this._resources = createResources(gameConfig.resources);
             statistics.createGroup('Resources', this._resources);
+            Object.values(this._resources).forEach(x => x.addListener('change', statistics.updateStats.bind(statistics, 'Resources')));
         }
 
         this._initializationStage = GameInitializationStage.Init;

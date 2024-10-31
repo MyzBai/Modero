@@ -85,8 +85,31 @@
         }
 
         .s-craft-list {
+            & > :first-child {
+                border: $default-border;
+                background-color: $color-primary-bg;
+                margin-bottom: 0.2em;
+                text-align: center;
+            }
             li {
+                display: grid;
+                grid-template-columns: 1fr auto auto;
                 padding: $padding-container;
+
+                :nth-child(2),
+                :nth-child(3) {
+                    box-sizing: border-box;
+                    text-align: center;
+                }
+
+                :nth-child(2) {
+                    border-left: $default-border;
+                    border-right: $default-border;
+                }
+                :nth-child(2),
+                :nth-child(3) {
+                    padding: 0 1em;
+                }
                 &.selected {
                     z-index: 2;
                 }

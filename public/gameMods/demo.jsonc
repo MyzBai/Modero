@@ -14,9 +14,7 @@
         "Adds {1} To {2} Elemental Damage"
     ],
     "resources": [
-        { "id": "b70657", "name": "Copper", "hiddenBeforeMutation": true, "sticky": true },
-        { "id": "5a0a61", "name": "Silver", "hiddenBeforeMutation": true, "sticky": true },
-        { "id": "60030f", "name": "Gold", "hiddenBeforeMutation": true, "sticky": true }
+        { "id": "60030f", "name": "Gold", "hiddenBeforeMutation": false, "sticky": true }
     ],
     "worlds": {
         "enemyBaseLifeList": [ 50, 80, 100, 200, 500, 800, 1000, 1300, 2000 ],
@@ -31,9 +29,7 @@
                         "level": 1,
                         "weight": 1000,
                         "modList": [
-                            "{20}% Chance To Drop {1} @Resource{Gold} On Death",
-                            "{50}% Chance To Drop {1} @Resource{Silver} On Death",
-                            "{100}% Chance To Drop {1} @Resource{Copper} On Death"
+                            "{100}% Chance To Drop {10} @Resource{Gold} On Death"
                         ]
                     }
                 ],
@@ -531,11 +527,36 @@
                     }
                 },
                 "craftList": [
-                    { "desc": "Reforge item with new random modifiers", "probability": 5, "startCount": 3, "successRates": { "min": 100, "max": 100 } },
-                    { "desc": "Add new modifier", "probability": 50, "successRates": { "min": 75, "max": 95 } },
-                    { "desc": "Remove modifier", "probability": 180, "successRates": { "min": 85, "max": 95 } },
-                    { "desc": "Upgrade modifier", "probability": 100, "successRates": { "min": 70, "max": 95 } },
-                    { "desc": "Randomize numerical values", "probability": 200, "successRates": { "min": 90, "max": 95 } }
+                    {
+                        "desc": "Reforge item with new random modifiers",
+                        "cost": { "name": "Gold", "value": 10 },
+                        "successRates": { "min": 100, "max": 100 }
+                    },
+                    {
+                        "desc": "Add new modifier",
+                        "cost": { "name": "Gold", "value": 100 },
+                        "successRates": { "min": 75, "max": 95 }
+                    },
+                    {
+                        "desc": "Remove modifier",
+                        "cost": { "name": "Gold", "value": 200 },
+                        "successRates": { "min": 85, "max": 95 }
+                    },
+                    {
+                        "desc": "Upgrade modifier",
+                        "cost": { "name": "Gold", "value": 500 },
+                        "successRates": { "min": 70, "max": 95 }
+                    },
+                    {
+                        "desc": "Randomize all numerical values",
+                        "cost": { "name": "Gold", "value": 800 },
+                        "successRates": { "min": 90, "max": 95 }
+                    },
+                    {
+                        "desc": "Randomize numerical values of a modifier",
+                        "cost": { "name": "Gold", "value": 2000 },
+                        "successRates": { "min": 85, "max": 90 }
+                    }
                 ]
             },
             "modLists": [

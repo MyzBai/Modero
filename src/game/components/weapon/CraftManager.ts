@@ -44,19 +44,20 @@ export class CraftManager {
     }
 
     calcSuccessRate(craft: Craft, ctx: CraftContext, mod?: Modifier) {
-        if (craft.desc === 'Add new modifier') {
-            return remap(5, 1, craft.successRates.min, craft.successRates.max, ctx.modList.length);
+        const type = craft.template.type;
+        if (type === 'Add') {
+            return remap(ctx.getMaxModCount() - 1, 1, craft.successRates.min, craft.successRates.max, ctx.modList.length);
         }
-        if (craft.desc === 'Remove modifier') {
+        if (type === 'Remove') {
             assertDefined(mod);
-            const v0 = remap(6, 1, craft.successRates.min, craft.successRates.max, ctx.modList.length);
+            const v0 = remap(ctx.getMaxModCount(), 1, craft.successRates.min, craft.successRates.max, ctx.modList.length);
             const modGroup = getModGroupList(mod.text, ctx.modGroupsList, ctx.weaponType?.name);
             const tier = calcModTier(mod.text, modGroup);
             const v1 = modGroup.length === 1 ? craft.successRates.max : remap(1, modGroup.length, craft.successRates.min, craft.successRates.max, tier);
             const avg = (v0 + v1) / 2;
             return avg;
         }
-        if (craft.desc === 'Upgrade modifier') {
+        if (type === 'Upgrade') {
             assertDefined(mod);
             const modGroup = getModGroupList(mod.text, ctx.modGroupsList, ctx.weaponType?.name);
             const tier = calcModTier(mod.text, modGroup);
@@ -64,13 +65,17 @@ export class CraftManager {
             const maxChance = craft.successRates.max;
             return remap(2, modGroup.length, minChance, maxChance, tier);
         }
-        if (craft.desc === 'Randomize numerical values') {
-            assertDefined(mod);
-            const modGroup = getModGroupList(mod.text, ctx.modGroupsList, ctx.weaponType?.name);
-            const tier = calcModTier(mod.text, modGroup);
-            const minChance = modGroup.length === 1 ? craft.successRates.max : craft.successRates.min;
-            const maxChance = craft.successRates.max;
-            return remap(tier, modGroup.length, minChance, maxChance, modGroup.length);
+        if (type === 'Randomize Numericals') {
+            if (craft.template.target === 'Single') {
+                assertDefined(mod);
+                const modGroup = getModGroupList(mod.text, ctx.modGroupsList, ctx.weaponType?.name);
+                const tier = calcModTier(mod.text, modGroup);
+                const minChance = modGroup.length === 1 ? craft.successRates.max : craft.successRates.min;
+                const maxChance = craft.successRates.max;
+                return remap(tier, modGroup.length, minChance, maxChance, modGroup.length);
+            } else if (craft.template.target === 'All') {
+                return remap(1, ctx.getMaxModCount(), craft.successRates.min, craft.successRates.max, ctx.modList.length);
+            }
         }
         return 100;
     }
@@ -87,7 +92,6 @@ export class CraftManager {
         for (let i = 0; i < count; i++) {
             candidateModList = candidateModList.filter(x => !itemModList.concat(newModList).some(y => x.template.desc === y.template.desc));
             if (candidateModList.length === 0) {
-                console.warn(`failed to generate the expected amount of modifiers of (${count})`);
                 return [];
             }
             const candidateCopyList = candidateModList.map(x => {

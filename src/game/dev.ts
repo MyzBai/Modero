@@ -1,4 +1,4 @@
-import { combat, game, gameLoop, gameLoopAnim, player } from './game';
+import { combat, game, gameLoop, gameLoopAnim, player, statistics } from './game';
 import { loadGame } from '../shared/utils/saveManager';
 
 declare global {
@@ -26,6 +26,10 @@ export function initDevTools() {
         player,
         getEnemy: () => combat.enemy,
         setLevel: (level: number) => player.stats.level.set(level),
+        addResource: (name: string, amount: number) => {
+            Object.values(game.resources).find(x => x.options.label?.toLowerCase() === name.toLowerCase())?.add(amount);
+            statistics.updateStats('Resources');
+        },
         addArtifact: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:AddArtifact', { detail: baseName })),
         increaseArtifactRank: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:IncreaseArtifactRank', { detail: baseName })),
         setLoopSpeed: (speed: number) => {

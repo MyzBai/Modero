@@ -78,8 +78,7 @@ export interface WeaponMod {
 }
 export interface WeaponCraft {
     desc: WeaponCraftDescription;
-    probability: Probability;
-    startCount?: UnsignedInteger;
+    cost?: Cost;
     successRates: { min: UnsignedInteger; max: UnsignedInteger; };
 }
 
@@ -310,6 +309,11 @@ type WorldMod = string;
 /**@items {"$ref": "#/definitions/WorldMod"} */
 type WorldModList = WorldMod[];
 
+
+export interface Cost {
+    name: ResourceName;
+    value: UnsignedInteger;
+}
 
 export const ReferenceNames = ['Resource'] as const;
 

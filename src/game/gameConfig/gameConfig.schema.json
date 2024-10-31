@@ -1052,15 +1052,8 @@
         "desc": {
           "$ref": "#/definitions/WeaponCraftDescription"
         },
-        "probability": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 100,
-          "description": "Percent = 1/Probability"
-        },
-        "startCount": {
-          "type": "integer",
-          "minimum": 0
+        "cost": {
+          "$ref": "#/definitions/Cost"
         },
         "successRates": {
           "type": "object",
@@ -1084,7 +1077,6 @@
       "additionalProperties": false,
       "required": [
         "desc",
-        "probability",
         "successRates"
       ]
     },
@@ -1105,7 +1097,10 @@
           "body": "Upgrade modifier"
         },
         {
-          "body": "Randomize numerical values"
+          "body": "Randomize numerical values of a modifier"
+        },
+        {
+          "body": "Randomize all numerical values"
         }
       ],
       "oneOf": [
@@ -1122,8 +1117,28 @@
           "pattern": "Upgrade modifier"
         },
         {
-          "pattern": "Randomize numerical values"
+          "pattern": "Randomize numerical values of a modifier"
+        },
+        {
+          "pattern": "Randomize all numerical values"
         }
+      ]
+    },
+    "Cost": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/ResourceName"
+        },
+        "value": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
       ]
     },
     "Treasury": {

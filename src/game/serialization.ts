@@ -110,7 +110,6 @@ export interface Weapon {
     crafting: WeaponCrafting;
 }
 export interface WeaponCrafting {
-    craftList: { id: string; count: number; }[];
     modList?: SerializedModifier[];
 }
 
