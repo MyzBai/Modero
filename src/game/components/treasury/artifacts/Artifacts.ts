@@ -1,7 +1,7 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Modifier } from 'src/game/mods/Modifier';
 import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
-import { combat, notifications, player } from 'src/game/game';
+import { combat, game, notifications, player } from 'src/game/game';
 import type * as GameSerialization from 'src/game/serialization';
 import { createObjectListElement, type AssignableObject, getNextRankObject, createAssignableObject, getRankNumeral, getRankBaseName, createObjectInfoElements, unlockObject, selectObjectByName } from 'src/game/utils/objectUtils';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
@@ -77,7 +77,7 @@ export class Artifacts {
                 } else {
                     console.log('no artifact available');
                 }
-            });
+            }, { signal: game.abortSignal });
             window.addEventListener('Dev:IncreaseArtifactRank', e => {
                 const artifact = this.artifactList.find(x => x.baseName.toLowerCase() === e.detail.toLowerCase());
                 if (!artifact) {
@@ -85,7 +85,7 @@ export class Artifacts {
                     return;
                 }
                 this.onArtifactFound.invoke(artifact);
-            });
+            }, { signal: game.abortSignal });
         }
     }
 

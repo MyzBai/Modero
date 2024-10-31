@@ -45,6 +45,7 @@ export class Game {
     readonly stats = createGameStats();
     private _resources?: Record<string, Statistic>;
     private _initializationStage = GameInitializationStage.None;
+    private _abortController = new AbortController();
     constructor() {
 
         this.pageShadowHost = document.createElement('div');
@@ -106,12 +107,11 @@ export class Game {
         //stats
         this.page.insertAdjacentHTML('beforeend', '<ul class="sticky-stat-group-list g-scroll-list-v" data-sticky-stat-group-list></ul>');
 
-
         window.addEventListener('beforeunload', () => {
             if (this._gameConfigId && loadGame().has(this._gameConfigId)) {
                 this.saveGame();
             }
-        });
+        }, { signal: this._abortController.signal });
     }
 
     get menu() {
@@ -142,6 +142,10 @@ export class Game {
         return this._resources!;
     }
 
+    get abortSignal() {
+        return this._abortController.signal;
+    }
+
     async init(gameConfig: Config, gameConfigId: string, save?: UnsafeSerialization) {
 
         if (this._gameConfig) {
@@ -150,6 +154,8 @@ export class Game {
 
         this._gameConfigId = gameConfigId;
         this._gameConfig = gameConfig;
+
+        this._abortController = new AbortController();
 
         statistics.createGroup('General', this.stats);
 
@@ -335,6 +341,7 @@ export class Game {
 
     dispose() {
         this.pageShadowHost.remove();
+        this._abortController.abort();
     }
 
     serialize(save: Serialization) {
@@ -391,7 +398,11 @@ export const notifications = new Notifications();
 export const worlds = new Worlds();
 
 export async function init(args: [...Parameters<typeof game['init']>]) {
-    await game.init(args[0], args[1], args[2]);
+    try {
+        await game.init(args[0], args[1], args[2]);
+    } catch (error) {
+        dispose();
+    }
 
     document.addEventListener('visibilitychange', toggleLoopType);
 
