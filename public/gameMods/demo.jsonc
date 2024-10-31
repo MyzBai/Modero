@@ -90,16 +90,22 @@
                 {
                     "exp": 5,
                     "modList": [
-                        "+{0.5} Mana Regeneration",
+                        "+{1} Mana Regeneration",
                         "+{1} Additional Aura Slots",
-                        "+{100} Maximum Insight",
                         "+{100} Maximum Mana"
                     ]
                 },
                 {
                     "modList": [
+                        "+{2} Mana Regeneration",
                         "+{2} Additional Aura Slots",
-                        "+{300} Maximum Insight",
+                        "+{150} Maximum Mana"
+                    ]
+                },
+                {
+                    "modList": [
+                        "+{3} Mana Regeneration",
+                        "+{3} Additional Aura Slots",
                         "+{200} Maximum Mana"
                     ]
                 }

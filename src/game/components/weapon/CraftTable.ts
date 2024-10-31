@@ -228,6 +228,8 @@ export class CraftTable {
             x.removeAttribute('data-craft');
         });
 
+        this.updateCraftListItemStates();
+
         if (!this.selectedCraft) {
             return;
         }
@@ -452,6 +454,7 @@ export class CraftTable {
         this.element.querySelectorStrict('[data-cancel-button]').setAttribute('disabled', '');
         this.clearCraftSelection();
         this.updateModListElement();
+        this.updateCraftListItemStates();
     }
 
     private disableCraft() {

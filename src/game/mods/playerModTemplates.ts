@@ -20,7 +20,7 @@ export const generalPlayerModTemplateList = [
     { desc: '#% Increased Attack Speed', stats: [{ name: 'AttackSpeed', valueType: 'Inc' }], id: 'a9714e' },
     { desc: '#% Increased Maximum Mana', stats: [{ name: 'MaxMana', valueType: 'Inc' }], id: '29a502' },
     { desc: '+# Maximum Mana', stats: [{ name: 'MaxMana', valueType: 'Base' }], id: 'a12998' },
-    { desc: '+## Mana Regeneration', stats: [{ name: 'ManaRegen', valueType: 'Base' }], id: 'b63646' },
+    { desc: '+# Mana Regeneration', stats: [{ name: 'ManaRegen', valueType: 'Base' }], id: 'b63646' },
     { desc: '#% Increased Mana Regeneration', stats: [{ name: 'ManaRegen', valueType: 'Inc' }], id: '012b35' },
     { desc: '+##% Of Maximum Mana Regeneration', stats: [{ name: 'ManaRegen', valueType: 'Base', extends: [{ type: 'PerStat', statName: 'maxMana', div: 100 }] }], id: '6214e1' },
     { desc: '#% Increased Aura Duration', stats: [{ name: 'AuraDuration', valueType: 'Inc' }], id: '9e1042' },
@@ -106,7 +106,7 @@ export const playerStartModTemplateList = [
     extractModifier(generalPlayerModTemplateList, '+#% Critical Hit Chance Per # Dexterity'),
     extractModifier(generalPlayerModTemplateList, '+# Maximum Mana Per # Intelligence'),
     extractModifier(generalPlayerModTemplateList, '+# Maximum Mana'),
-    extractModifier(generalPlayerModTemplateList, '+## Mana Regeneration'),
+    extractModifier(generalPlayerModTemplateList, '+# Mana Regeneration'),
     extractModifier(generalPlayerModTemplateList, '+##% Of Maximum Mana Regeneration'),
 ] as const satisfies readonly ModTemplate[];
 

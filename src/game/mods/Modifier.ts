@@ -2,7 +2,7 @@ import { type ModTemplate, type ModTemplateStat } from './types';
 import { modTemplateList } from './modTemplates';
 import { parseTextReferences as parseTextReference, parseTextValues } from 'src/shared/utils/textParsing';
 import type { StatModifier } from './ModDB';
-import { randomRangeInt, toDecimals } from 'src/shared/utils/utils';
+import { randomRangeInt } from 'src/shared/utils/utils';
 import { assertDefined } from '../../shared/utils/assert';
 
 export interface PopupOptions {
@@ -82,10 +82,8 @@ export class Modifier {
                 assertDefined(mod.reference?.name, 'mod is missing a name in reference property');
                 return mod.reference.name;
             } else if ($1.startsWith('#')) {
-                let value = mod.values[i++]!;
-                const decimals = $1.length - 1;
-                value = toDecimals(value, decimals);
-                return value.toString();
+                const { value, decimalCount } = mod.rangeValues[i]!;
+                return value.toFixed(decimalCount);
             }
             throw new Error('failed parsing mod description');
         };
@@ -103,10 +101,14 @@ export class Modifier {
             console.warn(`invalid mod: ${text}`);
             return Modifier.empty();
         }
-        const values = parseTextValues(text);
-        const ranges: ModValueRange[] = values.map((x, i) => ({ min: x.min, max: x.max, value: x.min, decimalCount: Math.max(0, (template.desc.match(/#+/g)?.[i]?.length || 0) - 1) }));
+        const textValues = parseTextValues(text);
+        const valueRanges: ModValueRange[] = [];
+        for (const [i, valueRange] of textValues.entries()) {
+            const decimalCount = Math.max(0, (template.desc.match(/#+/g)?.[i]?.length || 0) - 1);
+            valueRanges.push({ ...valueRange, decimalCount });
+        }
         const references = parseTextReference(text);
-        return new Modifier(text, template, ranges, references);
+        return new Modifier(text, template, valueRanges, references);
     }
 
     static getTemplate(text: string) {

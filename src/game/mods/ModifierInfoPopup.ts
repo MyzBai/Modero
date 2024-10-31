@@ -34,7 +34,13 @@ export class ModifierInfoPopup {
     }
 
     private addDesc(body: HTMLElement, mod: Modifier) {
-        const desc = mod.text.replace(/@\w+(\{([^\}])\})|\{([^\}])\}/g, '$1');
+        const regex = /\{([^\}]+)\}/g;
+        let i = 0;
+        const desc = mod.text.replace(regex, (_, $1) => {
+            const { value, decimalCount } = mod.rangeValues[i]!;
+            const valueText = value.toFixed(decimalCount);
+            return `${valueText}(${$1})`;
+        });
         body.insertAdjacentHTML('beforeend', `<div class="g-mod-desc" style="text-align: center; padding-top: 0.3em;">${desc}</div>`);
     }
 }
