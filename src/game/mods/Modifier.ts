@@ -82,7 +82,7 @@ export class Modifier {
                 assertDefined(mod.reference?.name, 'mod is missing a name in reference property');
                 return mod.reference.name;
             } else if ($1.startsWith('#')) {
-                const { value, decimalCount } = mod.rangeValues[i]!;
+                const { value, decimalCount } = mod.rangeValues[i++]!;
                 return value.toFixed(decimalCount);
             }
             throw new Error('failed parsing mod description');
