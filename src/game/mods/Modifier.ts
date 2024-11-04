@@ -156,7 +156,7 @@ export class Modifier {
             const pow = Math.pow(10, rangeValue.decimalCount + 1);
             const min = rangeValue.min * pow;
             const max = rangeValue.min === rangeValue.max ? min : rangeValue.max * pow + 1 * pow;
-            rangeValue.value = (Math.floor(randomRangeInt(min, max))) / pow;
+            rangeValue.value = Math.floor(randomRangeInt(min, max) / pow);
         }
     }
 
