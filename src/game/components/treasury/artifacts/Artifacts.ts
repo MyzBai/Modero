@@ -154,7 +154,7 @@ export class Artifacts {
             }
             button.textContent = artifact.assigned ? 'Unassign' : 'Assign';
             button.toggleAttribute('disabled', disabled);
-            button.setAttribute('data-tag', !artifact.assigned ? 'valid' : '');
+            button.setAttribute('data-tag', !artifact.assigned ? 'valid' : 'invalid');
         };
         button.addEventListener('click', () => {
             if (artifact.assigned) {
@@ -233,9 +233,9 @@ export class Artifacts {
             }
         }
 
-        const artifact = this.artifactList.find(x => x.assigned || x.selected);
+        const artifact = this.artifactList.find(x => x.assigned || x.selected || x.unlocked);
         if (artifact) {
-            this.selectArtifactByName(artifact?.name);
+            this.selectArtifactByName(artifact.name);
         }
     }
 }
