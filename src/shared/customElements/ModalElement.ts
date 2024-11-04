@@ -13,6 +13,10 @@ export class ModalElement extends CustomElement {
         this.querySelectorStrict<HTMLElement>('[data-body]').style.minWidth = v;
     }
 
+    get body() {
+        return this.querySelectorStrict('[data-body]');
+    }
+
     init() {
         const content = document.createElement('div');
         content.classList.add('s-content');
@@ -40,7 +44,7 @@ export class ModalElement extends CustomElement {
         this.querySelectorStrict<HTMLElement>('[data-body]').textContent = text;
     }
 
-    setBodyElement(element: HTMLElement) {
+    addBodyElement(element: HTMLElement) {
         this.querySelectorStrict<HTMLElement>('[data-body]').appendChild(element);
     }
 

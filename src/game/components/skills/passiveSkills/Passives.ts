@@ -6,7 +6,7 @@ import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
 import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';
 import { createObjectListElement, createAssignableObject, createObjectInfoElements, getRankBaseName, unlockObject, getRankNumeral } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
-import { SkillPage, type PassiveSkill } from './SkillPage';
+import { SkillPage, type PassiveSkill } from '../SkillPage';
 
 
 interface InsightCapacityEnhancer {
@@ -249,6 +249,7 @@ export class Passives extends SkillPage {
             insightCapacityEnhancer.curCount = Math.min(data.count, insightCapacityEnhancer.data.probabilities.length);
         }
         this.applyInsightCapacityEnhancersAsModifiers();
+        player.updateStatsDirect();
         for (const data of save?.passiveList?.filter(isDefined) || []) {
             const passive = this.skillList.find(x => x.data.id === data?.id);
             if (!passive) {

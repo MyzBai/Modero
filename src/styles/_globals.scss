@@ -106,6 +106,7 @@
     cursor: default;
     &:hover {
         filter: brightness(120%);
+        text-decoration: underline;
     }
 }
 
@@ -122,5 +123,19 @@
         border: $default-border;
         padding: $padding-container;
         gap: $default-gap;
+    }
+}
+
+.g-level-modal {
+    .s-body {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 1em;
+        justify-items: center;
+
+        ul {
+            border: $default-border;
+            min-width: 30em;
+        }
     }
 }

@@ -6,7 +6,7 @@ export type ComponentName = keyof Components;
 export interface Config {
     version: typeof GAME_CONFIG_VERSION;
     playerStartModList: PlayerStartModList;
-    resources?: Resource[];
+    resources: Resource[];
     worlds: Worlds;
     components?: {
         guildHall?: GuildHall;
@@ -53,7 +53,7 @@ export interface Worlds {
 
 export interface Weapon {
     levelList?: {
-        exp?: Exp;
+        upgradeCost?: Cost;
         modList: WeaponUpgradeModList;
     }[];
     weaponTypeList?: WeaponType[];
@@ -84,7 +84,7 @@ export interface WeaponCraft {
 
 export interface Skills {
     levelList?: {
-        exp?: Exp;
+        upgradeCost?: Cost;
         modList: SkillsUpgradeModList;
     }[];
     attackSkills?: {
@@ -138,7 +138,7 @@ export interface PassiveSkill {
 export interface Treasury {
     requirements?: Requirements;
     levelList?: {
-        exp?: Exp;
+        upgradeCost?: Cost;
         modList: TreasuryUpgradeModList;
     }[];
     artifacts?: Artifacts;
@@ -160,20 +160,23 @@ export type GuildName = 'Vanguard' | 'Wanderer' | 'Arcane';
 
 export interface GuildHall {
     requirements?: Requirements;
-    levelList?: { exp: Exp; }[];
+    levelList?: {
+        upgradeCost?: Cost;
+        modList: GuildHallModList;
+    }[];
     guildList: Guild[];
     guildClassList: GuildClass[];
 }
 export interface Guild {
     name: GuildName;
-    modList: PlayerModList[];
+    modList: PlayerModList;
 }
 /**@uniqueItemProperties {["id"]} */
 export interface GuildClass {
     id: Id;
     guildName: GuildName;
     name: Name;
-    modList: PlayerModList[];
+    modList: PlayerModList;
 }
 
 export interface Achievements {
@@ -186,15 +189,16 @@ export interface Achievement {
 export const SchemaOverrideSymbolNames = [
     'PlayerMod',
     'PlayerStartMod',
+    'EnemyMod',
+    'EnemyBaseLife',
+    'EnemyBaseCount',
     'SkillsUpgradeMod',
     'WeaponUpgradeMod',
     'WeaponCraftDescription',
     'TreasuryUpgradeMod',
-    'EnemyMod',
+    'GuildHallMod',
     'WorldMod',
-    'AchievementDescription',
-    'EnemyBaseLife',
-    'EnemyBaseCount'
+    'AchievementDescription'
 ] as const satisfies readonly string[];
 export type SchemaOverrideSymbolName = typeof SchemaOverrideSymbolNames[number];
 
@@ -278,6 +282,11 @@ type PlayerStartMod = string;
 /**@items {"$ref": "#/definitions/PlayerStartMod"} */
 type PlayerStartModList = PlayerStartMod[];
 
+/**@$ref #/definitions/EnemyMod */
+type EnemyMod = string;
+/**@items {"$ref": "#/definitions/EnemyMod"}*/
+type EnemyModList = EnemyMod[];
+
 /**@$ref #/definitions/SkillsUpgradeMod */
 type SkillsUpgradeMod = string;
 /**@items {"$ref": "#/definitions/SkillsUpgradeMod"} */
@@ -288,26 +297,26 @@ type WeaponUpgradeMod = string;
 /**@items {"$ref": "#/definitions/WeaponUpgradeMod"} */
 type WeaponUpgradeModList = WeaponUpgradeMod[];
 
+/**@$ref #/definitions/WeaponCraftDescription */
+type WeaponCraftDescription = string;
+
 /**@$ref #/definitions/TreasuryUpgradeMod */
 type TreasuryUpgradeMod = string;
 /**@items {"$ref": "#/definitions/TreasuryUpgradeMod"} */
 type TreasuryUpgradeModList = TreasuryUpgradeMod[];
 
-/**@$ref #/definitions/EnemyMod */
-type EnemyMod = string;
-/**@items {"$ref": "#/definitions/EnemyMod"}*/
-type EnemyModList = EnemyMod[];
-
-/**@$ref #/definitions/AchievementDescription */
-type AchievementDescription = string;
-
-/**@$ref #/definitions/WeaponCraftDescription */
-type WeaponCraftDescription = string;
+/**@$ref #/definitions/GuildHallMod */
+type GuildHallMod = string;
+/**@items {"$ref": "#/definitions/GuildHallMod"} */
+type GuildHallModList = GuildHallMod[];
 
 /**@$ref #/definitions/WorldMod */
 type WorldMod = string;
 /**@items {"$ref": "#/definitions/WorldMod"} */
 type WorldModList = WorldMod[];
+
+/**@$ref #/definitions/AchievementDescription */
+type AchievementDescription = string;
 
 
 export interface Cost {

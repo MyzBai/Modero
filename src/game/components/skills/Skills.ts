@@ -1,37 +1,39 @@
 import { Component } from '../Component';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
-import { AttackSkills } from './AttackSkills';
-import { AuraSkills } from './AuraSkills';
-import { Passives } from './Passives';
+import { AttackSkills } from './attackSkills/AttackSkills';
+import { AuraSkills } from './auraSkills/AuraSkills';
+import { Passives } from './passiveSkills/Passives';
 import { TabMenuElement } from 'src/shared/customElements/TabMenuElement';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { player } from 'src/game/game';
 import { createHelpIcon } from 'src/shared/utils/dom';
-import { LevelElement } from '../../../shared/customElements/LevelElement';
 import { Modifier } from '../../mods/Modifier';
-import { ModalElement } from '../../../shared/customElements/ModalElement';
-import { createModListElement } from '../../utils/dom';
+import { createLevelModal } from '../../utils/dom';
 import { PlayerUpdateStatsFlag } from '../../Player';
+import { Value } from '../../../shared/utils/Value';
+import { isNumber } from '../../../shared/utils/utils';
+import { assertDefined } from '../../../shared/utils/assert';
 
 export class Skills extends Component {
 
     private attackSkills?: AttackSkills;
     private auraSkills?: AuraSkills;
     private passiveSkills?: Passives;
-    private readonly levelElement?: LevelElement;
+    private readonly level = new Value(1);
     constructor(readonly data: GameConfig.Skills) {
         super('skills');
 
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Skills</div>');
+        const titleElement = document.createElement('div');
+        titleElement.classList.add('g-title');
+        titleElement.textContent = 'Skills';
         if (data.levelList) {
-            this.levelElement = createCustomElement(LevelElement);
-            this.levelElement.setAction('Meditating');
-            this.levelElement.setLevelClickCallback(this.showSkillsOverview.bind(this));
-            this.levelElement.onLevelChange.listen(this.updateLevel.bind(this));
-            this.page.appendChild(this.levelElement);
-            this.updateLevel();
+            titleElement.innerHTML = `<span class="g-clickable-text">Skills Lv.<var data-level>1</var></span>`;
+            titleElement.addEventListener('click', this.openSkillsLevelModal.bind(this));
+            this.page.appendChild(titleElement);
+            this.updateSkillsLevel();
         }
+        this.page.appendChild(titleElement);
         const menu = createCustomElement(TabMenuElement);
         menu.classList.add('s-menu');
         menu.setDirection('horizontal');
@@ -49,8 +51,6 @@ export class Skills extends Component {
             Passives requires insight. You can gain insight by killing enemies.
         `.trim());
         this.page.appendChild(helpIconElement);
-
-
 
         if (data.attackSkills) {
             this.attackSkills = new AttackSkills(data.attackSkills);
@@ -71,31 +71,29 @@ export class Skills extends Component {
             menu.registerPageElement(this.passiveSkills.page, 'passives');
             this.page.appendChild(this.passiveSkills.page);
         }
+
+        this.level.addListener('change', this.updateSkillsLevel.bind(this));
     }
 
-    private updateLevel() {
-        if (!this.levelElement) {
-            return;
-        }
-        this.levelElement.maxExp = this.data.levelList?.[this.levelElement.level - 1]?.exp ?? Infinity;
-        const modList = this.data.levelList?.[this.levelElement!.level - 1]?.modList ?? [];
+    private openSkillsLevelModal() {
+        assertDefined(this.data.levelList);
+        createLevelModal({
+            title: 'Skills',
+            level: this.level,
+            levelData: this.data.levelList
+        });
+    }
+
+    private updateSkillsLevel() {
+        this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
+        const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
         player.modDB.replace('Skills', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
         player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
-    private showSkillsOverview() {
-        const modal = createCustomElement(ModalElement);
-        modal.setTitle('Skills Overview');
-
-        const body = createModListElement(this.data.levelList?.[this.levelElement!.level - 1]?.modList ?? []);
-
-        modal.setBodyElement(body);
-    }
-
     serialize(save: Serialization) {
         save.skills = {
-            level: this.levelElement?.level,
-            exp: this.levelElement?.curExp,
+            level: this.level.value,
             meditating: player.activity?.name === 'Meditating',
             attackSkills: this.attackSkills?.serialize(),
             auraSkills: this.auraSkills?.serialize(),
@@ -104,14 +102,8 @@ export class Skills extends Component {
     }
 
     deserialize({ skills: save }: UnsafeSerialization) {
-        if (this.levelElement) {
-            this.levelElement.setLevel(save?.level ?? 1);
-            this.levelElement.curExp = save?.exp ?? 0;
-            this.levelElement.updateProgressBar();
-            this.updateLevel();
-            if (save?.meditating) {
-                this.levelElement.startAction();
-            }
+        if (isNumber(save?.level)) {
+            this.level.set(save.level);
         }
         if (save?.attackSkills) {
             this.attackSkills?.deserialize(save.attackSkills);

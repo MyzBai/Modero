@@ -20,7 +20,7 @@ export class ModifierInfoPopup {
         this.addAdditionalProperties(body, additionalProperties);
 
         this.addDesc(body, mod);
-        modal.setBodyElement(body);
+        modal.body.appendChild(body);
     }
 
     private addTags(body: HTMLElement, tags: readonly ModifierTag[]) {

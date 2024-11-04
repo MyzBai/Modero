@@ -172,16 +172,16 @@ export class CraftTable {
                     disabled = false;
                     break;
                 case 'Add':
-                    disabled = !this.ctxCopy && (ctx.modList.length >= this.ctx.getMaxModCount() || this.craftManager.generateMods(ctx.modList, this.ctx.candidateModList, 1).length === 0);
+                    disabled = !this.ctxCopy || (ctx.modList.length >= this.ctx.getMaxModCount() || this.craftManager.generateMods(ctx.modList, this.ctx.candidateModList, 1).length === 0);
                     break;
                 case 'Remove':
                 case 'Upgrade':
                 case 'Randomize Numericals':
-                    disabled = !this.ctxCopy && ctx.modList.length === 0;
+                    disabled = !this.ctxCopy || ctx.modList.length === 0;
                     break;
 
             }
-            if (craft.cost && !evalCost(craft.cost, game.gameConfig.resources ?? [], game.resources)) {
+            if (craft.cost && !evalCost(craft.cost)) {
                 disabled = true;
             }
             craft.element.toggleAttribute('disabled', disabled);
@@ -318,7 +318,7 @@ export class CraftTable {
         }
 
         if (this.selectedCraft.cost) {
-            subtractCost(this.selectedCraft.cost, game.gameConfig.resources ?? [], game.resources);
+            subtractCost(this.selectedCraft.cost);
         }
 
         this.syncCraftItem();
@@ -515,7 +515,7 @@ export class CraftTable {
         const additions = this.ctxCopy.modList.filter(x => !this.ctx.modList.some(y => y.template === x.template));
         [...b.querySelectorAll<HTMLElement>('[data-mod]')].filter(x => additions.find(y => y.desc === x.textContent)).forEach(x => x.setAttribute('data-tag', 'valid'));
 
-        modal.setBodyElement(element);
+        modal.addBodyElement(element);
 
         this.element.appendChild(modal);
     }
@@ -605,7 +605,7 @@ export class CraftTable {
         `.trim());
         bodyElement.appendChild(helpIcon);
 
-        modal.setBodyElement(bodyElement);
+        modal.addBodyElement(bodyElement);
         this.element.appendChild(modal);
     }
 

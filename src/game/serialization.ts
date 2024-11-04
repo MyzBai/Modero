@@ -96,15 +96,11 @@ export interface Effect {
 
 export interface GuildHall {
     level?: number;
-    exp?: number;
-    training?: boolean;
     classId?: string;
 }
 
 export interface Weapon {
     level?: number;
-    exp?: number;
-    refining?: boolean;
     weaponTypeId?: string;
     modList: SerializedModifier[];
     crafting: WeaponCrafting;

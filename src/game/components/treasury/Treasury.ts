@@ -1,29 +1,30 @@
 import { createCustomElement } from '../../../shared/customElements/customElements';
-import { LevelElement } from '../../../shared/customElements/LevelElement';
-import { ModalElement } from '../../../shared/customElements/ModalElement';
 import { TabMenuElement } from '../../../shared/customElements/TabMenuElement';
 import { player } from '../../game';
 import * as GameConfig from '../../gameConfig/GameConfig';
 import { Modifier } from '../../mods/Modifier';
-import { createModListElement } from '../../utils/dom';
+import { createLevelModal } from '../../utils/dom';
 import { Artifacts } from './artifacts/Artifacts';
 import { Component } from '../Component';
 import type { Serialization, UnsafeSerialization } from '../../serialization';
 import { PlayerUpdateStatsFlag } from '../../Player';
+import { Value } from '../../../shared/utils/Value';
+import { isNumber } from '../../../shared/utils/utils';
+import { assertDefined } from '../../../shared/utils/assert';
 
 export class Treasury extends Component {
-    private readonly levelElement?: LevelElement;
+    private readonly level = new Value(1);
     private artifacts?: Artifacts;
     constructor(private readonly data: GameConfig.Treasury) {
         super('treasury');
 
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Treasury</div>');
+        const titleElement = document.createElement('div');
+        titleElement.classList.add('g-title');
+        titleElement.textContent = 'Treasury';
+        this.page.appendChild(titleElement);
         if (data.levelList) {
-            this.levelElement = createCustomElement(LevelElement);
-            this.levelElement.setAction('Expanding Treasury');
-            this.levelElement.setLevelClickCallback(this.showTreasuryUpgradeOverview.bind(this));
-            this.levelElement.onLevelChange.listen(this.updateTreasuryLevel.bind(this));
-            this.page.appendChild(this.levelElement);
+            titleElement.innerHTML = `<span class="g-clickable-text">Treasury Lv.<var data-level>1</var></span>`;
+            titleElement.addEventListener('click', this.openTreasuryLevelModal.bind(this));
             this.updateTreasuryLevel();
         }
         const menu = createCustomElement(TabMenuElement);
@@ -37,45 +38,37 @@ export class Treasury extends Component {
             menu.registerPageElement(this.artifacts.page, 'artifacts');
             this.page.append(this.artifacts.page);
         }
+
+        this.level.addListener('change', this.updateTreasuryLevel.bind(this));
+    }
+
+    private openTreasuryLevelModal() {
+        assertDefined(this.data.levelList);
+        createLevelModal({
+            title: 'Treasury',
+            level: this.level,
+            levelData: this.data.levelList
+        });
     }
 
     private updateTreasuryLevel() {
-        if (!this.levelElement) {
-            return;
-        }
-        this.levelElement.maxExp = this.data.levelList![this.levelElement.level - 1]?.exp ?? Infinity;
-        const modList = this.data.levelList?.[this.levelElement.level - 1]?.modList ?? [];
+        this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
+        const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
         player.modDB.replace('Treasury', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
         player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
-    private showTreasuryUpgradeOverview() {
-        const modal = createCustomElement(ModalElement);
-        modal.setTitle('Treasury Overview');
-
-        const body = createModListElement(this.data.levelList?.[this.levelElement!.level - 1]?.modList ?? []);
-
-        modal.setBodyElement(body);
-    }
-
     serialize(save: Serialization): void {
         save.treasury = {
-            level: this.levelElement?.level,
-            exp: this.levelElement?.curExp,
+            level: this.level.value,
             expanding: player.activity?.name === 'Expanding Treasury',
             artifacts: this.artifacts?.serialize()
         }
     }
 
     deserialize({ treasury: save }: UnsafeSerialization): void {
-        if (this.levelElement) {
-            this.levelElement.setLevel(save?.level ?? 1);
-            this.levelElement.curExp = save?.exp ?? 0;
-            this.levelElement.updateProgressBar();
-            this.updateTreasuryLevel();
-            if (save?.expanding) {
-                this.levelElement.startAction();
-            }
+        if (isNumber(save?.level)) {
+            this.level.set(save.level);
         }
         this.artifacts?.deserialize(save?.artifacts);
     }

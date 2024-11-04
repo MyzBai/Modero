@@ -1,0 +1,27 @@
+@use 'variables' as *;
+
+.p-passive-skills {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-auto-flow: column;
+    gap: $default-gap;
+    .s-toolbar {
+        justify-content: space-between;
+        .s-insight-counter {
+            padding-left: $padding-container;
+            align-self: center;
+        }
+    }
+
+    .s-skill-list {
+        li {
+            position: relative;
+        }
+    }
+
+    .s-skill-info {
+        grid-row-start: 1;
+    }
+}

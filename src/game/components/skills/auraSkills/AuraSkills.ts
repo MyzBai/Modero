@@ -8,7 +8,7 @@ import { isDefined } from 'src/shared/utils/utils';
 import { createObjectListElement, createAssignableObject, createObjectInfoElements, getRankBaseName, unlockObject } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { createCustomElement } from 'src/shared/customElements/customElements';
-import { SkillPage, type AuraSkill } from './SkillPage';
+import { SkillPage, type AuraSkill } from '../SkillPage';
 
 interface SkillSlot {
     skill: AuraSkill | null;

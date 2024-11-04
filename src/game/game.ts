@@ -93,7 +93,7 @@ export class Game {
             const modEntry = gameModRegistry.list.findStrict(x => x.id === this.gameConfigId);
             const modal = createCustomElement(ModalElement);
             modal.setTitle(this.gameConfigName ?? 'undefined');
-            modal.setBodyElement(createModEntryInfoElement(modEntry).contentElement);
+            modal.addBodyElement(createModEntryInfoElement(modEntry).contentElement);
             modal.style.textAlign = 'center';
         });
         this.page.appendChild(modTitleElement);
@@ -107,11 +107,7 @@ export class Game {
         //stats
         this.page.insertAdjacentHTML('beforeend', '<ul class="sticky-stat-group-list g-scroll-list-v" data-sticky-stat-group-list></ul>');
 
-        window.addEventListener('beforeunload', () => {
-            if (this._gameConfigId && loadGame().has(this._gameConfigId)) {
-                this.saveGame();
-            }
-        }, { signal: this._abortController.signal });
+
     }
 
     get menu() {
@@ -155,7 +151,11 @@ export class Game {
         this._gameConfigId = gameConfigId;
         this._gameConfig = gameConfig;
 
+        if (this._abortController) {
+            this._abortController.abort();
+        }
         this._abortController = new AbortController();
+
 
         statistics.createGroup('General', this.stats);
 
@@ -221,6 +221,10 @@ export class Game {
         this.page.querySelectorStrict('[data-mod-title]').textContent = configName;
         await this.loadPage();
         this._initializationStage = GameInitializationStage.Done;
+
+        window.addEventListener('beforeunload', () => {
+            this.saveGame();
+        }, { signal: this._abortController.signal });
     }
 
     private async loadPage(): Promise<void> {
@@ -342,6 +346,7 @@ export class Game {
     dispose() {
         this.pageShadowHost.remove();
         this._abortController.abort();
+        console.log('dispose');
     }
 
     serialize(save: Serialization) {
@@ -392,7 +397,6 @@ export const gameLoopAnim = new Loop('Animation');
 export const game = new Game();
 export const statistics = new Statistics();
 export const combat = new Combat();
-// export const world = new World();
 export const player = new Player();
 export const notifications = new Notifications();
 export const worlds = new Worlds();
@@ -402,6 +406,7 @@ export async function init(args: [...Parameters<typeof game['init']>]) {
         await game.init(args[0], args[1], args[2]);
     } catch (error) {
         dispose();
+        throw error;
     }
 
     document.addEventListener('visibilitychange', toggleLoopType);
@@ -416,7 +421,7 @@ export async function init(args: [...Parameters<typeof game['init']>]) {
 export function dispose() {
     game.dispose();
     if (ENVIRONMENT === 'development') {
-        window.idleAscension.dispose();
+        window.idleAscension?.dispose();
     }
 }
 

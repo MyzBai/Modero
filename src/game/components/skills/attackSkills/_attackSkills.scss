@@ -1,0 +1,9 @@
+@use 'variables' as *;
+
+.p-attack-skills {
+    grid-column: span 2;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: $default-gap;
+}

@@ -45,6 +45,7 @@
   "additionalProperties": false,
   "required": [
     "playerStartModList",
+    "resources",
     "version",
     "worlds"
   ],
@@ -190,15 +191,19 @@
           "items": {
             "type": "object",
             "properties": {
-              "exp": {
-                "type": "integer",
-                "minimum": 1,
-                "default": 0
+              "upgradeCost": {
+                "$ref": "#/definitions/Cost"
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/GuildHallMod"
+                },
+                "type": "array"
               }
             },
             "additionalProperties": false,
             "required": [
-              "exp"
+              "modList"
             ]
           }
         },
@@ -236,6 +241,23 @@
       },
       "additionalProperties": false
     },
+    "Cost": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/ResourceName"
+        },
+        "value": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ]
+    },
     "Guild": {
       "type": "object",
       "properties": {
@@ -243,13 +265,10 @@
           "$ref": "#/definitions/GuildName"
         },
         "modList": {
-          "type": "array",
           "items": {
-            "items": {
-              "$ref": "#/definitions/PlayerMod"
-            },
-            "type": "array"
-          }
+            "$ref": "#/definitions/PlayerMod"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -280,13 +299,10 @@
           "type": "string"
         },
         "modList": {
-          "type": "array",
           "items": {
-            "items": {
-              "$ref": "#/definitions/PlayerMod"
-            },
-            "type": "array"
-          }
+            "$ref": "#/definitions/PlayerMod"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -305,10 +321,8 @@
           "items": {
             "type": "object",
             "properties": {
-              "exp": {
-                "type": "integer",
-                "minimum": 1,
-                "default": 0
+              "upgradeCost": {
+                "$ref": "#/definitions/Cost"
               },
               "modList": {
                 "items": {
@@ -551,10 +565,8 @@
           "items": {
             "type": "object",
             "properties": {
-              "exp": {
-                "type": "integer",
-                "minimum": 1,
-                "default": 0
+              "upgradeCost": {
+                "$ref": "#/definitions/Cost"
               },
               "modList": {
                 "items": {
@@ -1124,23 +1136,6 @@
         }
       ]
     },
-    "Cost": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/ResourceName"
-        },
-        "value": {
-          "type": "integer",
-          "minimum": 0
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "name",
-        "value"
-      ]
-    },
     "Treasury": {
       "type": "object",
       "properties": {
@@ -1152,10 +1147,8 @@
           "items": {
             "type": "object",
             "properties": {
-              "exp": {
-                "type": "integer",
-                "minimum": 1,
-                "default": 0
+              "upgradeCost": {
+                "$ref": "#/definitions/Cost"
               },
               "modList": {
                 "items": {
@@ -1438,6 +1431,54 @@
           "pattern": "^([-+])\\{(([0-9]+(\\.[0-9]+)?)([-]([0-9]+(\\.[0-9]+)?))?)\\}% Of Maximum Mana Regeneration$"
         }
       ]
+    },
+    "EnemyMod": {
+      "type": "string",
+      "pattern": "^[^#]*$",
+      "defaultSnippets": [
+        {
+          "body": "{${1:#}}% Reduced Damage Taken"
+        },
+        {
+          "body": "+{${1:#}}% Evade Chance"
+        },
+        {
+          "body": "{${1:#}}% Increased Life"
+        },
+        {
+          "body": "{${1:#}}% Reduced Life"
+        },
+        {
+          "body": "{${1:#}}% Chance To Drop {${2:#}} @Resource{${3:#}} On Death"
+        }
+      ],
+      "oneOf": [
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Damage Taken$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Evade Chance$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Life$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Life$"
+        },
+        {
+          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Drop \\{(([0-9]+)([-]([0-9]+))?)\\} @Resource\\{(Gold|Silver|Copper)\\} On Death$"
+        }
+      ]
+    },
+    "EnemyBaseLife": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "EnemyBaseCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
     },
     "SkillsUpgradeMod": {
       "type": "string",
@@ -2597,43 +2638,9 @@
         }
       ]
     },
-    "EnemyMod": {
-      "type": "string",
-      "pattern": "^[^#]*$",
-      "defaultSnippets": [
-        {
-          "body": "{${1:#}}% Reduced Damage Taken"
-        },
-        {
-          "body": "+{${1:#}}% Evade Chance"
-        },
-        {
-          "body": "{${1:#}}% Increased Life"
-        },
-        {
-          "body": "{${1:#}}% Reduced Life"
-        },
-        {
-          "body": "{${1:#}}% Chance To Drop {${2:#}} @Resource{${3:#}} On Death"
-        }
-      ],
-      "oneOf": [
-        {
-          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Damage Taken$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Evade Chance$"
-        },
-        {
-          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Life$"
-        },
-        {
-          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Reduced Life$"
-        },
-        {
-          "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Chance To Drop \\{(([0-9]+)([-]([0-9]+))?)\\} @Resource\\{(Gold|Silver|Copper)\\} On Death$"
-        }
-      ]
+    "GuildHallMod": {
+      "$ref": "#/definitions/GuildHallMod",
+      "type": "string"
     },
     "WorldMod": {
       "type": "string",
@@ -2684,16 +2691,6 @@
           "pattern": "^Enemies Drop \\{(([0-9]+)([-]([0-9]+))?)\\}% More Resources On Death$"
         }
       ]
-    },
-    "EnemyBaseLife": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 9007199254740991
-    },
-    "EnemyBaseCount": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 9007199254740991
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#"

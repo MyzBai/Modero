@@ -1,6 +1,11 @@
 import { isString } from 'src/shared/utils/utils';
 import { Modifier } from '../mods/Modifier';
 import { sortModifiers } from '../mods/utils';
+import { createCustomElement } from '../../shared/customElements/customElements';
+import { ModalElement } from '../../shared/customElements/ModalElement';
+import type { Value } from '../../shared/utils/Value';
+import type { Cost } from '../gameConfig/GameConfig';
+import { evalCost, subtractCost, getResourceByName } from './utils';
 
 
 export function createModListElement(modList: string[]): HTMLUListElement;
@@ -17,7 +22,50 @@ export function createModListElement(modList: string[] | Modifier[]) {
     return modListElement;
 }
 
+export interface LevelModalOptions {
+    title: string;
+    level: Value;
+    levelData: { upgradeCost?: Cost; modList: string[]; }[];
+}
+export function createLevelModal(opts: LevelModalOptions) {
+    const modal = createCustomElement(ModalElement);
+    modal.classList.add('g-level-modal');
+    modal.setTitle(`${opts.title} Lv.${opts.level.value.toFixed()}`);
+    const levelData = opts.levelData[opts.level.value - 1]!;
 
+    const modListElement = createModListElement(levelData.modList);
+    modal.body.appendChild(modListElement);
+
+    const upgradeCost = levelData.upgradeCost;
+    if (upgradeCost) {
+        const upgradeButton = document.createElement('button');
+        let text = 'Upgrade';
+        if (upgradeCost.value > 0) {
+            text += `\n${upgradeCost.value.toFixed()} ${upgradeCost.name}`;
+        }
+        upgradeButton.toggleAttribute('disabled', !evalCost(upgradeCost));
+        upgradeButton.textContent = text;
+        upgradeButton.addEventListener('click', () => {
+            subtractCost(upgradeCost);
+            opts.level.add(1);
+            modal.remove();
+            createLevelModal(opts);
+        });
+        modal.body.appendChild(upgradeButton);
+
+        const callback = () => {
+            upgradeButton.toggleAttribute('disabled', !evalCost(levelData.upgradeCost!));
+        };
+        const resource = getResourceByName(upgradeCost.name);
+        resource.addListener('change', callback);
+        new IntersectionObserver((entries) => {
+            const entry = entries[0];
+            if (entry?.target === modal && !entry.isIntersecting) {
+                resource.removeListener('change', callback);
+            }
+        }).observe(modal);
+    }
+}
 
 export async function fadeOut(): Promise<void> {
     return new Promise((resolve) => {

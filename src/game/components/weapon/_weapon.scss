@@ -2,7 +2,7 @@
 .p-weapon {
     position: relative;
     display: grid;
-    grid-template-rows: auto auto 0.6fr 1fr;
+    grid-template-rows: auto 0.6fr 1fr;
     gap: $default-gap;
     z-index: 1;
     .s-weapon {

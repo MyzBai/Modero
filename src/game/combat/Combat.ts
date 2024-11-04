@@ -12,6 +12,7 @@ import { Modifier } from '../mods/Modifier';
 import { playerModTemplateList } from '../mods/playerModTemplates';
 import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { calcEnemyResourceDrop } from '../calc/calcStats';
+import { createModListElement } from '../utils/dom';
 
 interface CombatEventData {
     ctx: CombatContext;
@@ -41,15 +42,10 @@ export class Combat {
 
         const enemyLabel = game.page.querySelectorStrict('[data-combat-overview] [data-enemy-name]');
         enemyLabel.addEventListener('click', () => {
-            const body = document.createElement('ul');
-            body.classList.add('g-mod-list');
-            for (const mod of this.ctx?.enemy.modList ?? []) {
-                body.insertAdjacentHTML('beforeend', `<li>${mod.desc}</li>`);
-            }
             const modal = createCustomElement(ModalElement);
             modal.minWidth = '15em';
             modal.setTitle('Enemy Modifiers');
-            modal.setBodyElement(body);
+            modal.addBodyElement(createModListElement(this.ctx?.enemy.modList ?? []));
         });
 
         const effectsElement = document.createElement('fieldset');

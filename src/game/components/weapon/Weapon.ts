@@ -7,11 +7,10 @@ import { modTemplateList } from 'src/game/mods/modTemplates';
 import { CraftTable, type ModGroupList, type WeaponModifierCandidate } from './CraftTable';
 import { isDefined, isNumber, isString } from 'src/shared/utils/utils';
 import { createHelpIcon } from 'src/shared/utils/dom';
-import { LevelElement } from '../../../shared/customElements/LevelElement';
-import { createCustomElement } from '../../../shared/customElements/customElements';
-import { ModalElement } from '../../../shared/customElements/ModalElement';
-import { createModListElement } from '../../utils/dom';
+import { createLevelModal } from '../../utils/dom';
 import { PlayerUpdateStatsFlag } from '../../Player';
+import { Value } from '../../../shared/utils/Value';
+import { assertDefined } from '../../../shared/utils/assert';
 
 export class Weapon extends Component {
     static sourceName = 'Weapon';
@@ -19,9 +18,21 @@ export class Weapon extends Component {
     private readonly candidateModList: WeaponModifierCandidate[] = [];
     private readonly craftTable: CraftTable;
     private readonly modList: Modifier[] = [];
-    private readonly levelElement?: LevelElement;
+    private readonly level = new Value(1);
     constructor(readonly data: GameConfig.Weapon) {
         super('weapon');
+
+        const titleElement = document.createElement('div');
+        titleElement.classList.add('g-title');
+        titleElement.textContent = 'Weapon';
+        this.page.appendChild(titleElement);
+        if (data.levelList) {
+            titleElement.innerHTML = `<span class="g-clickable-text">Weapon Lv.<var data-level>1</var></span>`;
+            titleElement.addEventListener('click', this.openWeaponLevelModal.bind(this));
+            this.page.appendChild(titleElement);
+            this.updateWeaponLevel();
+        }
+        this.page.appendChild(titleElement);
 
         const helpIconElement = createHelpIcon('Weapon Help', `
             Craft your weapon using the craft table.
@@ -30,15 +41,6 @@ export class Weapon extends Component {
         `.trim());
         this.page.appendChild(helpIconElement);
 
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Weapon</div>');
-        if (data.levelList) {
-            this.levelElement = createCustomElement(LevelElement);
-            this.levelElement.setAction('Refining Weapon');
-            this.levelElement.setLevelClickCallback(this.showWeaponUpgradeOverview.bind(this));
-            this.levelElement.onLevelChange.listen(this.updateWeaponLevel.bind(this));
-            this.page.appendChild(this.levelElement);
-            this.updateWeaponLevel();
-        }
         this.page.insertAdjacentHTML('beforeend', '<div class="s-weapon" data-weapon><div class="hidden" data-weapon-type></div><ul class="s-mod-list g-mod-list" data-mod-list></ul></div>');
 
         this.craftTable = new CraftTable({
@@ -69,34 +71,33 @@ export class Weapon extends Component {
         this.craftTable.craftConfirmed.listen(() => {
             this.applyModifiers();
         });
+
+        this.level.addListener('change', this.updateWeaponLevel.bind(this));
+    }
+
+    private openWeaponLevelModal() {
+        assertDefined(this.data.levelList);
+        createLevelModal({
+            title: 'Weapon',
+            level: this.level,
+            levelData: this.data.levelList
+        });
+    }
+
+    private updateWeaponLevel() {
+        this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
+        const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
+        player.modDB.replace('WeaponUpgrade', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+        player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
     private applyModifiers() {
         player.modDB.replace(Weapon.sourceName, Modifier.extractStatModifierList(...this.modList));
     }
 
-    private updateWeaponLevel() {
-        if (!this.levelElement) {
-            return;
-        }
-        this.levelElement.maxExp = this.data.levelList?.[this.levelElement.level - 1]?.exp ?? Infinity;
-        const modList = this.data.levelList?.[this.levelElement.level - 1]?.modList ?? [];
-        player.modDB.replace('WeaponUpgrade', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
-        player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
-    }
-
-    private showWeaponUpgradeOverview() {
-        const modal = createCustomElement(ModalElement);
-        modal.setTitle('Weapon Upgrade Overview');
-        const body = createModListElement(this.data.levelList?.[this.levelElement!.level - 1]?.modList ?? []);
-        modal.setBodyElement(body);
-    }
-
     serialize(save: Serialization) {
         save.weapon = {
-            level: this.levelElement?.level ?? 0,
-            exp: this.levelElement?.curExp ?? 0,
-            refining: player.activity?.name === 'Refining Weapon',
+            level: this.level.value ?? 0,
             modList: this.modList.map(x => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === x.text).id, values: x.values })),
             crafting: this.craftTable.serialize(this.data.modLists.flatMap(x => x).map(x => ({ id: x.id, text: x.mod })))
         };
@@ -124,14 +125,8 @@ export class Weapon extends Component {
             }
             return mod;
         };
-        if (this.levelElement) {
-            this.levelElement.setLevel(save?.level ?? 1);
-            this.levelElement.curExp = save?.exp ?? 0;
-            this.levelElement.updateProgressBar();
-            this.updateWeaponLevel();
-            if (save?.refining) {
-                this.levelElement.startAction();
-            }
+        if (isNumber(save.level)) {
+            this.level.set(save.level);
         }
 
         const modList = save.modList?.map(x => x && deserializeMod(x.srcId, x.values?.filter(isNumber))).filter(isDefined) ?? [];

@@ -3,7 +3,7 @@ import { loadGame } from '../shared/utils/saveManager';
 
 declare global {
     interface Window {
-        idleAscension: ReturnType<typeof initDevTools>;
+        idleAscension?: ReturnType<typeof initDevTools>;
     }
     interface GlobalEventHandlersEventMap {
         'Dev:AddArtifact': CustomEvent<string>;

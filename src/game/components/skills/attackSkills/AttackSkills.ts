@@ -7,7 +7,7 @@ import type { StatModifier } from 'src/game/mods/ModDB';
 import { isDefined } from 'src/shared/utils/utils';
 import { createAssignableObject, createObjectListElement, createObjectInfoElements, getRankBaseName, unlockObject } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
-import { SkillPage, type AttackSkill } from './SkillPage';
+import { SkillPage, type AttackSkill } from '../SkillPage';
 
 
 export class AttackSkills extends SkillPage {

@@ -26,7 +26,7 @@ export function parseTextValues(text: string) {
         }
         values.push({
             min: parseFloat(min),
-            max: parseFloat(max || min),
+            max: parseFloat(max ?? min),
             value: parseFloat(min),
             startIndex: match.index || 0,
             text: match[0],

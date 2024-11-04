@@ -1,0 +1,54 @@
+@use 'variables' as *;
+
+.p-aura-skills {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto max(40%) auto 1fr;
+    grid-auto-flow: column;
+    gap: $default-gap;
+
+    .s-skill-slot-list {
+        overflow-y: auto;
+        border: $default-border;
+        .skill-slot {
+            position: relative;
+            display: block;
+            cursor: default;
+            padding: $padding-container;
+            border: $default-border;
+
+            &:hover {
+                filter: brightness(120%);
+            }
+            &:not(:first-child) {
+                margin-top: 0.1em;
+            }
+            .s-title {
+                display: flex;
+                align-items: center;
+                .rank {
+                    opacity: 0.6;
+                    margin-left: auto;
+                    display: block;
+                }
+            }
+            .progress-bar {
+                height: 5px;
+            }
+
+            &.selected {
+                border: 1px solid $color-border-highlight;
+                pointer-events: all;
+            }
+        }
+    }
+
+    .s-skill-list {
+        border: $default-border;
+        overflow-y: auto;
+        .equipped {
+            color: $color-tag-accent;
+        }
+    }
+}

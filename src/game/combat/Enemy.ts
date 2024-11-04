@@ -21,6 +21,7 @@ export class Enemy {
     constructor(readonly enemyData: EnemyData) {
         this.stats.baseLife.set(enemyData.baseLife);
         this.modList = Modifier.modListFromTexts([...enemyData.enemyModList]);
+        this.modList.forEach(x => x.randomizeValues());
         this.modDB.add('EnemyMod', Modifier.extractStatModifierList(...this.modList));
         this.stats.maxLife.set(1);
         this.stats.life.set(this.stats.maxLife.value);

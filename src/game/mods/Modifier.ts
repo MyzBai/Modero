@@ -85,7 +85,7 @@ export class Modifier {
                 const { value, decimalCount } = mod.rangeValues[i++]!;
                 return value.toFixed(decimalCount);
             }
-            throw new Error('failed parsing mod description');
+            throw new Error(`failed parsing mod description: (${mod.text} > ${mod.template.desc})`);
         };
         return mod.template.desc.replace(regex, replacer);
     }

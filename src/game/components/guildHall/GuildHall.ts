@@ -1,15 +1,15 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Component } from '../Component';
 import { createAssignableObject, createObjectInfoElements, createObjectListElement, type AssignableObject } from 'src/game/utils/objectUtils';
-import { player } from 'src/game/game';
+import { player, statistics } from 'src/game/game';
 import { Modifier } from 'src/game/mods/Modifier';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { createCustomElement } from '../../../shared/customElements/customElements';
-import { createHelpIcon } from '../../../shared/utils/dom';
 import { ModalElement } from '../../../shared/customElements/ModalElement';
 import { createModListElement } from '../../utils/dom';
-import { LevelElement } from '../../../shared/customElements/LevelElement';
 import { PlayerUpdateStatsFlag } from '../../Player';
+import { Value } from '../../../shared/utils/Value';
+import { evalCost } from '../../utils/utils';
 
 export interface GuildClass extends AssignableObject {
     data: GameConfig.GuildClass;
@@ -23,47 +23,44 @@ export interface Guild {
 
 export class GuildHall extends Component {
     private readonly guildClassList: GuildClass[];
-    private activeGuildClass?: GuildClass;
-    private readonly levelElement?: LevelElement;
+    private activeGuildClass: GuildClass | null = null;
+    private readonly level = new Value(1);
     constructor(private readonly data: GameConfig.GuildHall) {
         super('guildHall');
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Class List</div>');
 
+        const titleElement = document.createElement('div');
+        titleElement.classList.add('g-title');
+        titleElement.textContent = 'Guild Hall';
         if (data.levelList) {
-            this.levelElement = createCustomElement(LevelElement);
-            this.levelElement.setAction('Training');
-            this.levelElement.setLevelClickCallback(this.showGuildHallOverview.bind(this));
-            this.levelElement.onLevelChange.listen(this.updateGuildHallLevel.bind(this));
-            this.page.appendChild(this.levelElement);
+            titleElement.innerHTML = `<span class="g-clickable-text">Guild Hall Lv.<var data-level>1</var></span>`;
+            titleElement.addEventListener('click', this.openGuildHallLevelModal.bind(this));
             this.updateGuildHallLevel();
         }
+        this.page.appendChild(titleElement);
+
+        const toolbar = document.createElement('div');
+        toolbar.classList.add('g-toolbar', 's-toolbar');
+        const resetClassElement = document.createElement('div');
+        resetClassElement.insertAdjacentHTML('beforeend', '<span class="g-clickable-text">Reset</span>');
+        resetClassElement.addEventListener('click', this.resetClass.bind(this));
+        toolbar.appendChild(resetClassElement);
+        this.page.appendChild(toolbar);
 
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v guild-class-list" data-guild-class-list></ul>');
         this.page.insertAdjacentHTML('beforeend', '<div data-guild-class-info></div>');
-
-        const guildHelp = createHelpIcon('', () => `
-            [Rest]
-            You can click the rest button to stop combat. Guild hall will receieve exp while resting.
-            [Class]
-            You can assign a class. Choose wisely...
-            [Guild]
-            Each class is associated with a guild. You can click on the guild's title to see their bonus.
-
-            Class and guild modifiers can be improved by increasing the level of the guild hall.
-        `.trim());
-        this.page.appendChild(guildHelp);
 
         this.guildClassList = [];
         const fragment = document.createDocumentFragment();
         for (const guild of this.data.guildList) {
             const element = document.createElement('div');
-            element.classList.add('g-title', 's-guild-title');
-            element.textContent = guild.name;
+            element.classList.add('g-title');
+            element.insertAdjacentHTML('beforeend', `<span class="g-clickable-text">${guild.name}</span>`);
             element.addEventListener('click', () => {
                 const modal = createCustomElement(ModalElement);
                 modal.setTitle(`${guild.name} Guild`);
-                const modListElement = createModListElement(this.getGuildModList(guild.name));
-                modal.setBodyElement(modListElement);
+                const modList = this.data.guildList.findStrict(x => x.name === guild.name).modList;
+                const modListElement = createModListElement(modList);
+                modal.addBodyElement(modListElement);
             })
             fragment.appendChild(element);
             for (const guildClass of this.data.guildClassList.filter(x => x.guildName === guild.name)) {
@@ -82,82 +79,51 @@ export class GuildHall extends Component {
 
         this.guildClassList.find(x => x.unlocked)?.element.click();
         this.page.querySelector<HTMLElement>('[data-class-list] li')?.click();
-    }
 
-    get level() {
-        return this.levelElement?.level ?? 1;
+        this.level.addListener('change', this.updateGuildHallLevel.bind(this));
     }
 
     get selectedGuildClass() {
         return this.guildClassList.find(x => x.selected);
     }
 
-    get isTraining() {
-        return player.stats.activity.getText() === 'Training';
+    private openGuildHallLevelModal() {
+        const modal = createCustomElement(ModalElement);
+        modal.setTitle(`Guild Hall Lv.${this.level.value.toFixed()}`);
+        const body = document.createElement('div');
+        const upgradeButton = document.createElement('button');
+        upgradeButton.textContent = 'Upgrade';
+        const cost = this.data.levelList?.[this.level.value - 1]?.upgradeCost;
+        if (cost) {
+            upgradeButton.toggleAttribute('disabled', evalCost(cost));
+            upgradeButton.textContent += `\n${cost.value.toFixed()}${cost.name}`;
+        }
+        upgradeButton.addEventListener('click', () => {
+            this.level.add(1);
+            this.openGuildHallLevelModal();
+        });
+        body.appendChild(upgradeButton);
+        const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
+        const modListElement = createModListElement(modList);
+        body.appendChild(modListElement);
+        modal.addBodyElement(body);
     }
 
     private updateGuildHallLevel() {
-        if (!this.data.levelList) {
-            return;
-        }
-        if (!this.levelElement) {
-            return;
-        }
-        this.levelElement.maxExp = this.data.levelList[this.level - 1]?.exp ?? Infinity;
-        if (!this.activeGuildClass) {
-            return;
-        }
-        const modList = Modifier.modListFromTexts(this.getGuildClassModList(this.activeGuildClass.name));
-        player.modDB.replace('GuildClass', Modifier.extractStatModifierList(...modList));
-        const guildName = this.activeGuildClass?.data.guildName;
-        if (guildName) {
-            const modList = Modifier.modListFromTexts(this.getGuildModList(guildName));
-            player.modDB.replace('GuildClassAscension', Modifier.extractStatModifierList(...modList));
-        }
+        const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
+        Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList));
+        player.modDB.replace('GuildHall', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
         player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
-    }
-
-    private getGuildClassModList(name: string) {
-        const guildClass = this.data.guildClassList.findStrict(x => x.name === name);
-        const index = Math.min(this.level - 1, guildClass.modList.length - 1);
-        return guildClass.modList[index]!;
-    }
-
-    private getGuildModList(name: string) {
-        const guild = this.data.guildList.findStrict(x => x.name === name);
-        const index = Math.min(this.level - 1, guild.modList.length - 1);
-        return guild.modList[index]!;
     }
 
     private selectGuildClassByName(name: string) {
         const guildClass = this.guildClassList.findStrict(x => x.data.name === name);
+        if (this.selectedGuildClass) {
+            this.selectedGuildClass.selected = false;
+        }
+        guildClass.selected = true;
         this.guildClassList.forEach(x => x.element.classList.toggle('selected', x === guildClass));
         this.showClassInfo(guildClass);
-    }
-
-    private showGuildHallOverview() {
-        const modal = createCustomElement(ModalElement);
-        modal.setTitle('Guild Hall Overview');
-        const element = document.createElement('div');
-        if (this.activeGuildClass) {
-            {
-                const fieldset = document.createElement('fieldset');
-                fieldset.insertAdjacentHTML('beforeend', `<legend>Guild Modifiers [${this.activeGuildClass.data.guildName}]</legend>`);
-                fieldset.appendChild(createModListElement(this.getGuildModList(this.activeGuildClass.data.guildName)));
-                element.appendChild(fieldset);
-            }
-            {
-                const fieldset = document.createElement('fieldset');
-                fieldset.insertAdjacentHTML('beforeend', `<legend>Class Modifiers [${this.activeGuildClass.name}]</legend>`);
-                fieldset.appendChild(createModListElement(this.getGuildClassModList(this.activeGuildClass.name)));
-                element.appendChild(fieldset);
-            }
-        }
-        if (element.childElementCount === 0) {
-            modal.setBodyText('Nothing to view yet.');
-            return;
-        }
-        modal.setBodyElement(element);
     }
 
     private showClassInfo(guildClass: GuildClass) {
@@ -166,63 +132,65 @@ export class GuildHall extends Component {
         if (!guildClass) {
             return;
         }
-        const modList = guildClass.data.modList[this.level - 1];
         const elements = createObjectInfoElements({
             obj: { name: guildClass.name },
-            modList
+            modList: guildClass.data.modList
         });
         elements.element.classList.add('guild-class-info');
         elements.element.setAttribute('data-guild-class-info', '');
         element?.replaceWith(elements.element) ?? this.page.appendChild(elements.element);
 
         const button = document.createElement('button');
-        const updateLabel = () => {
+        const updateButton = () => {
             button.textContent = 'Assign';
             button.setAttribute('data-tag', 'valid');
-            if (player.stats.guildClass.getText() === guildClass.name) {
-                button.textContent = 'Unassign';
-                button.setAttribute('data-tag', 'invalid');
-            }
         };
-        updateLabel();
-        button.toggleAttribute('disabled', !guildClass.unlocked);
+        updateButton();
+        button.toggleAttribute('disabled', !guildClass.unlocked || player.stats.guildClass.value !== 0);
         button.addEventListener('click', () => {
             this.assignClass(guildClass);
-            updateLabel();
+            updateButton();
         });
         elements.contentElement.appendChild(button);
     }
 
-    private assignClass(guildClass: GuildClass) {
+    private resetClass() {
+        this.assignClass(null);
+    }
+
+    private assignClass(guildClass: GuildClass | null) {
         this.activeGuildClass = guildClass;
-        player.stats.guildClass.setText(guildClass.name);
-        player.modDB.replace('GuildClass', Modifier.extractStatModifierList(...Modifier.modListFromTexts(guildClass.data.modList[this.level - 1] ?? [])));
+        if (guildClass) {
+            player.stats.guildClass.setText(guildClass.name);
+            player.modDB.replace('GuildClass', Modifier.extractStatModifierList(...Modifier.modListFromTexts(guildClass.data.modList)));
+            const guild = this.data.guildList.findStrict(x => x.name === guildClass.data.guildName);
+            player.modDB.replace('Guild', Modifier.extractStatModifierList(...Modifier.modListFromTexts(guild.modList)));
+        } else {
+            player.stats.guildClass.setDefault();
+            player.modDB.removeBySource('Guild');
+            player.modDB.removeBySource('GuildClass');
+            if (this.selectedGuildClass) {
+                this.selectGuildClassByName(this.selectedGuildClass.name);
+            }
+        }
+        if (this.activeGuildClass) {
+            this.selectGuildClassByName(this.activeGuildClass.name);
+        }
 
-        this.page.querySelectorAll('[data-guild-class-list] [data-id]').forEach(x => x.classList.toggle('m-text-green', x.getAttribute('data-id') === guildClass.id));
-
-        const guild = this.data.guildList.findStrict(x => x.name === guildClass.data.guildName);
-        const modList = guild.modList[this.level - 1] ?? [];
-        player.modDB.replace('Guild', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+        this.page.querySelectorAll('[data-guild-class-list] [data-id]').forEach(x => x.classList.toggle('m-text-green', x.getAttribute('data-id') === guildClass?.id));
+        statistics.updateStats('Player');
     }
 
     serialize(save: Serialization) {
         save.guildHall = {
+            level: this.level.value,
             classId: this.activeGuildClass?.data.id,
-            training: this.isTraining,
-            level: this.level,
-            exp: this.levelElement?.curExp,
         }
     }
 
     deserialize({ guildHall: save }: UnsafeSerialization) {
-        if (this.levelElement) {
-            this.levelElement.setLevel(save?.level ?? 1);
-            this.levelElement.curExp = save?.exp ?? 0;
-            this.levelElement.updateProgressBar();
-            this.updateGuildHallLevel();
-            if (save?.training) {
-                this.levelElement.startAction();
-            }
+        if (this.data.levelList && save?.level) {
+            this.level.set(save?.level);
         }
         const guildClass = this.guildClassList.find(x => x.data.id === save?.classId);
         if (guildClass) {
