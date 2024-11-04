@@ -99,7 +99,7 @@ export interface Skills {
             name: Name;
             insight: UnsignedInteger;
             probabilities: Probability[];
-            flavourText?: FlavourText;
+            // flavourText?: FlavourText;
         }[];
         passiveSkillList: PassiveSkill[];
     };
@@ -243,8 +243,8 @@ type Exp = number;
 /**@TJS-pattern ^[A-Za-z 0-9]{3,32}$*/
 type Name = string;
 
-/**@pattern ^[A-Za-z .,!?0-9]{3,128}$ */
-type FlavourText = string;
+// /**@pattern ^[A-Za-z .,!?0-9]{3,128}$ */
+// type FlavourText = string;
 
 /**
  * @TJS-type integer

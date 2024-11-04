@@ -391,10 +391,6 @@
                     "items": {
                       "type": "number"
                     }
-                  },
-                  "flavourText": {
-                    "pattern": "^[A-Za-z .,!?0-9]{3,128}$",
-                    "type": "string"
                   }
                 },
                 "additionalProperties": false,
@@ -824,13 +820,16 @@
           "body": "+{${1:#}} Strength"
         },
         {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
           "body": "{${1:#}}% Increased Strength"
         },
         {
           "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
-        },
-        {
-          "body": "+{${1:#}} Dexterity"
         },
         {
           "body": "{${1:#}}% Increased Dexterity"
@@ -843,9 +842,6 @@
         },
         {
           "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
-        },
-        {
-          "body": "+{${1:#}} Intelligence"
         },
         {
           "body": "{${1:#}}% Increased Intelligence"
@@ -1003,13 +999,16 @@
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
         },
         {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
@@ -1022,9 +1021,6 @@
         },
         {
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
@@ -1608,13 +1604,16 @@
           "body": "+{${1:#}} Strength"
         },
         {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
           "body": "{${1:#}}% Increased Strength"
         },
         {
           "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
-        },
-        {
-          "body": "+{${1:#}} Dexterity"
         },
         {
           "body": "{${1:#}}% Increased Dexterity"
@@ -1627,9 +1626,6 @@
         },
         {
           "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
-        },
-        {
-          "body": "+{${1:#}} Intelligence"
         },
         {
           "body": "{${1:#}}% Increased Intelligence"
@@ -1799,13 +1795,16 @@
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
         },
         {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
@@ -1818,9 +1817,6 @@
         },
         {
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
@@ -1994,13 +1990,16 @@
           "body": "+{${1:#}} Strength"
         },
         {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
           "body": "{${1:#}}% Increased Strength"
         },
         {
           "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
-        },
-        {
-          "body": "+{${1:#}} Dexterity"
         },
         {
           "body": "{${1:#}}% Increased Dexterity"
@@ -2013,9 +2012,6 @@
         },
         {
           "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
-        },
-        {
-          "body": "+{${1:#}} Intelligence"
         },
         {
           "body": "{${1:#}}% Increased Intelligence"
@@ -2185,13 +2181,16 @@
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
         },
         {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
@@ -2204,9 +2203,6 @@
         },
         {
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
@@ -2380,13 +2376,16 @@
           "body": "+{${1:#}} Strength"
         },
         {
+          "body": "+{${1:#}} Dexterity"
+        },
+        {
+          "body": "+{${1:#}} Intelligence"
+        },
+        {
           "body": "{${1:#}}% Increased Strength"
         },
         {
           "body": "{${1:#}}% More Attack Damage Per {${2:#}} Strength"
-        },
-        {
-          "body": "+{${1:#}} Dexterity"
         },
         {
           "body": "{${1:#}}% Increased Dexterity"
@@ -2399,9 +2398,6 @@
         },
         {
           "body": "+{${1:#}}% Critical Hit Chance Per {${2:#}} Dexterity"
-        },
-        {
-          "body": "+{${1:#}} Intelligence"
         },
         {
           "body": "{${1:#}}% Increased Intelligence"
@@ -2571,13 +2567,16 @@
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
         },
         {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
+        },
+        {
+          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
+        },
+        {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Strength$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% More Attack Damage Per \\{(([0-9]+)([-]([0-9]+))?)\\} Strength$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Dexterity$"
@@ -2590,9 +2589,6 @@
         },
         {
           "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\}% Critical Hit Chance Per \\{(([0-9]+)([-]([0-9]+))?)\\} Dexterity$"
-        },
-        {
-          "pattern": "^([-+])\\{(([0-9]+)([-]([0-9]+))?)\\} Intelligence$"
         },
         {
           "pattern": "^\\{(([0-9]+)([-]([0-9]+))?)\\}% Increased Intelligence$"
