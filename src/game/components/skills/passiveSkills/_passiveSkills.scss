@@ -24,4 +24,16 @@
     .s-skill-info {
         grid-row-start: 1;
     }
+
+    modal-element.insight-capacity-enhancer {
+        .s-body {
+            min-width: 15em;
+        }
+        table tr:not(:last-child) {
+            border-bottom: $default-border;
+        }
+        table td:first-child {
+            padding-right: 1em;
+        }
+    }
 }

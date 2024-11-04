@@ -7,6 +7,8 @@ import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';
 import { createObjectListElement, createAssignableObject, createObjectInfoElements, getRankBaseName, unlockObject, getRankNumeral } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { SkillPage, type PassiveSkill } from '../SkillPage';
+import { createCustomElement } from '../../../../shared/customElements/customElements';
+import { ModalElement } from '../../../../shared/customElements/ModalElement';
 
 
 interface InsightCapacityEnhancer {
@@ -23,7 +25,34 @@ export class Passives extends SkillPage {
         super();
         this.page = document.createElement('div');
         this.page.classList.add('p-passive-skills');
-        const toolbarElement = this.createToolbar();
+
+        const toolbarElement = document.createElement('div');
+        toolbarElement.classList.add('s-toolbar', 'g-toolbar');
+
+        const insightElement = document.createElement('div');
+        insightElement.classList.add('s-insight', 'g-clickable-text');
+        insightElement.insertAdjacentHTML('beforeend', '<span>Insight: <var data-insight></var></span>');
+        insightElement.addEventListener('click', () => {
+            const modal = createCustomElement(ModalElement);
+            modal.classList.add('insight-capacity-enhancer');
+            modal.setTitle('Insight Capacity');
+            const table = document.createElement('table');
+            const tBody = document.createElement('tbody');
+            for (const insightCapacityEnhancer of this.insightCapacityEnhancerList) {
+                tBody.insertAdjacentHTML('beforeend', `<tr><td>${insightCapacityEnhancer.name}</td><td>${insightCapacityEnhancer.curCount}/${insightCapacityEnhancer.data.probabilities.length}</td></tr>`);
+            }
+            table.appendChild(tBody);
+            modal.body.appendChild(table);
+            this.page.appendChild(modal);
+        });
+        toolbarElement.appendChild(insightElement);
+
+        const clearElement = document.createElement('span');
+        clearElement.classList.add('g-clickable-text', 'clear');
+        clearElement.textContent = 'Clear';
+        clearElement.addEventListener('click', this.clearPassives.bind(this));
+        toolbarElement.appendChild(clearElement);
+
         this.page.appendChild(toolbarElement);
 
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title">Passive List</div>');
@@ -31,7 +60,6 @@ export class Passives extends SkillPage {
         this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
 
         this.insightCapacityEnhancerList = data.insightCapacityEnhancerList.map(x => ({ ...x, data: x, curCount: x.probabilities.filter(x => x === 0).length }));
-        this.applyInsightCapacityEnhancersAsModifiers();
 
         this.skillList = data.passiveSkillList.map(data => {
             const baseName = getRankBaseName(data.name);
@@ -105,22 +133,7 @@ export class Passives extends SkillPage {
     }
 
     private updateInsightValueElement() {
-        this.page.querySelectorStrict('[data-insight-counter] [data-value]').textContent = this.insightRemaining.toFixed();
-    }
-
-    private createToolbar() {
-        const element = document.createElement('div');
-        element.classList.add('s-toolbar', 'g-toolbar');
-
-        element.insertAdjacentHTML('beforeend', `<div class="s-insight-counter" data-insight-counter><span>Insight: <var data-value>0</var></span></div>`);
-
-        const clearElement = document.createElement('span');
-        clearElement.classList.add('g-clickable-text', 'clear');
-        clearElement.textContent = 'Clear';
-        clearElement.addEventListener('click', this.clearPassives.bind(this));
-        element.appendChild(clearElement);
-
-        return element;
+        this.page.querySelectorStrict('[data-insight]').textContent = this.insightRemaining.toFixed();
     }
 
     protected showSkill(passive: PassiveSkill) {
