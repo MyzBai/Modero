@@ -87,6 +87,11 @@ export interface StatModPerStat {
     div?: number;
 }
 
+export interface ModReference {
+    type: typeof ReferenceNames[number];
+    name?: string;
+}
+
 export interface ModTemplateStat {
     name: StatName;
     valueType: StatModifierValueType;
@@ -95,7 +100,7 @@ export interface ModTemplateStat {
     modFlagsAny?: number;
     modFlagsAll?: number;
     extends?: ReadonlyArray<StatModTag>;
-    reference?: { type: typeof ReferenceNames[number]; name?: string; };
+    reference?: ModReference;
 }
 export type ModTemplateTarget = 'Player' | 'Enemy';
 export interface ModTemplate {

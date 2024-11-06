@@ -3,7 +3,7 @@ import { assertDefined } from 'src/shared/utils/assert';
 import type * as GameSerialization from '../serialization';
 import { isDefined } from 'src/shared/utils/utils';
 import { compareValueTypes } from '../utils/utils';
-import GameConfig from '../gameConfig/GameConfigExport';
+import type GameConfig from '../gameConfig/GameConfigExport';
 
 export type StatCollection = Readonly<Record<string, Statistic>>;
 export type GameStatCollection = ReturnType<typeof createGameStats>;

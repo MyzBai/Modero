@@ -4,6 +4,7 @@ import type { ModifierTag } from './types';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { createModTags } from './utils';
+import { assertDefined } from '../../shared/utils/assert';
 
 type AdditionalProperties = [string, string][];
 
@@ -34,10 +35,12 @@ export class ModifierInfoPopup {
     }
 
     private addDesc(body: HTMLElement, mod: Modifier) {
-        const regex = /\{([^\}]+)\}/g;
+        const regex = /\{([^}]+)\}/g;
         let i = 0;
         const desc = mod.text.replace(regex, (_, $1) => {
-            const { value, decimalCount } = mod.rangeValues[i]!;
+            const rangeValue = mod.rangeValues[i++];
+            assertDefined(rangeValue);
+            const { value, decimalCount } = rangeValue;
             const valueText = value.toFixed(decimalCount);
             return `${valueText}(${$1})`;
         });

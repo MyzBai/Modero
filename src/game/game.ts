@@ -43,7 +43,7 @@ export class Game {
     private _gameConfig?: GameConfig.Config;
     private _gameConfigId?: string;
     readonly stats = createGameStats();
-    private _resources?: Record<string, Statistic>;
+    private _resources: Record<string, Statistic> = {};
     private _initializationStage = GameInitializationStage.None;
     private _abortController = new AbortController();
     constructor() {
@@ -115,7 +115,9 @@ export class Game {
     }
 
     get gameConfig() {
-        return this._gameConfig!;
+        const gameConfig = this._gameConfig;
+        assertDefined(gameConfig);
+        return gameConfig;
     }
 
     get hasGameConfig() {
@@ -134,12 +136,12 @@ export class Game {
         return this._initializationStage;
     }
 
-    get resources() {
-        return this._resources!;
-    }
-
     get abortSignal() {
         return this._abortController.signal;
+    }
+
+    get resources() {
+        return this._resources;
     }
 
     async init(gameConfig: Config, gameConfigId: string, save?: UnsafeSerialization) {

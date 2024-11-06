@@ -1,3 +1,4 @@
+import { assertDefined } from '../../shared/utils/assert';
 import { game } from '../game';
 import type GameConfig from '../gameConfig/GameConfigExport';
 import type { ModifierTag } from '../mods/types';
@@ -10,7 +11,9 @@ export function getFormattedTag(tag: ModifierTag) {
 
 export function getResourceByName(name: string) {
     const id = game.gameConfig.resources.findStrict(x => x.name === name).id;
-    return game.resources[id]!;
+    const resource = game.resources[id];
+    assertDefined(resource);
+    return resource;
 }
 
 export function evalCost(cost: GameConfig.Cost) {

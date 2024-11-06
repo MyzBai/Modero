@@ -4,6 +4,7 @@ import { Modifier } from '../mods/Modifier';
 import { CombatContext } from '../combat/CombatContext';
 import type { Serialization, UnsafeSerialization } from '../serialization';
 import { clamp } from '../../shared/utils/utils';
+import { assertDefined } from '../../shared/utils/assert';
 
 export class Worlds {
     private page: HTMLElement;
@@ -27,7 +28,9 @@ export class Worlds {
     }
 
     get data() {
-        return game.gameConfig.worlds.worldList[game.stats.world.value - 1]!;
+        const data = game.gameConfig.worlds.worldList[game.stats.world.value - 1];
+        assertDefined(data);
+        return data;
     }
 
     get enemyBaseCount() {
@@ -37,7 +40,9 @@ export class Worlds {
     get enemyBaseLife() {
         const enemyBaseLifeList = game.gameConfig.worlds.enemyBaseLifeList;
         const index = clamp(player.level - 1, 0, enemyBaseLifeList.length - 1);
-        return enemyBaseLifeList[index]!;
+        const baseLife = enemyBaseLifeList[index];
+        assertDefined(baseLife);
+        return baseLife;
     }
 
     private createCombatContext() {

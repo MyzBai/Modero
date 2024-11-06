@@ -1,4 +1,5 @@
 import { ReferenceNames } from '../../game/gameConfig/GameConfig';
+import type { ModReference } from '../../game/mods/types';
 import { assertDefined } from './assert';
 import { ROMAN_NUMERALS } from './constants';
 
@@ -35,13 +36,17 @@ export function parseTextValues(text: string) {
     return values;
 }
 
-export function parseTextReferences(text: string) {
+export function parseTextReferences(text: string): ModReference | undefined {
     const match = text.match(referenceRegex);
-    if (!match || !match.groups) {
+    const groups = match?.groups;
+    if (!groups) {
         return;
     }
-    const type = match.groups['type']! as typeof ReferenceNames[number];
-    const name = match.groups['name']!;
+    assertDefined(groups['type']);
+    assertDefined(groups['name']);
+    const type = ReferenceNames.find(x => x === groups['type']);
+    assertDefined(type);
+    const name = groups['name'];
     return { type, name };
 }
 

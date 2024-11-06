@@ -34,9 +34,9 @@ export class Statistic extends Value {
         this.options.accumulators?.forEach(x => this.addAccumulator(x));
     }
 
-    static extractEnumType<T extends readonly string[]>(arr: T): T extends readonly (infer U)[] ? U : never {
-        return arr as any;
-    }
+    // static extractEnumType<T extends readonly string[]>(arr: T): T extends readonly (infer U)[] ? U : never {
+    //     return arr as any;
+    // }
 
     get visible() {
         if (this.options.hiddenBeforeMutation && !this.mutated) {

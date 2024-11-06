@@ -1,7 +1,7 @@
 import { createCustomElement } from '../../../shared/customElements/customElements';
 import { TabMenuElement } from '../../../shared/customElements/TabMenuElement';
 import { player } from '../../game';
-import * as GameConfig from '../../gameConfig/GameConfig';
+import type * as GameConfig from '../../gameConfig/GameConfig';
 import { Modifier } from '../../mods/Modifier';
 import { createLevelModal } from '../../utils/dom';
 import { Artifacts } from './artifacts/Artifacts';
@@ -63,7 +63,7 @@ export class Treasury extends Component {
             level: this.level.value,
             expanding: player.activity?.name === 'Expanding Treasury',
             artifacts: this.artifacts?.serialize()
-        }
+        };
     }
 
     deserialize({ treasury: save }: UnsafeSerialization): void {

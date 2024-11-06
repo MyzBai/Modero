@@ -1,4 +1,4 @@
-import { type ModTemplate, type ModTemplateStat } from './types';
+import { type ModReference, type ModTemplate } from './types';
 import { modTemplateList } from './modTemplates';
 import { parseTextReferences as parseTextReference, parseTextValues } from 'src/shared/utils/textParsing';
 import type { StatModifier } from './ModDB';
@@ -34,7 +34,7 @@ export class Modifier {
         readonly text: string,
         readonly template: ModTemplate,
         readonly rangeValues: ModValueRange[],
-        readonly reference?: ModTemplateStat['reference']) { }
+        readonly reference?: ModReference) { }
 
     get desc() {
         return Modifier.parseDescription(this);
@@ -82,7 +82,9 @@ export class Modifier {
                 assertDefined(mod.reference?.name, 'mod is missing a name in reference property');
                 return mod.reference.name;
             } else if ($1.startsWith('#')) {
-                const { value, decimalCount } = mod.rangeValues[i++]!;
+                const rangeValue = mod.rangeValues[i++];
+                assertDefined(rangeValue);
+                const { value, decimalCount } = rangeValue;
                 return value.toFixed(decimalCount);
             }
             throw new Error(`failed parsing mod description: (${mod.text} > ${mod.template.desc})`);
@@ -163,16 +165,5 @@ export class Modifier {
     static empty() {
         const template: ModTemplate = { desc: '[Removed]', stats: [], id: '' };
         return new Modifier(template.desc, template, []);
-    }
-
-    static combine(mod1: Modifier, mod2: Modifier) {
-        if (mod1.values.length !== mod2.values.length) {
-            throw Error('modifiers are not compatible');
-        }
-        const newValues = [];
-        for (let i = 0; i < mod1.values.length; i++) {
-            newValues[i] = mod1.values[i]! + mod2.values[i]!;
-        }
-        mod1.setValues(newValues);
     }
 }

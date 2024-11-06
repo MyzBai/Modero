@@ -2,6 +2,7 @@ import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { notifications } from '../../game';
 import { getRankNumeral, getNextRankObject, selectObjectByName, unlockObject, type AssignableObject } from '../../utils/objectUtils';
 import { pickOneFromPickProbability } from '../../../shared/utils/utils';
+import { assertDefined } from '../../../shared/utils/assert';
 
 type SkillType = 'Attack' | 'Aura' | 'Passive';
 export type AttackSkill = BaseSkill<GameConfig.AttackSkill>;
@@ -37,14 +38,16 @@ export abstract class SkillPage {
             return;
         }
         skill.rankList.filter(x => x.assigned).forEach(x => this.unassignSkill(x));
-        const element = this.elementMap.get(skill.baseName)!;
-        this.elementMap.forEach((el, key) => key === skill.baseName && el.classList.toggle('m-text-green', key === skill.baseName));
+        const element = this.elementMap.get(skill.baseName);
+        assertDefined(element);
         element.textContent = skill.name;
+        this.elementMap.forEach((el, key) => key === skill.baseName && el.classList.toggle('m-text-green', key === skill.baseName));
         skill.assigned = true;
     }
 
     protected unassignSkill(skill: Skill) {
-        const element = this.elementMap.get(skill.baseName)!;
+        const element = this.elementMap.get(skill.baseName);
+        assertDefined(element);
         element.classList.remove('m-text-green');
         skill.assigned = false;
     }

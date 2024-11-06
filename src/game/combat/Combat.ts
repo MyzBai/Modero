@@ -1,4 +1,4 @@
-import { CombatContext as CombatContext } from './CombatContext';
+import type { CombatContext as CombatContext } from './CombatContext';
 import { game, gameLoop, gameLoopAnim, player, statistics } from '../game';
 import type { Enemy } from './Enemy';
 import { Effects, effectTypes, type DOTEffect } from '../effects/Effects';

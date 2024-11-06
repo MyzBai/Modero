@@ -3,7 +3,7 @@ import { calcBaseAttackDamage, calcAilmentBaseDamage } from './calcDamage';
 import { calcModBase, calcModFlag, calcModIncMore, calcModTotal, type Configuration, type EnemyConfiguration, type PlayerConfiguration } from './calcMod';
 import { ModifierFlags } from '../mods/types';
 import type { EnemyStatCollection, PlayerStatCollection, StatCollection } from '../statistics/stats';
-import { Statistic } from '../statistics/Statistic';
+import type { Statistic } from '../statistics/Statistic';
 import { compareValueTypes } from '../utils/utils';
 import type { ModDB } from '../mods/ModDB';
 import type { PlayerUpdateStatsFlag } from '../Player';

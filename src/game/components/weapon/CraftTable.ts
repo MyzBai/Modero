@@ -164,7 +164,7 @@ export class CraftTable {
     private updateCraftListItemStates() {
         for (const craft of this.craftList) {
             craft.element.classList.toggle('selected', craft === this.selectedCraft);
-            let ctx = this.ctxCopy || this.ctx;
+            const ctx = this.ctxCopy || this.ctx;
             let disabled = true;
 
             switch (craft.template.type) {
@@ -632,7 +632,7 @@ export class CraftTable {
     updateCraftList() {
         // this.selectCraftById(null);
         this.craftListElement.querySelectorAll('[data-craft-id]').forEach(x => {
-            const id = x.getAttribute('data-craft-id')!;
+            const id = x.getAttribute('data-craft-id');
             const cost = this.craftList.findStrict(x => x.template.id === id).cost;
             x.querySelectorStrict('[data-resource]').textContent = cost ? cost.name : '';
             x.querySelectorStrict('[data-cost]').textContent = cost ? cost.value.toFixed() : '';

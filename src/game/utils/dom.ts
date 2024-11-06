@@ -6,6 +6,7 @@ import { ModalElement } from '../../shared/customElements/ModalElement';
 import type { Value } from '../../shared/utils/Value';
 import type { Cost } from '../gameConfig/GameConfig';
 import { evalCost, subtractCost, getResourceByName } from './utils';
+import { assertDefined } from '../../shared/utils/assert';
 
 
 export function createModListElement(modList: string[]): HTMLUListElement;
@@ -31,7 +32,8 @@ export function createLevelModal(opts: LevelModalOptions) {
     const modal = createCustomElement(ModalElement);
     modal.classList.add('g-level-modal');
     modal.setTitle(`${opts.title} Lv.${opts.level.value.toFixed()}`);
-    const levelData = opts.levelData[opts.level.value - 1]!;
+    const levelData = opts.levelData[opts.level.value - 1];
+    assertDefined(levelData);
 
     const modListElement = createModListElement(levelData.modList);
     modal.body.appendChild(modListElement);
@@ -54,7 +56,7 @@ export function createLevelModal(opts: LevelModalOptions) {
         modal.body.appendChild(upgradeButton);
 
         const callback = () => {
-            upgradeButton.toggleAttribute('disabled', !evalCost(levelData.upgradeCost!));
+            upgradeButton.toggleAttribute('disabled', !evalCost(upgradeCost));
         };
         const resource = getResourceByName(upgradeCost.name);
         resource.addListener('change', callback);

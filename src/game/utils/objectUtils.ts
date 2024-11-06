@@ -74,7 +74,7 @@ export function createObjectListElement(obj: { id: string; name: string; probabi
     return element;
 }
 
-export function getNextRankObject<T extends AssignableObject>(obj: T & { rankList: T[] }): T | undefined {
+export function getNextRankObject<T extends AssignableObject>(obj: T & { rankList: T[]; }): T | undefined {
     const index = obj.rankList.findIndex(x => x.name === obj.name) + 1;
     const nextRankObj = obj.rankList[index];
     return nextRankObj;

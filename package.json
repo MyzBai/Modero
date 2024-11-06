@@ -13,12 +13,9 @@
         "build-watch": "run-p \"build:esbuild --watch\" \"build:sass --watch\"",
         "build:esbuild": "tsx scripts/esbuild.ts",
         "build:sass": "tsx scripts/sass.ts",
-        "build:gameConfig": "run-s build:gameConfigSchema build:gameConfigSchemaValidator",
-        "build:gameConfigSchema": "tsx scripts/generateGameConfigSchema.ts",
-        "build:gameConfigSchemaValidator": "tsx scripts/generateGameConfigSchemaValidator.ts",
+        "build:gameConfig": "tsx scripts/generateGameConfigSchemaValidator.ts && tsx scripts/generateGameConfigSchema.ts",
         "eslint": "npx eslint --ext ts .",
-        "tests": "tsx tests/statMod.test.ts",
-        "validate": "run-p \"eslint\" \"tests\""
+        "test": "npm run eslint && tsx tests/statMod.test.ts"
     },
     "repository": {
         "type": "git",
@@ -48,6 +45,6 @@
         "sass": "^1.56.1",
         "tsx": "^4.7.2",
         "typescript": "^5.6.3",
-        "typescript-json-schema": "^0.63.0"
+        "typescript-json-schema": "^0.65.1"
     }
 }

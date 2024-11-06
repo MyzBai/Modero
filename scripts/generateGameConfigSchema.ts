@@ -101,7 +101,7 @@ function createSchemaOverrideProperties(generator: JsonSchemaGenerator) {
 function createStringSchemaOverride(generator: JsonSchemaGenerator, opts: StringSchemaOverrideOptions) {
     const createDefaultSnippet = (text: string) => {
         let count = 1;
-        return text.replace(/\{([^\}])\}/g, (_, $1) => {
+        return text.replace(/\{([^}])\}/g, (_, $1) => {
             return `{\${${count++}:${$1}}}`;
         });
     };
@@ -151,7 +151,7 @@ function replaceSymbol(text: string) {
 
 function replaceHash(text: string, valueOpts?: ValueOptions) {
     return text.replace(/(#+)/g, str => {
-        let pattern = str.length > 1 ? numberRangeRegex.source : integerRangeRegex.source;
+        const pattern = str.length > 1 ? numberRangeRegex.source : integerRangeRegex.source;
         if (valueOpts?.excludeBrackets) {
             return pattern;
         }

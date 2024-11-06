@@ -61,7 +61,7 @@ export class GuildHall extends Component {
                 const modList = this.data.guildList.findStrict(x => x.name === guild.name).modList;
                 const modListElement = createModListElement(modList);
                 modal.addBodyElement(modListElement);
-            })
+            });
             fragment.appendChild(element);
             for (const guildClass of this.data.guildClassList.filter(x => x.guildName === guild.name)) {
                 const element = createObjectListElement(guildClass);
@@ -185,7 +185,7 @@ export class GuildHall extends Component {
         save.guildHall = {
             level: this.level.value,
             classId: this.activeGuildClass?.data.id,
-        }
+        };
     }
 
     deserialize({ guildHall: save }: UnsafeSerialization) {
@@ -197,7 +197,5 @@ export class GuildHall extends Component {
             this.assignClass(guildClass);
             this.selectGuildClassByName(guildClass.name);
         }
-
-        this.selectGuildClassByName(this.data.guildClassList[0]?.name!);
     }
 }

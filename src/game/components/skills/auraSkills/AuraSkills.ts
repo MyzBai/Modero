@@ -116,7 +116,7 @@ export class AuraSkills extends SkillPage {
             this.createSkillSlot();
         }
         if (!this.selectedSkillSlot && this.skillSlotList[0]) {
-            this.selectSkillSlot(this.skillSlotList[0])
+            this.selectSkillSlot(this.skillSlotList[0]);
         }
     }
 

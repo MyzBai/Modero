@@ -150,5 +150,5 @@ export interface Treasury {
             assigned: boolean;
             expFac: number;
         }[];
-    }
+    };
 }

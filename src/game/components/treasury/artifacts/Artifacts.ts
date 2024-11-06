@@ -113,7 +113,8 @@ export class Artifacts {
         player.modDB.add(`Artifact/${artifact.data.name}`, Modifier.extractStatModifierList(...Modifier.modListFromTexts(artifact.data.modList)));
         this.updateArtifactsCounter();
 
-        const element = this.elementMap.get(artifact.baseName)!;
+        const element = this.elementMap.get(artifact.baseName);
+        assertDefined(element);
         element.setAttribute('data-tag', 'valid');
         element.textContent = artifact.name;
     }
@@ -123,9 +124,10 @@ export class Artifacts {
         player.modDB.removeBySource(`Artifact/${artifact.data.name}`);
         this.updateArtifactsCounter();
 
-        const element = this.elementMap.get(artifact.baseName)!;
+        const element = this.elementMap.get(artifact.baseName);
+        assertDefined(element);
         element.removeAttribute('data-tag');
-        element.textContent = this.artifactList.find(x => x.baseName === artifact.baseName)!.name;
+        element.textContent = this.artifactList.findStrict(x => x.baseName === artifact.baseName).name;
     }
 
     private showArtifact(artifact: Artifact) {

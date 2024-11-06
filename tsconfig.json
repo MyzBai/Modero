@@ -28,6 +28,6 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
     },
-    "include": [ "src" ],
+    "include": [ "src", "scripts", "tests" ],
     "exclude": [ "public", "node_modules" ],
 }

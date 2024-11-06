@@ -14,7 +14,7 @@ export enum PlayerUpdateStatsFlag {
     Combat = 1 << 0,
     Persistent = 1 << 1,
     All = PlayerUpdateStatsFlag.Combat | PlayerUpdateStatsFlag.Persistent
-};
+}
 
 
 export const playerActivityNameList = ['Combat', 'Meditating', 'Refining Weapon', 'Expanding Treasury', 'Training'] as const;

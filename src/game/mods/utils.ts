@@ -86,15 +86,3 @@ export function extractModifier<T extends ReadonlyArray<ModTemplate>>(list: T, d
     assertDefined(template);
     return template;
 }
-
-export function combineModifiers(modList: Modifier[]): Modifier[] {
-    const map = new Map<string, Modifier>();
-    for (const mod of modList) {
-        if (!map.has(mod.template.desc)) {
-            map.set(mod.template.desc, Modifier.modFromText(mod.text));
-            continue;
-        }
-        Modifier.combine(map.get(mod.template.desc)!, mod);
-    }
-    return [...map.values()];
-}
