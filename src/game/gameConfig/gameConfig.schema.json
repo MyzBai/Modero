@@ -355,6 +355,11 @@
         "auraSkills": {
           "type": "object",
           "properties": {
+            "levelReq": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
             "auraSkillList": {
               "type": "array",
               "items": {

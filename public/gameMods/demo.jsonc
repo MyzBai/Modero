@@ -96,22 +96,21 @@
                     "upgradeCost": { "name": "Gold", "value": 1000 },
                     "modList": [
                         "+{1} Mana Regeneration",
-                        "+{1} Additional Aura Slots",
                         "+{100} Maximum Mana"
                     ]
                 },
                 {
-                    "upgradeCost": { "name": "Gold", "value": 1000 },
+                    "upgradeCost": { "name": "Gold", "value": 5000 },
                     "modList": [
                         "+{2} Mana Regeneration",
-                        "+{2} Additional Aura Slots",
+                        "+{1} Additional Aura Slots",
                         "+{150} Maximum Mana"
                     ]
                 },
                 {
                     "modList": [
                         "+{3} Mana Regeneration",
-                        "+{3} Additional Aura Slots",
+                        "+{2} Additional Aura Slots",
                         "+{200} Maximum Mana"
                     ]
                 }
@@ -225,6 +224,7 @@
                 ]
             },
             "auraSkills": {
+                "levelReq": 2,
                 "auraSkillList": [
                     {
                         "id": "3a3d8a",

@@ -58,12 +58,15 @@ export class Skills extends Component {
             menu.registerPageElement(this.attackSkills.page, 'attack');
             this.page.append(this.attackSkills.page);
         }
-        if (data.auraSkills) {
-            this.auraSkills = new AuraSkills(data.auraSkills);
-            menu.addMenuItem('Aura', 'aura', 1);
-            menu.registerPageElement(this.auraSkills.page, 'aura');
-            menu.sort();
-            this.page.append(this.auraSkills.page);
+        const auraSkillsData = data.auraSkills;
+        if (auraSkillsData) {
+            this.level.registerTargetValueCallback(auraSkillsData.levelReq ?? 1, () => {
+                this.auraSkills = new AuraSkills(auraSkillsData);
+                menu.addMenuItem('Aura', 'aura', 1);
+                menu.registerPageElement(this.auraSkills.page, 'aura');
+                menu.sort();
+                this.page.append(this.auraSkills.page);
+            });
         }
         if (data.passiveSkills) {
             this.passiveSkills = new Passives(data.passiveSkills);
@@ -72,7 +75,7 @@ export class Skills extends Component {
             this.page.appendChild(this.passiveSkills.page);
         }
 
-        this.level.addListener('change', this.updateSkillsLevel.bind(this));
+        this.level.addListener('add', this.updateSkillsLevel.bind(this));
     }
 
     private openSkillsLevelModal() {
@@ -104,6 +107,7 @@ export class Skills extends Component {
     deserialize({ skills: save }: UnsafeSerialization) {
         if (isNumber(save?.level)) {
             this.level.set(save.level);
+            this.updateSkillsLevel();
         }
         if (save?.attackSkills) {
             this.attackSkills?.deserialize(save.attackSkills);
@@ -114,5 +118,6 @@ export class Skills extends Component {
         if (save?.passiveSkills) {
             this.passiveSkills?.deserialize(save.passiveSkills);
         }
+
     }
 }

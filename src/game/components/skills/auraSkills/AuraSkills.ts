@@ -98,6 +98,7 @@ export class AuraSkills extends SkillPage {
         });
 
         player.stats.maxAura.addListener('change', this.updateSkillSlots.bind(this));
+
         this.updateSkillSlots();
     }
 

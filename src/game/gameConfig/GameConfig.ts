@@ -91,6 +91,7 @@ export interface Skills {
         attackSkillList: AttackSkill[];
     };
     auraSkills?: {
+        levelReq?: Level;
         auraSkillList: AuraSkill[];
     };
     passiveSkills?: {
