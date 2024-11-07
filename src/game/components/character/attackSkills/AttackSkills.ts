@@ -13,7 +13,7 @@ import { SkillPage, type AttackSkill } from '../SkillPage';
 export class AttackSkills extends SkillPage {
     readonly page: HTMLElement;
     protected readonly skillList: AttackSkill[];
-    constructor(data: Required<GameConfig.Skills>['attackSkills']) {
+    constructor(data: Required<GameConfig.Character>['attackSkills']) {
         super();
         this.page = document.createElement('div');
         this.page.classList.add('p-attack-skills');
@@ -122,14 +122,14 @@ export class AttackSkills extends SkillPage {
         }
     }
 
-    serialize(): GameSerialization.Skills['attackSkills'] {
+    serialize(): GameSerialization.Character['attackSkills'] {
         return {
             skillId: this.activeSkill.data.id,
             skillList: this.skillList.filter(x => x.unlocked).map(x => ({ id: x.data.id, expFac: x.exp / x.maxExp }))
         };
     }
 
-    deserialize(save: DeepPartial<GameSerialization.Skills['attackSkills']>) {
+    deserialize(save: DeepPartial<GameSerialization.Character['attackSkills']>) {
         const activeSkill = this.skillList.find(x => x.data.id === save?.skillId);
         if (activeSkill) {
             this.assignSkill(activeSkill);

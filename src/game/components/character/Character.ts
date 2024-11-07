@@ -15,23 +15,23 @@ import { Value } from '../../../shared/utils/Value';
 import { isNumber } from '../../../shared/utils/utils';
 import { assertDefined } from '../../../shared/utils/assert';
 
-export class Skills extends Component {
+export class Character extends Component {
 
     private attackSkills?: AttackSkills;
     private auraSkills?: AuraSkills;
     private passiveSkills?: Passives;
     private readonly level = new Value(1);
-    constructor(readonly data: GameConfig.Skills) {
-        super('skills');
+    constructor(readonly data: GameConfig.Character) {
+        super('character');
 
         const titleElement = document.createElement('div');
         titleElement.classList.add('g-title');
-        titleElement.textContent = 'Skills';
+        titleElement.textContent = 'Character';
         if (data.levelList) {
-            titleElement.innerHTML = `<span class="g-clickable-text">Skills Lv.<var data-level>1</var></span>`;
-            titleElement.addEventListener('click', this.openSkillsLevelModal.bind(this));
+            titleElement.innerHTML = `<span class="g-clickable-text">Character Lv.<var data-level>1</var></span>`;
+            titleElement.addEventListener('click', this.openCharacterLevelModal.bind(this));
             this.page.appendChild(titleElement);
-            this.updateSkillsLevel();
+            this.updateCharacterLevel();
         }
         this.page.appendChild(titleElement);
         const menu = createCustomElement(TabMenuElement);
@@ -39,7 +39,8 @@ export class Skills extends Component {
         menu.setDirection('horizontal');
         this.page.appendChild(menu);
 
-        const helpIconElement = createHelpIcon('Skills', () => `
+        const helpIconElement = createHelpIcon('Character', () => `
+            [Attacks]
             Attack skills contains two base stats, attack speed and attack effectiveness.
             Attack speed is your base attack rate and can be further scaled with stat modifiers.
             Both attack damage and damage over time (DOT) are scaled by attack effectiveness when performing a hit.
@@ -75,39 +76,38 @@ export class Skills extends Component {
             this.page.appendChild(this.passiveSkills.page);
         }
 
-        this.level.addListener('add', this.updateSkillsLevel.bind(this));
+        this.level.addListener('add', this.updateCharacterLevel.bind(this));
     }
 
-    private openSkillsLevelModal() {
+    private openCharacterLevelModal() {
         assertDefined(this.data.levelList);
         createLevelModal({
-            title: 'Skills',
+            title: 'Character',
             level: this.level,
             levelData: this.data.levelList
         });
     }
 
-    private updateSkillsLevel() {
+    private updateCharacterLevel() {
         this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
         const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
-        player.modDB.replace('Skills', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+        player.modDB.replace('Character', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
         player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
     serialize(save: Serialization) {
-        save.skills = {
+        save.character = {
             level: this.level.value,
-            meditating: player.activity?.name === 'Meditating',
             attackSkills: this.attackSkills?.serialize(),
             auraSkills: this.auraSkills?.serialize(),
             passiveSkills: this.passiveSkills?.serialize(),
         };
     }
 
-    deserialize({ skills: save }: UnsafeSerialization) {
+    deserialize({ character: save }: UnsafeSerialization) {
         if (isNumber(save?.level)) {
             this.level.set(save.level);
-            this.updateSkillsLevel();
+            this.updateCharacterLevel();
         }
         if (save?.attackSkills) {
             this.attackSkills?.deserialize(save.attackSkills);

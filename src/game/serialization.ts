@@ -16,7 +16,7 @@ export interface Serialization {
     //components
     guildHall?: GuildHall;
     weapon?: Weapon;
-    skills?: Skills;
+    character?: Character;
     treasury?: Treasury;
     elementHighlightIdList?: string[];
 }
@@ -109,10 +109,8 @@ export interface WeaponCrafting {
     modList?: SerializedModifier[];
 }
 
-export interface Skills {
+export interface Character {
     level?: number;
-    exp?: number;
-    meditating?: boolean;
     attackSkills?: {
         skillId: string;
         skillList: {

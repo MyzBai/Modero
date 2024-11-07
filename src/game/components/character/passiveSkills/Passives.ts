@@ -13,7 +13,7 @@ import { ModalElement } from '../../../../shared/customElements/ModalElement';
 
 interface InsightCapacityEnhancer {
     name: string;
-    data: Required<GameConfig.Skills>['passiveSkills']['insightCapacityEnhancerList'][number];
+    data: Required<GameConfig.Character>['passiveSkills']['insightCapacityEnhancerList'][number];
     curCount: number;
 }
 
@@ -21,7 +21,7 @@ export class Passives extends SkillPage {
     readonly page: HTMLElement;
     protected readonly skillList: PassiveSkill[];
     private readonly insightCapacityEnhancerList: InsightCapacityEnhancer[];
-    constructor(data: Required<GameConfig.Skills>['passiveSkills']) {
+    constructor(data: Required<GameConfig.Character>['passiveSkills']) {
         super();
         this.page = document.createElement('div');
         this.page.classList.add('p-passive-skills');
@@ -78,7 +78,7 @@ export class Passives extends SkillPage {
                 continue;
             }
             const basePassive = this.skillList.find(x => x.baseName === passiveSkill.baseName);
-            passiveSkill.data.insight = basePassive?.data.insight ?? 0;
+            passiveSkill.data.insightCost = basePassive?.data.insightCost ?? 0;
         }
         this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
         this.skillList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
@@ -129,7 +129,7 @@ export class Passives extends SkillPage {
     }
 
     get insightAllocated() {
-        return this.skillList.filter(x => x.assigned).map(x => x.data.insight ?? 0).reduce((a, b) => a += b, 0);
+        return this.skillList.filter(x => x.assigned).map(x => x.data.insightCost ?? 0).reduce((a, b) => a += b, 0);
     }
 
     private updateInsightValueElement() {
@@ -138,8 +138,8 @@ export class Passives extends SkillPage {
 
     protected showSkill(passive: PassiveSkill) {
         const propertyList = [];
-        if (passive.data.insight) {
-            propertyList.push(['Insight', passive.data.insight.toFixed()]);
+        if (passive.data.insightCost) {
+            propertyList.push(['Insight', passive.data.insightCost.toFixed()]);
         }
         const itemInfoElements = createObjectInfoElements({
             obj: passive,
@@ -153,7 +153,7 @@ export class Passives extends SkillPage {
         const updateButton = () => {
             const rankList = this.skillList.filter(x => x.baseName === passive.baseName);
             let disabled = true;
-            if (rankList.some(x => x.assigned) || (passive.data.insight ?? 0) <= this.insightRemaining) {
+            if (rankList.some(x => x.assigned) || (passive.data.insightCost ?? 0) <= this.insightRemaining) {
                 disabled = false;
             }
             button.textContent = 'Allocate';
@@ -228,9 +228,10 @@ export class Passives extends SkillPage {
         this.applyInsightCapacityEnhancersAsModifiers();
         setTimeout(() => {
             this.updateInsightValueElement();
+            this.selectSkillByName(this.selectedPassive.name);
         }, 100);
 
-        const skillsPage = this.page.closest('[data-page-content="skills"]');
+        const skillsPage = this.page.closest('[data-page-content="character"]');
         assertNonNullable(skillsPage);
 
         notifications.addNotification({
@@ -246,14 +247,14 @@ export class Passives extends SkillPage {
         }
     }
 
-    serialize(): GameSerialization.Skills['passiveSkills'] {
+    serialize(): GameSerialization.Character['passiveSkills'] {
         return {
             insightCapacityEnhancerList: this.insightCapacityEnhancerList.filter(x => x.curCount > 0).map(x => ({ id: x.data.id, count: x.curCount })),
             passiveList: this.skillList.filter(x => x.unlocked).map(x => ({ id: x.data.id, allocated: x.assigned, expFac: x.exp / x.maxExp }))
         };
     }
 
-    deserialize(save: DeepPartial<GameSerialization.Skills['passiveSkills']>) {
+    deserialize(save: DeepPartial<GameSerialization.Character['passiveSkills']>) {
         for (const data of save?.insightCapacityEnhancerList?.filter(isDefined) || []) {
             const insightCapacityEnhancer = this.insightCapacityEnhancerList.find(x => x.data.id === data.id);
             if (!insightCapacityEnhancer || !data.count) {
@@ -270,7 +271,7 @@ export class Passives extends SkillPage {
             }
             passive.exp = passive.maxExp * (data.expFac ?? 0);
             unlockObject(passive, this.elementMap);
-            if (data.allocated && (passive.data.insight ?? 0) <= this.insightRemaining) {
+            if (data.allocated && (passive.data.insightCost ?? 0) <= this.insightRemaining) {
                 this.assignSkill(passive);
             }
         }

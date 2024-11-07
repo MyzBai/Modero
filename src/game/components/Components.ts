@@ -2,7 +2,7 @@ import { assertDefined } from 'src/shared/utils/assert';
 import { GameInitializationStage, game, notifications } from '../game';
 import type { Component } from './Component';
 import { Achievements } from './achievements/Achievements';
-import { Skills } from './skills/Skills';
+import { Character } from './character/Character';
 import type * as GameSerialization from '../serialization';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Weapon } from './weapon/Weapon';
@@ -15,7 +15,7 @@ type ComponentUnion = NonNullable<PropertyValuesToUnion<GameConfig.Components>>;
 export class Components {
     private readonly components = {
         guildHall: { label: 'Guild Hall', constr: GuildHall },
-        skills: { label: 'Skills', constr: Skills },
+        character: { label: 'Character', constr: Character },
         weapon: { label: 'Weapon', constr: Weapon },
         treasury: { label: 'Treasury', constr: Treasury },
         achievements: { label: 'Achievements', constr: Achievements },

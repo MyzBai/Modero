@@ -26,8 +26,8 @@
         "guildHall": {
           "$ref": "#/definitions/GuildHall"
         },
-        "skills": {
-          "$ref": "#/definitions/Skills"
+        "character": {
+          "$ref": "#/definitions/Character"
         },
         "weapon": {
           "$ref": "#/definitions/Weapon"
@@ -313,7 +313,7 @@
         "name"
       ]
     },
-    "Skills": {
+    "Character": {
       "type": "object",
       "properties": {
         "levelList": {
@@ -341,6 +341,7 @@
           "type": "object",
           "properties": {
             "attackSkillList": {
+              "description": "TJS-minItems 1",
               "type": "array",
               "items": {
                 "$ref": "#/definitions/AttackSkill"
@@ -361,6 +362,7 @@
               "default": 1
             },
             "auraSkillList": {
+              "description": "TJS-minItems 1",
               "type": "array",
               "items": {
                 "$ref": "#/definitions/AuraSkill"
@@ -408,6 +410,7 @@
               }
             },
             "passiveSkillList": {
+              "description": "TJS-minItems 1",
               "type": "array",
               "items": {
                 "$ref": "#/definitions/PassiveSkill"
@@ -433,6 +436,20 @@
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
         },
+        "requirement": {
+          "type": "object",
+          "properties": {
+            "characterLevel": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "characterLevel"
+          ]
+        },
         "manaCost": {
           "type": "integer",
           "minimum": 0
@@ -452,12 +469,6 @@
             "$ref": "#/definitions/PlayerMod"
           },
           "type": "array"
-        },
-        "probability": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 100,
-          "description": "Percent = 1/Probability"
         },
         "exp": {
           "type": "integer",
@@ -486,6 +497,20 @@
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
         },
+        "requirement": {
+          "type": "object",
+          "properties": {
+            "characterLevel": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "characterLevel"
+          ]
+        },
         "manaCost": {
           "type": "integer",
           "minimum": 0
@@ -500,15 +525,10 @@
           },
           "type": "array"
         },
-        "probability": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 100,
-          "description": "Percent = 1/Probability"
-        },
         "exp": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "1 exp gained per second while active"
         }
       },
       "additionalProperties": false,
@@ -530,9 +550,24 @@
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
         },
-        "insight": {
+        "requirement": {
+          "type": "object",
+          "properties": {
+            "characterLevel": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "characterLevel"
+          ]
+        },
+        "insightCost": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "only first rank requires this property"
         },
         "modList": {
           "items": {
@@ -540,15 +575,10 @@
           },
           "type": "array"
         },
-        "probability": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 100,
-          "description": "Percent = 1/Probability"
-        },
         "exp": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "1 exp gained per second while active"
         }
       },
       "additionalProperties": false,

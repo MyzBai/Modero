@@ -10,7 +10,7 @@ export interface Config {
     worlds: Worlds;
     components?: {
         guildHall?: GuildHall;
-        skills?: Skills;
+        character?: Character;
         weapon?: Weapon;
         treasury?: Treasury;
         achievements?: Achievements;
@@ -82,16 +82,18 @@ export interface WeaponCraft {
     successRates: { min: UnsignedInteger; max: UnsignedInteger; };
 }
 
-export interface Skills {
+export interface Character {
     levelList?: {
         upgradeCost?: Cost;
         modList: SkillsUpgradeModList;
     }[];
     attackSkills?: {
+        /**TJS-minItems 1 */
         attackSkillList: AttackSkill[];
     };
     auraSkills?: {
         levelReq?: Level;
+        /**TJS-minItems 1 */
         auraSkillList: AuraSkill[];
     };
     passiveSkills?: {
@@ -100,39 +102,42 @@ export interface Skills {
             name: Name;
             insight: UnsignedInteger;
             probabilities: Probability[];
-            // flavourText?: FlavourText;
         }[];
+        /**TJS-minItems 1 */
         passiveSkillList: PassiveSkill[];
     };
 }
 export interface AttackSkill {
     id: Id;
     name: Name;
+    requirement?: { characterLevel: Level; };
     manaCost: UnsignedInteger;
     /**@TJS-default 1 @TJS-minimum 0.1 */
     attackSpeed: number;
     /**@TJS-default 100 */
     attackEffectiveness: UnsignedInteger;
     modList: PlayerModList;
-    probability?: Probability;
     /**@description 1 exp gained per attack */
     exp?: Exp;
 }
 export interface AuraSkill {
     id: Id;
     name: Name;
+    requirement?: { characterLevel: Level; };
     manaCost: UnsignedInteger;
     baseDuration: UnsignedInteger;
     modList: PlayerModList;
-    probability?: Probability;
+    /**@description 1 exp gained per second while active */
     exp?: UnsignedInteger;
 }
 export interface PassiveSkill {
     id: Id;
     name: Name;
-    insight?: UnsignedInteger;
+    requirement?: { characterLevel: Level; };
+    /**@description only first rank requires this property */
+    insightCost?: UnsignedInteger;
     modList: PlayerModList;
-    probability?: Probability;
+    /**@description 1 exp gained per second while active */
     exp?: UnsignedInteger;
 }
 

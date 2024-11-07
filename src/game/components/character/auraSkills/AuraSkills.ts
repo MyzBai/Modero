@@ -24,7 +24,7 @@ export class AuraSkills extends SkillPage {
     readonly page: HTMLElement;
     readonly skillSlotList: SkillSlot[] = [];
     protected readonly skillList: AuraSkill[];
-    constructor(data: Required<GameConfig.Skills>['auraSkills']) {
+    constructor(data: Required<GameConfig.Character>['auraSkills']) {
         super();
         this.page = document.createElement('div');
         this.page.classList.add('p-aura-skills');
@@ -319,14 +319,14 @@ export class AuraSkills extends SkillPage {
         player.modDB.removeBySource(`AuraSkill/${skill.data.name}`);
     }
 
-    serialize(): GameSerialization.Skills['auraSkills'] {
+    serialize(): GameSerialization.Character['auraSkills'] {
         return {
             skillSlotList: this.skillSlotList.map(x => x.skill ? { id: x.skill.data.id, timePct: x.time / x.duration } : undefined),
             skillList: this.skillList.filter(x => x.unlocked).map(x => ({ id: x.data.id, expFac: x.exp / x.maxExp }))
         };
     }
 
-    deserialize(save: DeepPartial<GameSerialization.Skills['auraSkills']>) {
+    deserialize(save: DeepPartial<GameSerialization.Character['auraSkills']>) {
         for (const skillData of save?.skillList?.filter(isDefined) || []) {
             const skill = this.skillList.find(x => x.data.id === skillData?.id);
             if (skill) {

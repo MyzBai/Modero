@@ -90,7 +90,7 @@
         ]
     },
     "components": {
-        "skills": {
+        "character": {
             "levelList": [
                 {
                     "upgradeCost": { "name": "Gold", "value": 1000 },
@@ -274,7 +274,6 @@
                     {
                         "id": "401583",
                         "name": "Attack Speed",
-                        "probability": 500,
                         "baseDuration": 20,
                         "manaCost": 50,
                         "modList": [ "{20}% More Attack Speed" ]
@@ -283,7 +282,6 @@
                         "id": "54e6e1",
                         "name": "Critical Hit I",
                         "exp": 600,
-                        "probability": 200,
                         "baseDuration": 30,
                         "manaCost": 100,
                         "modList": [ "+{20}% Critical Hit Chance", "+{60}% Critical Hit Multiplier" ]
@@ -318,7 +316,7 @@
                     {
                         "id": "068015",
                         "name": "Physical Attack Damage I",
-                        "insight": 200,
+                        "insightCost": 200,
                         "exp": 600,
                         "modList": [ "{20}% More Physical Attack Damage" ]
                     },
@@ -337,7 +335,7 @@
                         "id": "d5e6c1",
                         "name": "Elemental Attack Damage I",
                         "exp": 600,
-                        "insight": 200,
+                        "insightCost": 200,
                         "modList": [ "{20}% More Elemental Attack Damage" ]
                     },
                     {
@@ -355,7 +353,7 @@
                         "id": "87bd24",
                         "name": "Damage Over Time I",
                         "exp": 600,
-                        "insight": 100,
+                        "insightCost": 100,
                         "modList": [ "{20}% More Damage Over Time" ]
                     },
                     {
@@ -373,8 +371,7 @@
                         "id": "710279",
                         "name": "Attack Speed I",
                         "exp": 600,
-                        "probability": 300,
-                        "insight": 300,
+                        "insightCost": 300,
                         "modList": [ "{10}% More Attack Speed" ]
                     },
                     {
@@ -392,7 +389,7 @@
                         "id": "2d4245",
                         "name": "Critical Hit Chance I",
                         "exp": 600,
-                        "insight": 300,
+                        "insightCost": 300,
                         "modList": [ "+{10}% Critical Hit Chance" ]
                     },
                     {
@@ -410,8 +407,7 @@
                         "id": "ae708a",
                         "name": "Critical Hit Multiplier I",
                         "exp": 600,
-                        "probability": 500,
-                        "insight": 300,
+                        "insightCost": 300,
                         "modList": [ "+{30}% Critical Hit Multiplier" ]
                     },
                     {
@@ -429,8 +425,7 @@
                         "id": "0ca681",
                         "name": "Maximum Mana I",
                         "exp": 600,
-                        "probability": 300,
-                        "insight": 200,
+                        "insightCost": 200,
                         "modList": [ "+{100} Maximum Mana" ]
                     },
                     {
@@ -448,7 +443,7 @@
                         "id": "1f81a4",
                         "name": "Mana Regeneration I",
                         "exp": 600,
-                        "insight": 100,
+                        "insightCost": 100,
                         "modList": [ "+{1} Mana Regeneration" ]
                     },
                     {
@@ -466,8 +461,7 @@
                         "id": "ca2b79",
                         "name": "Strength I",
                         "exp": 600,
-                        "probability": 100,
-                        "insight": 100,
+                        "insightCost": 100,
                         "modList": [ "+{20} Strength" ]
                     },
                     {
@@ -485,8 +479,7 @@
                         "id": "a274a9",
                         "name": "Dexterity I",
                         "exp": 600,
-                        "probability": 100,
-                        "insight": 100,
+                        "insightCost": 100,
                         "modList": [ "+{20} Dexterity" ]
                     },
                     {
@@ -504,8 +497,7 @@
                         "id": "530862",
                         "name": "Intelligence I",
                         "exp": 600,
-                        "probability": 100,
-                        "insight": 100,
+                        "insightCost": 100,
                         "modList": [ "+{20} Intelligence" ]
                     },
                     {

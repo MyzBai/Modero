@@ -25,7 +25,17 @@ import { createModEntryInfoElement } from 'src/home/dom';
 import type GameConfig from './gameConfig/GameConfigExport';
 import type { Statistic } from './statistics/Statistic';
 
-export const mainMenuNames = ['combat', 'skills', 'weapon', 'treasury', 'guildHall', 'worlds', 'achievements', 'statistics', 'notifications'] as const;
+export const mainMenuNames = [
+    'combat',
+    'character',
+    'weapon',
+    'treasury',
+    'guildHall',
+    'worlds',
+    'achievements',
+    'statistics',
+    'notifications'
+] as const;
 
 export const enum GameInitializationStage {
     None = 0,
