@@ -906,7 +906,6 @@
         },
         "achievements": {
             "achievementList": [
-                { "description": "Reach Level {10}" },
                 { "description": "Deal {1000000} Total Physical Attack Damage" },
                 { "description": "Deal {1000000} Total Elemental Attack Damage" },
                 { "description": "Deal {1000000} Total Bleed Damage" },

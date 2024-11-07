@@ -18,7 +18,6 @@ export interface TaskTemplateArgs {
 }
 
 export const taskTemplates = [
-    { desc: 'Reach Level #', progress: (data) => data.playerStats.maxLevel.value / data.value },
     { desc: 'Deal # Total Physical Attack Damage', progress: (data) => data.gameStats.totalPhysicalAttackDamage.value / data.value },
     { desc: 'Deal # Total Elemental Attack Damage', progress: (data) => data.gameStats.totalElementalAttackDamage.value / data.value },
     { desc: 'Deal # Total Physical Damage', progress: (data) => data.gameStats.totalPhysicalDamage.value / data.value },

@@ -1254,9 +1254,6 @@
       "pattern": "^[^#]*$",
       "defaultSnippets": [
         {
-          "body": "Reach Level {${1:#}}"
-        },
-        {
           "body": "Deal {${1:#}} Total Physical Attack Damage"
         },
         {
@@ -1282,9 +1279,6 @@
         }
       ],
       "oneOf": [
-        {
-          "pattern": "^Reach Level \\{(([0-9]+)([-]([0-9]+))?)\\}$"
-        },
         {
           "pattern": "^Deal \\{(([0-9]+)([-]([0-9]+))?)\\} Total Physical Attack Damage$"
         },
