@@ -224,7 +224,7 @@
                 ]
             },
             "auraSkills": {
-                "levelReq": 2,
+                "requirement": { "characterLevel": 2 },
                 "auraSkillList": [
                     {
                         "id": "3a3d8a",

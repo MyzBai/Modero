@@ -9,6 +9,7 @@ import { createObjectListElement, createAssignableObject, createObjectInfoElemen
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { SkillPage, type AuraSkill } from '../SkillPage';
+import type { Value } from '../../../../shared/utils/Value';
 
 interface SkillSlot {
     skill: AuraSkill | null;
@@ -24,7 +25,7 @@ export class AuraSkills extends SkillPage {
     readonly page: HTMLElement;
     readonly skillSlotList: SkillSlot[] = [];
     protected readonly skillList: AuraSkill[];
-    constructor(data: Required<GameConfig.Character>['auraSkills']) {
+    constructor(characterLevel: Value, data: Required<GameConfig.Character>['auraSkills']) {
         super();
         this.page = document.createElement('div');
         this.page.classList.add('p-aura-skills');
@@ -45,6 +46,7 @@ export class AuraSkills extends SkillPage {
         });
         this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
         this.skillList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
+        this.skillList.filter(x => x.data.requirement && x.rankList.indexOf(x) === 0).forEach(x => characterLevel.registerTargetValueCallback(x.data.requirement?.characterLevel ?? 1, unlockObject.bind(this, x, this.elementMap)));
 
         this.skillSlotList[0]?.element.click();
         if (this.skillSlotList[0]) {

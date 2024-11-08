@@ -9,6 +9,7 @@ import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { SkillPage, type PassiveSkill } from '../SkillPage';
 import { createCustomElement } from '../../../../shared/customElements/customElements';
 import { ModalElement } from '../../../../shared/customElements/ModalElement';
+import type { Value } from '../../../../shared/utils/Value';
 
 
 interface InsightCapacityEnhancer {
@@ -21,7 +22,7 @@ export class Passives extends SkillPage {
     readonly page: HTMLElement;
     protected readonly skillList: PassiveSkill[];
     private readonly insightCapacityEnhancerList: InsightCapacityEnhancer[];
-    constructor(data: Required<GameConfig.Character>['passiveSkills']) {
+    constructor(characterLevel: Value, data: Required<GameConfig.Character>['passiveSkills']) {
         super();
         this.page = document.createElement('div');
         this.page.classList.add('p-passive-skills');
@@ -71,6 +72,7 @@ export class Passives extends SkillPage {
             return { type: 'Passive', data, ...createAssignableObject(data), rankList: [] };
         });
         this.skillList.forEach(x => x.rankList = this.skillList.filter(y => y.baseName === x.baseName));
+        this.skillList.filter(x => x.data.requirement && x.rankList.indexOf(x) === 0).forEach(x => characterLevel.registerTargetValueCallback(x.data.requirement?.characterLevel ?? 1, unlockObject.bind(this, x, this.elementMap)));
 
         for (const passiveSkill of this.skillList) {
             const rank = getRankNumeral(passiveSkill.name);

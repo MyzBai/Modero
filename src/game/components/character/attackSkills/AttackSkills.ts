@@ -8,12 +8,13 @@ import { isDefined } from 'src/shared/utils/utils';
 import { createAssignableObject, createObjectListElement, createObjectInfoElements, getRankBaseName, unlockObject } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { SkillPage, type AttackSkill } from '../SkillPage';
+import type { Value } from '../../../../shared/utils/Value';
 
 
 export class AttackSkills extends SkillPage {
     readonly page: HTMLElement;
     protected readonly skillList: AttackSkill[];
-    constructor(data: Required<GameConfig.Character>['attackSkills']) {
+    constructor(characterLevel: Value, data: Required<GameConfig.Character>['attackSkills']) {
         super();
         this.page = document.createElement('div');
         this.page.classList.add('p-attack-skills');
@@ -32,6 +33,7 @@ export class AttackSkills extends SkillPage {
             return { type: 'Attack', data, ...createAssignableObject(data), rankList: [] };
         });
         this.skillList.forEach(x => x.rankList = this.skillList.filter(y => y.baseName === x.baseName));
+        this.skillList.filter(x => x.data.requirement && x.rankList.indexOf(x) === 0).forEach(x => characterLevel.registerTargetValueCallback(x.data.requirement?.characterLevel ?? 1, unlockObject.bind(this, x, this.elementMap)));
         this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
         this.skillList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
 

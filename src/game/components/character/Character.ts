@@ -54,15 +54,15 @@ export class Character extends Component {
         this.page.appendChild(helpIconElement);
 
         if (data.attackSkills) {
-            this.attackSkills = new AttackSkills(data.attackSkills);
+            this.attackSkills = new AttackSkills(this.level, data.attackSkills);
             menu.addMenuItem('Attack', 'attack', 0);
             menu.registerPageElement(this.attackSkills.page, 'attack');
             this.page.append(this.attackSkills.page);
         }
         const auraSkillsData = data.auraSkills;
         if (auraSkillsData) {
-            this.level.registerTargetValueCallback(auraSkillsData.levelReq ?? 1, () => {
-                this.auraSkills = new AuraSkills(auraSkillsData);
+            this.level.registerTargetValueCallback(auraSkillsData.requirement.characterLevel ?? 1, () => {
+                this.auraSkills = new AuraSkills(this.level, auraSkillsData);
                 menu.addMenuItem('Aura', 'aura', 1);
                 menu.registerPageElement(this.auraSkills.page, 'aura');
                 menu.sort();
@@ -70,7 +70,7 @@ export class Character extends Component {
             });
         }
         if (data.passiveSkills) {
-            this.passiveSkills = new Passives(data.passiveSkills);
+            this.passiveSkills = new Passives(this.level, data.passiveSkills);
             menu.addMenuItem('Passives', 'passives', 2);
             menu.registerPageElement(this.passiveSkills.page, 'passives');
             this.page.appendChild(this.passiveSkills.page);

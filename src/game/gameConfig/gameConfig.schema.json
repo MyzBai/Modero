@@ -356,10 +356,19 @@
         "auraSkills": {
           "type": "object",
           "properties": {
-            "levelReq": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 1
+            "requirement": {
+              "type": "object",
+              "properties": {
+                "characterLevel": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "default": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "characterLevel"
+              ]
             },
             "auraSkillList": {
               "description": "TJS-minItems 1",
@@ -371,7 +380,8 @@
           },
           "additionalProperties": false,
           "required": [
-            "auraSkillList"
+            "auraSkillList",
+            "requirement"
           ]
         },
         "passiveSkills": {
@@ -437,6 +447,7 @@
           "type": "string"
         },
         "requirement": {
+          "description": "only applies to first rank",
           "type": "object",
           "properties": {
             "characterLevel": {
@@ -498,6 +509,7 @@
           "type": "string"
         },
         "requirement": {
+          "description": "only applies to first rank",
           "type": "object",
           "properties": {
             "characterLevel": {
@@ -551,6 +563,7 @@
           "type": "string"
         },
         "requirement": {
+          "description": "only applies to first rank",
           "type": "object",
           "properties": {
             "characterLevel": {
@@ -567,7 +580,7 @@
         "insightCost": {
           "type": "integer",
           "minimum": 0,
-          "description": "only first rank requires this property"
+          "description": "only applies to first rank"
         },
         "modList": {
           "items": {

@@ -92,7 +92,7 @@ export interface Character {
         attackSkillList: AttackSkill[];
     };
     auraSkills?: {
-        levelReq?: Level;
+        requirement: { characterLevel: Level; };
         /**TJS-minItems 1 */
         auraSkillList: AuraSkill[];
     };
@@ -110,6 +110,7 @@ export interface Character {
 export interface AttackSkill {
     id: Id;
     name: Name;
+    /**@description only applies to first rank */
     requirement?: { characterLevel: Level; };
     manaCost: UnsignedInteger;
     /**@TJS-default 1 @TJS-minimum 0.1 */
@@ -123,6 +124,7 @@ export interface AttackSkill {
 export interface AuraSkill {
     id: Id;
     name: Name;
+    /**@description only applies to first rank */
     requirement?: { characterLevel: Level; };
     manaCost: UnsignedInteger;
     baseDuration: UnsignedInteger;
@@ -133,8 +135,9 @@ export interface AuraSkill {
 export interface PassiveSkill {
     id: Id;
     name: Name;
+    /**@description only applies to first rank */
     requirement?: { characterLevel: Level; };
-    /**@description only first rank requires this property */
+    /**@description only applies to first rank */
     insightCost?: UnsignedInteger;
     modList: PlayerModList;
     /**@description 1 exp gained per second while active */
