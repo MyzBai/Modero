@@ -92,11 +92,12 @@ export interface Character {
         attackSkillList: AttackSkill[];
     };
     auraSkills?: {
-        requirement: { characterLevel: Level; };
+        requirements: { characterLevel: Level; };
         /**TJS-minItems 1 */
         auraSkillList: AuraSkill[];
     };
     passiveSkills?: {
+        /**TJS-minItems 1 */
         insightCapacityEnhancerList: {
             id: Id;
             name: Name;
@@ -111,41 +112,50 @@ export interface AttackSkill {
     id: Id;
     name: Name;
     /**@description only applies to first rank */
-    requirement?: { characterLevel: Level; };
-    manaCost: UnsignedInteger;
-    /**@TJS-default 1 @TJS-minimum 0.1 */
-    attackSpeed: number;
-    /**@TJS-default 100 */
-    attackEffectiveness: UnsignedInteger;
-    modList: PlayerModList;
-    /**@description 1 exp gained per attack */
-    exp?: Exp;
+    requirements?: { characterLevel: Level; };
+    /**@TJS-minItems 1 */
+    rankList: {
+        /**@description 1 exp gained per attack */
+        exp?: Exp;
+        manaCost: UnsignedInteger;
+        /**@TJS-default 1 @TJS-minimum 0.1 */
+        attackSpeed: number;
+        /**@TJS-default 100 */
+        attackEffectiveness: UnsignedInteger;
+        modList: PlayerModList;
+    }[];
 }
 export interface AuraSkill {
     id: Id;
     name: Name;
     /**@description only applies to first rank */
-    requirement?: { characterLevel: Level; };
-    manaCost: UnsignedInteger;
-    baseDuration: UnsignedInteger;
-    modList: PlayerModList;
-    /**@description 1 exp gained per second while active */
-    exp?: UnsignedInteger;
+    requirements?: { characterLevel: Level; };
+    /**@TJS-minItems 1 */
+    rankList: {
+        /**@description 1 exp gained per attack */
+        exp?: Exp;
+        manaCost: UnsignedInteger;
+        baseDuration: UnsignedInteger;
+        modList: PlayerModList;
+    }[];
 }
 export interface PassiveSkill {
     id: Id;
     name: Name;
     /**@description only applies to first rank */
-    requirement?: { characterLevel: Level; };
-    /**@description only applies to first rank */
-    insightCost?: UnsignedInteger;
-    modList: PlayerModList;
-    /**@description 1 exp gained per second while active */
-    exp?: UnsignedInteger;
+    requirements?: { characterLevel: Level; };
+    insightCost: UnsignedInteger;
+    /**@TJS-minItems 1 */
+    rankList: {
+        /**@description 1 exp gained per attack */
+        exp?: Exp;
+        modList: PlayerModList;
+    }[];
 }
 
 export interface Treasury {
     requirements?: Requirements;
+    /**@TJS-minItems 1 */
     levelList?: {
         upgradeCost?: Cost;
         modList: TreasuryUpgradeModList;
@@ -154,15 +164,19 @@ export interface Treasury {
 }
 
 export interface Artifacts {
-    requirements?: Requirements;
+    /**@TJS-minItems 1 */
     artifactList: Artifact[];
 }
 export interface Artifact {
     id: Id;
     name: Name;
-    modList: PlayerModList;
     probability?: Probability;
-    exp?: UnsignedInteger;
+    /**@TJS-minItems 1 */
+    rankList: {
+        /**@description 1 exp everytime its found */
+        exp?: UnsignedInteger;
+        modList: PlayerModList;
+    }[];
 }
 
 export type GuildName = 'Vanguard' | 'Wanderer' | 'Arcane';
@@ -180,10 +194,11 @@ export interface Guild {
     name: GuildName;
     modList: PlayerModList;
 }
-/**@uniqueItemProperties {["id"]} */
+
 export interface GuildClass {
     id: Id;
     guildName: GuildName;
+    requirements?: { guildHallLevel: Level; }
     name: Name;
     modList: PlayerModList;
 }

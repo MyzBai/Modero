@@ -294,6 +294,20 @@
         "guildName": {
           "$ref": "#/definitions/GuildName"
         },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "guildHallLevel": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "guildHallLevel"
+          ]
+        },
         "name": {
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
@@ -356,7 +370,7 @@
         "auraSkills": {
           "type": "object",
           "properties": {
-            "requirement": {
+            "requirements": {
               "type": "object",
               "properties": {
                 "characterLevel": {
@@ -381,13 +395,14 @@
           "additionalProperties": false,
           "required": [
             "auraSkillList",
-            "requirement"
+            "requirements"
           ]
         },
         "passiveSkills": {
           "type": "object",
           "properties": {
             "insightCapacityEnhancerList": {
+              "description": "TJS-minItems 1",
               "type": "array",
               "items": {
                 "type": "object",
@@ -446,7 +461,7 @@
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
         },
-        "requirement": {
+        "requirements": {
           "description": "only applies to first rank",
           "type": "object",
           "properties": {
@@ -461,41 +476,54 @@
             "characterLevel"
           ]
         },
-        "manaCost": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "attackSpeed": {
-          "default": 1,
-          "minimum": 0.1,
-          "type": "number"
-        },
-        "attackEffectiveness": {
-          "type": "integer",
-          "minimum": 0,
-          "default": 100
-        },
-        "modList": {
+        "rankList": {
+          "minItems": 1,
+          "type": "array",
           "items": {
-            "$ref": "#/definitions/PlayerMod"
-          },
-          "type": "array"
-        },
-        "exp": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 0,
-          "description": "1 exp gained per attack"
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 0,
+                "description": "1 exp gained per attack"
+              },
+              "manaCost": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "attackSpeed": {
+                "default": 1,
+                "minimum": 0.1,
+                "type": "number"
+              },
+              "attackEffectiveness": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 100
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/PlayerMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "attackEffectiveness",
+              "attackSpeed",
+              "manaCost",
+              "modList"
+            ]
+          }
         }
       },
       "additionalProperties": false,
       "required": [
-        "attackEffectiveness",
-        "attackSpeed",
         "id",
-        "manaCost",
-        "modList",
-        "name"
+        "name",
+        "rankList"
       ]
     },
     "AuraSkill": {
@@ -508,7 +536,7 @@
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
         },
-        "requirement": {
+        "requirements": {
           "description": "only applies to first rank",
           "type": "object",
           "properties": {
@@ -523,33 +551,47 @@
             "characterLevel"
           ]
         },
-        "manaCost": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "baseDuration": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "modList": {
+        "rankList": {
+          "minItems": 1,
+          "type": "array",
           "items": {
-            "$ref": "#/definitions/PlayerMod"
-          },
-          "type": "array"
-        },
-        "exp": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "1 exp gained per second while active"
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 0,
+                "description": "1 exp gained per attack"
+              },
+              "manaCost": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "baseDuration": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/PlayerMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "baseDuration",
+              "manaCost",
+              "modList"
+            ]
+          }
         }
       },
       "additionalProperties": false,
       "required": [
-        "baseDuration",
         "id",
-        "manaCost",
-        "modList",
-        "name"
+        "name",
+        "rankList"
       ]
     },
     "PassiveSkill": {
@@ -562,7 +604,7 @@
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
         },
-        "requirement": {
+        "requirements": {
           "description": "only applies to first rank",
           "type": "object",
           "properties": {
@@ -579,26 +621,40 @@
         },
         "insightCost": {
           "type": "integer",
-          "minimum": 0,
-          "description": "only applies to first rank"
+          "minimum": 0
         },
-        "modList": {
+        "rankList": {
+          "minItems": 1,
+          "type": "array",
           "items": {
-            "$ref": "#/definitions/PlayerMod"
-          },
-          "type": "array"
-        },
-        "exp": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "1 exp gained per second while active"
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 0,
+                "description": "1 exp gained per attack"
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/PlayerMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "modList"
+            ]
+          }
         }
       },
       "additionalProperties": false,
       "required": [
         "id",
-        "modList",
-        "name"
+        "insightCost",
+        "name",
+        "rankList"
       ]
     },
     "Weapon": {
@@ -1187,6 +1243,7 @@
           "$ref": "#/definitions/Requirements"
         },
         "levelList": {
+          "minItems": 1,
           "type": "array",
           "items": {
             "type": "object",
@@ -1216,10 +1273,8 @@
     "Artifacts": {
       "type": "object",
       "properties": {
-        "requirements": {
-          "$ref": "#/definitions/Requirements"
-        },
         "artifactList": {
+          "minItems": 1,
           "type": "array",
           "items": {
             "$ref": "#/definitions/Artifact"
@@ -1241,28 +1296,42 @@
           "pattern": "^[A-Za-z 0-9]{3,32}$",
           "type": "string"
         },
-        "modList": {
-          "items": {
-            "$ref": "#/definitions/PlayerMod"
-          },
-          "type": "array"
-        },
         "probability": {
           "type": "integer",
           "minimum": 1,
           "default": 100,
           "description": "Percent = 1/Probability"
         },
-        "exp": {
-          "type": "integer",
-          "minimum": 0
+        "rankList": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "exp": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "1 exp everytime its found"
+              },
+              "modList": {
+                "items": {
+                  "$ref": "#/definitions/PlayerMod"
+                },
+                "type": "array"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "modList"
+            ]
+          }
         }
       },
       "additionalProperties": false,
       "required": [
         "id",
-        "modList",
-        "name"
+        "name",
+        "rankList"
       ]
     },
     "Achievements": {

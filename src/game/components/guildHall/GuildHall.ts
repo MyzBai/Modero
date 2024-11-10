@@ -1,6 +1,6 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { Component } from '../Component';
-import { createAssignableObject, createObjectInfoElements, createObjectListElement, type AssignableObject } from 'src/game/utils/objectUtils';
+import { createAssignableObject, createObjectInfoElements, unlockObject, type AssignableObject } from 'src/game/utils/objectUtils';
 import { player, statistics } from 'src/game/game';
 import { Modifier } from 'src/game/mods/Modifier';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
@@ -13,8 +13,6 @@ import { evalCost } from '../../utils/utils';
 
 export interface GuildClass extends AssignableObject {
     data: GameConfig.GuildClass;
-    element: HTMLElement;
-    unlocked: boolean;
 }
 export interface Guild {
     data: GameConfig.Guild;
@@ -47,7 +45,7 @@ export class GuildHall extends Component {
         this.page.appendChild(toolbar);
 
         this.page.insertAdjacentHTML('beforeend', '<ul class="g-scroll-list-v guild-class-list" data-guild-class-list></ul>');
-        this.page.insertAdjacentHTML('beforeend', '<div data-guild-class-info></div>');
+        this.page.insertAdjacentHTML('beforeend', '<div data-item-info></div>');
 
         this.guildClassList = [];
         const fragment = document.createDocumentFragment();
@@ -63,13 +61,15 @@ export class GuildHall extends Component {
                 modal.addBodyElement(modListElement);
             });
             fragment.appendChild(element);
-            for (const guildClass of this.data.guildClassList.filter(x => x.guildName === guild.name)) {
-                const element = createObjectListElement(guildClass);
-                element.classList.remove('hidden');
-                element.addEventListener('click', this.selectGuildClassByName.bind(this, guildClass.name));
-                const data: GuildClass = { data: guildClass, ...createAssignableObject(guildClass), unlocked: true, element };
-                this.guildClassList.push(data);
-                fragment.appendChild(element);
+            for (const guildClassData of this.data.guildClassList.filter(x => x.guildName === guild.name)) {
+                const guildClass: GuildClass = {
+                    ...createAssignableObject(guildClassData),
+                    data: guildClassData
+                };
+                guildClass.element.addEventListener('click', this.selectGuildClass.bind(this, guildClass));
+                this.guildClassList.push(guildClass);
+                this.level.registerTargetValueCallback(guildClassData.requirements?.guildHallLevel ?? 1, unlockObject.bind(this, guildClass));
+                fragment.appendChild(guildClass.element);
             }
         }
         this.page.querySelectorStrict('[data-guild-class-list]').append(fragment);
@@ -116,29 +116,25 @@ export class GuildHall extends Component {
         player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 
-    private selectGuildClassByName(name: string) {
-        const guildClass = this.guildClassList.findStrict(x => x.data.name === name);
-        if (this.selectedGuildClass) {
-            this.selectedGuildClass.selected = false;
+    private selectGuildClass(guildClass?: GuildClass) {
+        this.guildClassList.forEach(x => {
+            x.selected = x === guildClass;
+            x.element.classList.toggle('selected', x.selected);
+        });
+        if (guildClass) {
+            this.showClassInfo(guildClass);
+        } else {
+            this.page.querySelector('[data-item-info]')?.replaceChildren();
         }
-        guildClass.selected = true;
-        this.guildClassList.forEach(x => x.element.classList.toggle('selected', x === guildClass));
-        this.showClassInfo(guildClass);
     }
 
     private showClassInfo(guildClass: GuildClass) {
-        const element = this.page.querySelector('[data-guild-class-info]');
-        element?.replaceChildren();
-        if (!guildClass) {
-            return;
-        }
+
         const elements = createObjectInfoElements({
-            obj: { name: guildClass.name },
+            name: guildClass.name,
             modList: guildClass.data.modList
         });
-        elements.element.classList.add('guild-class-info');
-        elements.element.setAttribute('data-guild-class-info', '');
-        element?.replaceWith(elements.element) ?? this.page.appendChild(elements.element);
+        this.page.querySelector('[data-item-info]')?.replaceWith(elements.element) ?? this.page.appendChild(elements.element);
 
         const button = document.createElement('button');
         const updateButton = () => {
@@ -170,11 +166,11 @@ export class GuildHall extends Component {
             player.modDB.removeBySource('Guild');
             player.modDB.removeBySource('GuildClass');
             if (this.selectedGuildClass) {
-                this.selectGuildClassByName(this.selectedGuildClass.name);
+                this.selectGuildClass(this.selectedGuildClass);
             }
         }
         if (this.activeGuildClass) {
-            this.selectGuildClassByName(this.activeGuildClass.name);
+            this.selectGuildClass(this.activeGuildClass);
         }
 
         this.page.querySelectorAll('[data-guild-class-list] [data-id]').forEach(x => x.classList.toggle('m-text-green', x.getAttribute('data-id') === guildClass?.id));
@@ -195,7 +191,7 @@ export class GuildHall extends Component {
         const guildClass = this.guildClassList.find(x => x.data.id === save?.classId);
         if (guildClass) {
             this.assignClass(guildClass);
-            this.selectGuildClassByName(guildClass.name);
+            this.selectGuildClass(guildClass);
         }
     }
 }

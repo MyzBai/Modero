@@ -16,6 +16,10 @@ interface ReadonlyArray<T> {
     findStrict(predicate: (value: T, index: number, obj: readonly T[]) => unknown, thisArg?: unknown): T;
 }
 
+interface MapStrict<K, V> extends Map<K, V> {
+    get(key: K): V;
+}
+
 type ExtractStrict<T, U extends T> = Extract<T, U>;
 type PickStrict<T, U extends keyof T> = {
     [P in U as T[P] extends Value | undefined ? P : never]: T[P]

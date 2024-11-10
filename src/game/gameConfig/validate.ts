@@ -16,7 +16,7 @@ export async function validateGameConfig(gameConfigText: string): Promise<Config
 
     const path = resolveGamePathFromVersion(version, 'gameConfigSchemaValidator.mjs');
     const url = new URL(path, window.location.href).href;
-    const { validate } = await import(url);
+    const { validate } = await import(`${url}?t=${Date.now()}`);
 
     if (!validate(gameConfig)) {
         let errors: Partial<ErrorObject>[] = [];

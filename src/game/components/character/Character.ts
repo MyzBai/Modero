@@ -61,7 +61,7 @@ export class Character extends Component {
         }
         const auraSkillsData = data.auraSkills;
         if (auraSkillsData) {
-            this.level.registerTargetValueCallback(auraSkillsData.requirement.characterLevel ?? 1, () => {
+            this.level.registerTargetValueCallback(auraSkillsData.requirements.characterLevel ?? 1, () => {
                 this.auraSkills = new AuraSkills(this.level, auraSkillsData);
                 menu.addMenuItem('Aura', 'aura', 1);
                 menu.registerPageElement(this.auraSkills.page, 'aura');

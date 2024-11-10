@@ -4,12 +4,13 @@ import type * as GameSerialization from 'src/game/serialization';
 import { Modifier } from 'src/game/mods/Modifier';
 import { isDefined, pickOneFromPickProbability } from 'src/shared/utils/utils';
 import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';
-import { createObjectListElement, createAssignableObject, createObjectInfoElements, getRankBaseName, unlockObject, getRankNumeral } from 'src/game/utils/objectUtils';
+import { createObjectInfoElements, unlockObject } from 'src/game/utils/objectUtils';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { SkillPage, type PassiveSkill } from '../SkillPage';
 import { createCustomElement } from '../../../../shared/customElements/customElements';
 import { ModalElement } from '../../../../shared/customElements/ModalElement';
 import type { Value } from '../../../../shared/utils/Value';
+import { addRankExp, createRankObject, deserializeRankObject, getRankExpPct, tryUnlockNextRank } from '../../../utils/rankObjectUtils';
 
 
 interface InsightCapacityEnhancer {
@@ -62,59 +63,30 @@ export class Passives extends SkillPage {
 
         this.insightCapacityEnhancerList = data.insightCapacityEnhancerList.map(x => ({ ...x, data: x, curCount: x.probabilities.filter(x => x === 0).length }));
 
-        this.skillList = data.passiveSkillList.map(data => {
-            const baseName = getRankBaseName(data.name);
-            if (!this.elementMap.has(baseName)) {
-                const element = createObjectListElement(data);
-                element.addEventListener('click', this.selectSkillByName.bind(this, data.name));
-                this.elementMap.set(baseName, element);
-            }
-            return { type: 'Passive', data, ...createAssignableObject(data), rankList: [] };
-        });
-        this.skillList.forEach(x => x.rankList = this.skillList.filter(y => y.baseName === x.baseName));
-        this.skillList.filter(x => x.data.requirement && x.rankList.indexOf(x) === 0).forEach(x => characterLevel.registerTargetValueCallback(x.data.requirement?.characterLevel ?? 1, unlockObject.bind(this, x, this.elementMap)));
+        this.skillList = data.passiveSkillList.reduce((skillList, skillData) => {
+            const passiveSkill: PassiveSkill = {
+                type: 'Passive',
+                insightCost: skillData.insightCost,
+                ...createRankObject(skillData)
+            };
+            passiveSkill.element.addEventListener('click', this.selectSkill.bind(this, passiveSkill));
+            this.page.querySelectorStrict('[data-skill-list]').appendChild(passiveSkill.element);
+            skillList.push(passiveSkill);
+            characterLevel.registerTargetValueCallback(skillData.requirements?.characterLevel ?? 1, unlockObject.bind(this, passiveSkill));
+            return skillList;
+        }, [] as PassiveSkill[]);
 
-        for (const passiveSkill of this.skillList) {
-            const rank = getRankNumeral(passiveSkill.name);
-            if (rank === 'I' || rank === undefined) {
-                continue;
-            }
-            const basePassive = this.skillList.find(x => x.baseName === passiveSkill.baseName);
-            passiveSkill.data.insightCost = basePassive?.data.insightCost ?? 0;
-        }
-        this.page.querySelectorStrict('[data-skill-list]').append(...this.elementMap.values());
-        this.skillList.filter(x => x.unlocked).forEach(x => unlockObject(x, this.elementMap));
-
-        const firstPassive = this.skillList.find(x => x.unlocked);
-        if (firstPassive) {
-            this.selectSkillByName(firstPassive.name);
-        }
+        this.selectSkill(this.skillList.find(x => x.unlocked));
 
         this.updateInsightValueElement();
+
+        game.tickSecondsEvent.listen(this.passiveSkillExpCallback.bind(this));
 
         combat.events.enemyDeath.listen((_, instance) => {
             this.tryGetInsightCapacityEnhancer();
             if (this.insightCapacityEnhancerList.every(x => x.curCount === x.data.probabilities.length)) {
                 instance.removeListener();
             }
-        });
-
-        combat.events.enemyDeath.listen((_, instance) => {
-            this.tryUnlockSkill();
-            if (this.skillList.every(x => x.unlocked)) {
-                instance.removeListener();
-            }
-        });
-
-        game.tickSecondsEvent.listen(() => {
-            const passives = this.skillList.filter(x => x.assigned && x.exp < x.maxExp);
-            for (const passive of passives) {
-                passive.exp += 1 * player.stats.meditationMultiplier.value;
-                if (passive.exp >= passive.maxExp) {
-                    this.tryUnlockNextSkillRank(passive);
-                }
-            }
-            this.updatePassiveInfo();
         });
 
         player.stats.insightCapacity.addListener('change', () => {
@@ -131,7 +103,7 @@ export class Passives extends SkillPage {
     }
 
     get insightAllocated() {
-        return this.skillList.filter(x => x.assigned).map(x => x.data.insightCost ?? 0).reduce((a, b) => a += b, 0);
+        return this.skillList.filter(x => x.assigned).map(x => x.insightCost).reduce((a, b) => a += b, 0);
     }
 
     private updateInsightValueElement() {
@@ -140,39 +112,48 @@ export class Passives extends SkillPage {
 
     protected showSkill(passive: PassiveSkill) {
         const propertyList = [];
-        if (passive.data.insightCost) {
-            propertyList.push(['Insight', passive.data.insightCost.toFixed()]);
-        }
+        propertyList.push(['Insight', passive.insightCost.toFixed()]);
+        const rankData = passive.rankList[passive.curRank - 1];
+        assertDefined(rankData);
+
         const itemInfoElements = createObjectInfoElements({
-            obj: passive,
-            propertyList, modList: passive.data.modList,
-            rankList: this.skillList.filter(x => x.baseName === passive.baseName),
-            onRankChange: (item) => this.showSkill(item as PassiveSkill)
+            name: passive.name,
+            propertyList,
+            modList: rankData.modList,
+            rankObj: passive,
+            onRankChange: (item) => this.showSkill(item)
         });
         this.page.querySelector('[data-item-info]')?.replaceWith(itemInfoElements.element) ?? this.page.appendChild(itemInfoElements.element);
 
         const button = document.createElement('button');
         const updateButton = () => {
-            const rankList = this.skillList.filter(x => x.baseName === passive.baseName);
             let disabled = true;
-            if (rankList.some(x => x.assigned) || (passive.data.insightCost ?? 0) <= this.insightRemaining) {
+            let tag = 'valid';
+            let label = 'Allocate';
+
+            if (passive.assigned) {
+                disabled = false;
+                if (passive.selectedRank === passive.curRank) {
+                    tag = 'invalid';
+                    label = 'Deallocate';
+                }
+            } else if (passive.insightCost <= this.insightRemaining) {
                 disabled = false;
             }
-            button.textContent = 'Allocate';
-            button.setAttribute('data-tag', 'valid');
-            if (passive.assigned) {
-                button.textContent = 'Unassign';
-                button.setAttribute('data-tag', 'invalid');
-            }
+
+            button.textContent = label;
+            button.setAttribute('data-tag', tag);
             button.toggleAttribute('disabled', disabled);
         };
         button.addEventListener('click', () => {
-            const rankList = this.skillList.filter(x => x.baseName === passive.baseName);
-            const allocatedPassive = rankList.find(x => x.assigned);
-            if (allocatedPassive) {
-                this.unassignSkill(allocatedPassive);
-            }
-            if (passive !== allocatedPassive) {
+            if (passive.assigned) {
+                if (passive.selectedRank !== passive.curRank) {
+                    this.unassignSkill(passive);
+                    this.assignSkill(passive);
+                } else {
+                    this.unassignSkill(passive);
+                }
+            } else {
                 this.assignSkill(passive);
             }
             updateButton();
@@ -187,7 +168,7 @@ export class Passives extends SkillPage {
         }
         const expbar = this.page.querySelector<ProgressElement>(`[data-item-info] ${ProgressElement.name}`);
         if (expbar) {
-            expbar.value = this.selectedPassive.exp / this.selectedPassive.maxExp;
+            expbar.value = getRankExpPct(this.selectedPassive);
         }
     }
 
@@ -199,14 +180,16 @@ export class Passives extends SkillPage {
     protected assignSkill(passive: PassiveSkill) {
         super.assignSkill(passive);
         this.updateInsightValueElement();
-        player.modDB.add(`Passive/${passive.data.name}`, Modifier.extractStatModifierList(...Modifier.modListFromTexts(passive.data.modList)));
+        const rankData = passive.rankList[passive.curRank - 1];
+        assertDefined(rankData);
+        player.modDB.add(`Passive/${passive.name}`, Modifier.extractStatModifierList(...Modifier.modListFromTexts(rankData.modList)));
         this.fixNegativeInsightRemaining();
     }
 
     protected unassignSkill(passive: PassiveSkill) {
         super.unassignSkill(passive);
         this.updateInsightValueElement();
-        player.modDB.removeBySource(`Passive/${passive.data.name}`);
+        player.modDB.removeBySource(`Passive/${passive.name}`);
     }
 
     private fixNegativeInsightRemaining() {
@@ -230,7 +213,7 @@ export class Passives extends SkillPage {
         this.applyInsightCapacityEnhancersAsModifiers();
         setTimeout(() => {
             this.updateInsightValueElement();
-            this.selectSkillByName(this.selectedPassive.name);
+            this.selectSkill(this.selectedPassive);
         }, 100);
 
         const skillsPage = this.page.closest('[data-page-content="character"]');
@@ -249,10 +232,21 @@ export class Passives extends SkillPage {
         }
     }
 
+    private passiveSkillExpCallback() {
+        const passives = this.skillList.filter(x => x.assigned && x.curExp < x.maxExp);
+        for (const passive of passives) {
+            addRankExp(passive, player.stats.meditationMultiplier.value);
+            if (passive.curExp === passive.maxExp) {
+                tryUnlockNextRank(passive);
+            }
+        }
+        this.updatePassiveInfo();
+    }
+
     serialize(): GameSerialization.Character['passiveSkills'] {
         return {
             insightCapacityEnhancerList: this.insightCapacityEnhancerList.filter(x => x.curCount > 0).map(x => ({ id: x.data.id, count: x.curCount })),
-            passiveList: this.skillList.filter(x => x.unlocked).map(x => ({ id: x.data.id, allocated: x.assigned, expFac: x.exp / x.maxExp }))
+            passiveList: this.skillList.filter(x => x.unlocked).map(x => ({ id: x.id, allocated: x.assigned, curRank: x.curRank, maxRank: x.maxRank, expFac: x.curExp / x.maxExp }))
         };
     }
 
@@ -267,16 +261,16 @@ export class Passives extends SkillPage {
         this.applyInsightCapacityEnhancersAsModifiers();
         player.updateStatsDirect();
         for (const data of save?.passiveList?.filter(isDefined) || []) {
-            const passive = this.skillList.find(x => x.data.id === data?.id);
+            const passive = this.skillList.find(x => x.id === data?.id);
             if (!passive) {
                 continue;
             }
-            passive.exp = passive.maxExp * (data.expFac ?? 0);
-            unlockObject(passive, this.elementMap);
-            if (data.allocated && (passive.data.insightCost ?? 0) <= this.insightRemaining) {
+            unlockObject(passive);
+            deserializeRankObject(passive, data);
+            if (data.allocated && passive.insightCost <= this.insightRemaining) {
                 this.assignSkill(passive);
             }
         }
-        this.selectSkillByName(this.skillList.find(x => x.assigned)?.name);
+        this.selectSkill(this.skillList.find(x => x.assigned) ?? this.skillList.find(x => x.unlocked));
     }
 }

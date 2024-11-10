@@ -115,16 +115,17 @@ export interface Character {
         skillId: string;
         skillList: {
             id: string;
+            curRank: number;
+            maxRank: number;
             expFac: number;
         }[];
     };
     auraSkills?: {
-        skillSlotList: ({
-            id: string;
-            timePct: number;
-        } | undefined)[];
         skillList: {
             id: string;
+            skillSlot?: { index: number; timePct: number; };
+            curRank: number;
+            maxRank: number;
             expFac: number;
         }[];
     };
@@ -133,6 +134,8 @@ export interface Character {
         passiveList: {
             id: string;
             allocated: boolean;
+            curRank: number;
+            maxRank: number;
             expFac: number;
         }[];
     };
