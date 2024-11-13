@@ -66,7 +66,6 @@ export function createPlayerStats(gameStats: GameStatCollection) {
     const minElementalDamage = new Statistic({ computed: true });
     const maxElementalDamage = new Statistic({ computed: true });
     return {
-        activity: new Statistic({ label: 'Activity', type: 'text', computed: true, hiddenBeforeMutation: true }),
         guildClass: new Statistic({ label: 'Player Class', type: 'text', computed: true, hiddenBeforeMutation: true }),
         level: new Statistic({ sticky: true, label: 'Level', defaultValue: 1, statFormat: self => [self, '/', maxLevel] }),
         maxLevel,

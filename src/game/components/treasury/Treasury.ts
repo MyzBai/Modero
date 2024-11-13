@@ -61,7 +61,6 @@ export class Treasury extends Component {
     serialize(save: Serialization): void {
         save.treasury = {
             level: this.level.value,
-            expanding: player.activity?.name === 'Expanding Treasury',
             artifacts: this.artifacts?.serialize()
         };
     }

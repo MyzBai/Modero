@@ -74,7 +74,6 @@ export class GuildHall extends Component {
         }
         this.page.querySelectorStrict('[data-guild-class-list]').append(fragment);
 
-        player.stats.activity.texts = ['None'];
         player.stats.guildClass.texts = ['None'];
 
         this.guildClassList.find(x => x.unlocked)?.element.click();
