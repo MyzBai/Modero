@@ -46,9 +46,9 @@ export class Blacksmith extends Component {
         }
         this.page.appendChild(titleElement);
 
-        const helpIconElement = createHelpIcon('Weapon Help', `
-            Craft your weapon using the craft table.
-            New and better modifiers become available as you level up.
+        const helpIconElement = createHelpIcon('Blacksmith Help', `
+            Craft your items using the craft table.
+            New and better modifiers become available as you level up the blacksmith.
             You can click modifiers to see more information about them.
         `.trim());
         this.page.appendChild(helpIconElement);
@@ -126,7 +126,7 @@ export class Blacksmith extends Component {
     private openBlacksmithLevelModal() {
         assertDefined(this.data.levelList);
         createLevelModal({
-            title: 'Weapon',
+            title: 'Blacksmith',
             level: this.level,
             levelData: this.data.levelList
         });
@@ -135,7 +135,7 @@ export class Blacksmith extends Component {
     private updateBlacksmithLevel() {
         this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
         const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
-        player.modDB.replace('WeaponUpgrade', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
+        player.modDB.replace('BlacksmithUpgrade', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
         player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }
 

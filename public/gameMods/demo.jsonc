@@ -239,7 +239,7 @@
                     },
                     {
                         "id": "54e6e1",
-                        "name": "Critical Hit I",
+                        "name": "Critical Hit",
                         "rankList": [
                             {
                                 "exp": 600, "baseDuration": 30, "manaCost": 100,
@@ -474,10 +474,10 @@
             "levelList": [
                 {
                     "upgradeCost": { "name": "Gold", "value": 1000 },
-                    "modList": [ "+{3} Additional Weapon Modifiers" ]
+                    "modList": [ ]
                 },
                 {
-                    "modList": [ "+{4} Additional Weapon Modifiers" ]
+                    "modList": [ ]
                 }
             ],
             "itemList": [

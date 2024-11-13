@@ -195,7 +195,6 @@ export function calcAilmentBaseDamage(damageType: DamageType, config: PlayerConf
     return { min: min * convMulti, max: max * convMulti };
 }
 
-//TODO: Remove as keywords and implement prober type check
 function generateConversionTable(config: OffenceConfiguration) {
     type Conversion = Partial<Record<DamageType, number>>;
     const conversionTable: ConversionTable = {};

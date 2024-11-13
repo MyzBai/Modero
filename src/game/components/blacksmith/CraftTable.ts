@@ -221,7 +221,6 @@ export class CraftTable {
 
         this.abortController?.abort();
 
-        //remove all listeners
         this.ctx.element.querySelectorAll<HTMLElement>('[data-craft]').forEach(x => {
             x.removeAttribute('data-craft');
         });
@@ -487,9 +486,6 @@ export class CraftTable {
         const b = createModListElement(this.ctx.item.modListCrafting);
         element.append(a, b);
 
-
-
-        // const missingModifiers = this.ctx.item.modList.filter(x => !this.ctx.item.modListCrafting.some(y => y.template === x.template));
         const missingModifiers = this.ctx.item.modListCrafting.filter(x => this.ctx.item.modList.some(y => y.template === x.template));
         [...a.querySelectorAll<HTMLElement>('[data-mod]')].filter(x => missingModifiers.find(y => y.desc === x.textContent)).forEach(x => x.setAttribute('data-tag', 'invalid'));
 
@@ -611,7 +607,6 @@ export class CraftTable {
     }
 
     updateCraftList() {
-        // this.selectCraftById(null);
         this.craftListElement.querySelectorAll('[data-craft-id]').forEach(x => {
             const id = x.getAttribute('data-craft-id');
             const cost = this.craftList.findStrict(x => x.template.id === id).cost;

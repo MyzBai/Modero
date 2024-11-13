@@ -9,7 +9,6 @@ export interface Serialization {
     game?: Game;
     player?: Player;
     worlds?: Worlds;
-    world?: World;
     statistics?: Statistics;
     effects?: Effects;
     notifications?: Notifications;

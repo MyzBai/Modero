@@ -24,7 +24,6 @@ export type StatName =
     | 'AuraDuration'
     | 'AttackSkillCost'
     | 'MaxArtifact' | 'ArtifactFind'
-    | 'AdditionalWeaponModifier'
     | 'Insight' | 'AuraSlot'
     | `${'Attack' | 'Aura' | 'Passive'}SkillExpMultiplier`
     | EnemyStatNames

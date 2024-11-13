@@ -19,7 +19,6 @@ export interface Config {
 
 export interface Requirements {
     curLevel?: Level;
-    // maxLevel?: Level;
     /**@TJS-minimum 1 */
     world?: UnsignedInteger;
 }

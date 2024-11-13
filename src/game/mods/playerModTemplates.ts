@@ -77,7 +77,6 @@ export const persistentPlayerModTemplateList = [
     { desc: '+# Maximum Artifacts', stats: [{ name: 'MaxArtifact', valueType: 'Base' }], id: '51cc9c' } as const,
     { desc: '+# Additional Aura Slots', stats: [{ name: 'AuraSlot', valueType: 'Base' }], id: '45357c' } as const,
     { desc: '+# Maximum Insight', stats: [{ name: 'Insight', valueType: 'Base' }], id: '419541' } as const,
-    { desc: '+# Additional Weapon Modifiers', stats: [{ name: 'AdditionalWeaponModifier', valueType: 'Base' }], id: '58c0f2' } as const,
 ] as const satisfies readonly ModTemplate[];
 
 export const permanentPlayerModTemplateList = [
