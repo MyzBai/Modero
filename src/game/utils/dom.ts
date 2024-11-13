@@ -1,6 +1,6 @@
 import { isString } from 'src/shared/utils/utils';
 import { Modifier } from '../mods/Modifier';
-import { sortModifiers } from '../mods/utils';
+import { sortModifiers } from '../mods/modUtils';
 import { createCustomElement } from '../../shared/customElements/customElements';
 import { ModalElement } from '../../shared/customElements/ModalElement';
 import type { Value } from '../../shared/utils/Value';

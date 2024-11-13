@@ -2,7 +2,7 @@ import { type ModReference, type ModTemplate } from './types';
 import { modTemplateList } from './modTemplates';
 import { parseTextReferences as parseTextReference, parseTextValues } from 'src/shared/utils/textParsing';
 import type { StatModifier } from './ModDB';
-import { randomRangeInt } from 'src/shared/utils/utils';
+import { isNumber, randomRangeInt } from 'src/shared/utils/utils';
 import { assertDefined } from '../../shared/utils/assert';
 
 export interface PopupOptions {
@@ -27,6 +27,11 @@ export interface SerializedModifier {
     srcId: string;//template id or id in GameConfig
     values: number[];
 }
+
+export type ModGroupList = {
+    text: string;
+    filter?: string[];
+}[];
 
 export class Modifier {
     weight = 0;
@@ -104,6 +109,9 @@ export class Modifier {
             return Modifier.empty();
         }
         const textValues = parseTextValues(text);
+        if (!textValues) {
+            return Modifier.empty();
+        }
         const valueRanges: ModValueRange[] = [];
         for (const [i, valueRange] of textValues.entries()) {
             const decimalCount = Math.max(0, (template.desc.match(/#+/g)?.[i]?.length || 0) - 1);
@@ -165,5 +173,20 @@ export class Modifier {
     static empty() {
         const template: ModTemplate = { desc: '[Removed]', stats: [], id: '' };
         return new Modifier(template.desc, template, []);
+    }
+
+    static serialize(...modList: Modifier[]): SerializedModifier[] {
+        return modList.map(x => ({ srcId: x.template.id, values: x.values }));
+    }
+    static deserialize(...modList: ({ text: string } & DeepPartial<SerializedModifier>)[]): Modifier[] {
+        return modList.reduce((a, c) => {
+            const mod = Modifier.modFromText(c.text);
+            const template = Modifier.getTemplate(c.text);
+            if (template) {
+                mod.setValues((c.values ?? []).filter(isNumber));
+                a.push(mod);
+            }
+            return a;
+        }, [] as Modifier[]);
     }
 }

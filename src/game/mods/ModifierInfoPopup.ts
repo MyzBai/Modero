@@ -3,7 +3,7 @@ import { getFormattedTag } from '../utils/utils';
 import type { ModifierTag } from './types';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
-import { createModTags } from './utils';
+import { createModTags } from './modUtils';
 import { assertDefined } from '../../shared/utils/assert';
 
 type AdditionalProperties = [string, string][];

@@ -107,7 +107,6 @@ export class Character extends Component {
     deserialize({ character: save }: UnsafeSerialization) {
         if (isNumber(save?.level)) {
             this.level.set(save.level);
-            this.updateCharacterLevel();
         }
         if (save?.attackSkills) {
             this.attackSkills?.deserialize(save.attackSkills);

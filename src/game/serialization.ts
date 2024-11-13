@@ -15,7 +15,7 @@ export interface Serialization {
     notifications?: Notifications;
     //components
     guildHall?: GuildHall;
-    weapon?: Weapon;
+    blacksmith?: Blacksmith;
     character?: Character;
     treasury?: Treasury;
     elementHighlightIdList?: string[];
@@ -99,14 +99,13 @@ export interface GuildHall {
     classId?: string;
 }
 
-export interface Weapon {
+export interface Blacksmith {
     level?: number;
-    weaponTypeId?: string;
-    modList: SerializedModifier[];
-    crafting: WeaponCrafting;
-}
-export interface WeaponCrafting {
-    modList?: SerializedModifier[];
+    itemList: {
+        id: string;
+        modList: SerializedModifier[];
+        modListCrafting?: SerializedModifier[];
+    }[];
 }
 
 export interface Character {

@@ -1,5 +1,5 @@
 import { ModifierFlags, type ModTemplate } from './types';
-import { extractModifier } from './utils';
+import { extractModifier } from './modUtils';
 
 
 export const generalPlayerModTemplateList = [

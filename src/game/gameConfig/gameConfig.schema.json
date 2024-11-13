@@ -29,8 +29,8 @@
         "character": {
           "$ref": "#/definitions/Character"
         },
-        "weapon": {
-          "$ref": "#/definitions/Weapon"
+        "blacksmith": {
+          "$ref": "#/definitions/Blacksmith"
         },
         "treasury": {
           "$ref": "#/definitions/Treasury"
@@ -657,7 +657,7 @@
         "rankList"
       ]
     },
-    "Weapon": {
+    "Blacksmith": {
       "type": "object",
       "properties": {
         "levelList": {
@@ -670,7 +670,7 @@
               },
               "modList": {
                 "items": {
-                  "$ref": "#/definitions/WeaponUpgradeMod"
+                  "$ref": "#/definitions/BlacksmithUpgradeMod"
                 },
                 "type": "array"
               }
@@ -681,10 +681,31 @@
             ]
           }
         },
-        "weaponTypeList": {
+        "itemList": {
+          "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/WeaponType"
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/Id"
+              },
+              "name": {
+                "$ref": "#/definitions/BlacksmithItemName"
+              },
+              "reforgeWeights": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "reforgeWeights"
+            ]
           }
         },
         "modLists": {
@@ -692,7 +713,7 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/WeaponMod"
+              "$ref": "#/definitions/BlacksmithMod"
             }
           }
         },
@@ -714,7 +735,7 @@
             "craftList": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/WeaponCraft"
+                "$ref": "#/definitions/BlacksmithCraft"
               }
             }
           },
@@ -728,35 +749,18 @@
       "additionalProperties": false,
       "required": [
         "crafting",
+        "itemList",
         "modLists"
       ]
     },
-    "WeaponType": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/Id"
-        },
-        "name": {
-          "$ref": "#/definitions/WeaponTypeName"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "name"
-      ]
-    },
-    "WeaponTypeName": {
+    "BlacksmithItemName": {
       "enum": [
-        "One Handed Sword",
-        "Staff",
-        "Two Handed Axe",
-        "Wand"
+        "Armour",
+        "Weapon"
       ],
       "type": "string"
     },
-    "WeaponMod": {
+    "BlacksmithMod": {
       "type": "object",
       "properties": {
         "id": {
@@ -775,14 +779,12 @@
         "mod": {
           "$ref": "#/definitions/PlayerMod"
         },
-        "weaponTypes": {
+        "itemFilter": {
           "type": "array",
           "items": {
             "enum": [
-              "One Handed Sword",
-              "Staff",
-              "Two Handed Axe",
-              "Wand"
+              "Armour",
+              "Weapon"
             ],
             "type": "string"
           }
@@ -1158,11 +1160,11 @@
         }
       ]
     },
-    "WeaponCraft": {
+    "BlacksmithCraft": {
       "type": "object",
       "properties": {
         "desc": {
-          "$ref": "#/definitions/WeaponCraftDescription"
+          "$ref": "#/definitions/BlacksmithCraftDescription"
         },
         "cost": {
           "$ref": "#/definitions/Cost"
@@ -1192,7 +1194,7 @@
         "successRates"
       ]
     },
-    "WeaponCraftDescription": {
+    "BlacksmithCraftDescription": {
       "type": "string",
       "pattern": "^[^#]*$",
       "defaultSnippets": [
@@ -1973,7 +1975,7 @@
         }
       ]
     },
-    "WeaponUpgradeMod": {
+    "BlacksmithUpgradeMod": {
       "type": "string",
       "pattern": "^[^#]*$",
       "defaultSnippets": [

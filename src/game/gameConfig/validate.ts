@@ -77,4 +77,11 @@ function* createErrorMessage(errors: Partial<ErrorObject>[]): Generator<string> 
             yield `wrong type at "${wrongType.instancePath}". (${wrongType.message})`;
         }
     }
+
+    const enums = errors.filter(x => x.keyword === 'enum');
+    for (const error of enums) {
+        if (error.params && 'allowedValues' in error.params) {
+            yield `enum at ${error.instancePath} does not match [${error.params['allowedValues']?.join(', ')}]`;
+        }
+    }
 }

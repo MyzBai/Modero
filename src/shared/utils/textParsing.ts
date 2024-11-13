@@ -17,23 +17,27 @@ export const strToKebab = (str: string) => str.split(' ').join('-').toLowerCase(
 export const camelToKebab = (str: string) => str.replace(/(?=[A-Z])/g, '-').toLowerCase();
 
 export function parseTextValues(text: string) {
-    const matches = [...text.matchAll(new RegExp(numberRangeRegex, 'g'))];
-    const values = [];
-    for (const match of matches) {
-        assertDefined(match.groups, `failed matching groups on mod: (${text})`);
-        const { min, max } = match.groups;
-        if (!min) {
-            throw `failed matching min value on mod: (${text})`;
+    try {
+        const matches = [...text.matchAll(new RegExp(numberRangeRegex, 'g'))];
+        const values = [];
+        for (const match of matches) {
+            assertDefined(match.groups, `failed matching groups on mod: (${text})`);
+            const { min, max } = match.groups;
+            if (!min) {
+                throw Error(`failed matching min value on mod: (${text})`);
+            }
+            values.push({
+                min: parseFloat(min),
+                max: parseFloat(max ?? min),
+                value: parseFloat(min),
+                startIndex: match.index || 0,
+                text: match[0],
+            });
         }
-        values.push({
-            min: parseFloat(min),
-            max: parseFloat(max ?? min),
-            value: parseFloat(min),
-            startIndex: match.index || 0,
-            text: match[0],
-        });
+        return values;
+    } catch (error) {
+        console.error('parseTextValues failed', text);
     }
-    return values;
 }
 
 export function parseTextReferences(text: string): ModReference | undefined {

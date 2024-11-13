@@ -11,7 +11,7 @@ export interface Config {
     components?: {
         guildHall?: GuildHall;
         character?: Character;
-        weapon?: Weapon;
+        blacksmith?: Blacksmith;
         treasury?: Treasury;
         achievements?: Achievements;
     };
@@ -51,33 +51,34 @@ export interface Worlds {
     }[];
 }
 
-export interface Weapon {
+export interface Blacksmith {
     levelList?: {
         upgradeCost?: Cost;
-        modList: WeaponUpgradeModList;
+        modList: BlacksmithUpgradeModList;
     }[];
-    weaponTypeList?: WeaponType[];
-    modLists: WeaponMod[][];
+    /**@TJS-minItems 1 */
+    itemList: {
+        id: Id;
+        name: BlacksmithItemName;
+        reforgeWeights: UnsignedInteger[];
+    }[];
+    modLists: BlacksmithMod[][];
     crafting: {
         advancedReforge: {
             requirements: Requirements;
         };
-        craftList: WeaponCraft[];
+        craftList: BlacksmithCraft[];
     };
 }
-export interface WeaponType {
-    id: Id;
-    name: WeaponTypeName;
-}
-export interface WeaponMod {
+export interface BlacksmithMod {
     id: Id;
     level: Level;
     weight: Weight;
     mod: PlayerMod;
-    weaponTypes?: WeaponTypeName[];
+    itemFilter?: BlacksmithItemName[];
 }
-export interface WeaponCraft {
-    desc: WeaponCraftDescription;
+export interface BlacksmithCraft {
+    desc: BlacksmithCraftDescription;
     cost?: Cost;
     successRates: { min: UnsignedInteger; max: UnsignedInteger; };
 }
@@ -217,8 +218,8 @@ export const SchemaOverrideSymbolNames = [
     'EnemyBaseLife',
     'EnemyBaseCount',
     'SkillsUpgradeMod',
-    'WeaponUpgradeMod',
-    'WeaponCraftDescription',
+    'BlacksmithUpgradeMod',
+    'BlacksmithCraftDescription',
     'TreasuryUpgradeMod',
     'GuildHallMod',
     'WorldMod',
@@ -316,13 +317,13 @@ type SkillsUpgradeMod = string;
 /**@items {"$ref": "#/definitions/SkillsUpgradeMod"} */
 type SkillsUpgradeModList = SkillsUpgradeMod[];
 
-/**@$ref #/definitions/WeaponUpgradeMod */
-type WeaponUpgradeMod = string;
-/**@items {"$ref": "#/definitions/WeaponUpgradeMod"} */
-type WeaponUpgradeModList = WeaponUpgradeMod[];
+/**@$ref #/definitions/BlacksmithUpgradeMod */
+type BlacksmithUpgradeMod = string;
+/**@items {"$ref": "#/definitions/BlacksmithUpgradeMod"} */
+type BlacksmithUpgradeModList = BlacksmithUpgradeMod[];
 
-/**@$ref #/definitions/WeaponCraftDescription */
-type WeaponCraftDescription = string;
+/**@$ref #/definitions/BlacksmithCraftDescription */
+type BlacksmithCraftDescription = string;
 
 /**@$ref #/definitions/TreasuryUpgradeMod */
 type TreasuryUpgradeMod = string;
@@ -351,8 +352,8 @@ export interface Cost {
 export const ReferenceNames = ['Resource'] as const;
 
 //User Override
-export const WeaponTypeNames = ['One Handed Sword', 'Two Handed Axe', 'Wand', 'Staff'] as const satisfies readonly Name[];
-export type WeaponTypeName = typeof WeaponTypeNames[number] extends undefined ? Name : typeof WeaponTypeNames[number];
+export const BlacksmithItemNames = ['Weapon', 'Armour'] as const satisfies readonly Name[];
+export type BlacksmithItemName = typeof BlacksmithItemNames[number] extends undefined ? Name : typeof BlacksmithItemNames[number];
 
 export const ResourceNames = ['Gold', 'Silver', 'Copper'] as const satisfies readonly Name[];
 export type ResourceName = typeof ResourceNames[number] extends undefined ? Name : typeof ResourceNames[number];

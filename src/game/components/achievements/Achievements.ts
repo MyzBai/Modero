@@ -75,7 +75,7 @@ class Achievement {
         const element = document.createElement('div');
         element.classList.add('s-achievement', 'g-field');
 
-        const textData = parseTextValues(this.task.text)[0];
+        const textData = parseTextValues(this.task.text)?.[0];
         assertDefined(textData);
 
         element.insertAdjacentHTML('beforeend', this.task.createHTML());

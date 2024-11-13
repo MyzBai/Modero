@@ -92,6 +92,7 @@ export class TextInputDropdownElement extends CustomElement {
             }, { signal: this.abortController.signal });
             // window.addEventListener('resize', this.updateDropdownContentElementPosition, { signal: this.abortController.signal });
         }
+        this.dropdownContentElement.style.width = CSS.px(Math.max(this.clientWidth, this.dropdownContentElement.getBoundingClientRect().width)).toString();
     }
 
     private closeDropdownContentElement(e?: MouseEvent) {

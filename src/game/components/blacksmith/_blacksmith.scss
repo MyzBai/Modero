@@ -1,74 +1,61 @@
 @use 'variables' as *;
-.p-weapon {
+.p-blacksmith {
     position: relative;
     display: grid;
-    grid-template-rows: auto 0.6fr 1fr;
+    grid-template-rows: auto auto 0.6fr 1fr;
     gap: $default-gap;
     z-index: 1;
-    .s-weapon {
-        position: relative;
+
+    .s-item-dropdown {
         display: flex;
-        flex-direction: column;
+        border: $default-border;
+        & > :first-child {
+            flex-grow: 0;
+            min-width: 10em;
+        }
+    }
 
-        .s-weapon-type {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            border-bottom: $default-border;
-            span:first-child {
-                grid-column: 2;
-            }
-            .change {
-                grid-column: 3;
-                padding-left: 0.5em;
-                cursor: default;
+    .s-mod-list {
+        flex: 1;
 
+        &[data-craft-area] {
+            z-index: 2;
+
+            outline: 1px solid $color-title-accent;
+            user-select: none;
+
+            &[data-craft] {
                 &:hover {
-                    filter: brightness(120%);
+                    box-shadow: 0 0 5px 1px $color-title-accent inset;
+                    user-select: none;
+                }
+                * {
+                    pointer-events: none;
                 }
             }
-        }
 
-        .s-mod-list {
-            flex: 1;
+            &[data-success-rate]:has([data-craft]:hover)::after {
+                position: absolute;
+                content: 'Success Rate: ' attr(data-success-rate) '%';
+                color: $color-title-accent;
+                top: 0;
+                transform: translateY(-100%);
+                z-index: 3;
+            }
 
-            &[data-craft-area] {
-                z-index: 2;
-
-                outline: 1px solid $color-title-accent;
-                user-select: none;
-
-                &[data-craft] {
-                    &:hover {
-                        box-shadow: 0 0 5px 1px $color-title-accent inset;
-                        user-select: none;
-                    }
-                    * {
-                        pointer-events: none;
-                    }
-                }
+            [data-craft='false'] {
+                pointer-events: none;
+                opacity: 0.5;
             }
         }
-        &[data-success-rate]:has([data-craft]:hover)::after {
-            position: absolute;
-            content: 'Success Rate: ' attr(data-success-rate) '%';
-            color: $color-title-accent;
-            top: 0;
-            transform: translateY(-100%);
-            z-index: 3;
-        }
-        [data-craft='false'] {
-            pointer-events: none;
-            opacity: 0.5;
-        }
+    }
 
-        .backdrop {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            backdrop-filter: blur(1px) !important;
-            background-color: rgba(0, 0, 0, 0.589);
-        }
+    .craft-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        backdrop-filter: blur(1px) !important;
+        background-color: rgba(0, 0, 0, 0.589);
     }
 
     .craft-table {

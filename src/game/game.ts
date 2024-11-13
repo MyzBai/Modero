@@ -28,7 +28,7 @@ import type { Statistic } from './statistics/Statistic';
 export const mainMenuNames = [
     'combat',
     'character',
-    'weapon',
+    'blacksmith',
     'treasury',
     'guildHall',
     'worlds',

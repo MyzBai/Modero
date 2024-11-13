@@ -5,7 +5,7 @@ import { Achievements } from './achievements/Achievements';
 import { Character } from './character/Character';
 import type * as GameSerialization from '../serialization';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
-import { Weapon } from './weapon/Weapon';
+import { Blacksmith } from './blacksmith/Blacksmith';
 import type { Serialization } from '../serialization';
 import { evaluateStatRequirements } from '../statistics/statRequirements';
 import { GuildHall } from './guildHall/GuildHall';
@@ -16,7 +16,7 @@ export class Components {
     private readonly components = {
         guildHall: { label: 'Guild Hall', constr: GuildHall },
         character: { label: 'Character', constr: Character },
-        weapon: { label: 'Weapon', constr: Weapon },
+        blacksmith: { label: 'Blacksmith', constr: Blacksmith },
         treasury: { label: 'Treasury', constr: Treasury },
         achievements: { label: 'Achievements', constr: Achievements },
     } as const satisfies Record<GameConfig.ComponentName, { label: string; constr: new (data: UnionToIntersection<ComponentUnion>) => Component; }>;

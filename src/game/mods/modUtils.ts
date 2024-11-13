@@ -2,7 +2,7 @@ import { hasAnyFlag } from 'src/shared/utils/utils';
 import { ModifierFlags, type ModTemplate, type ModTemplateStat, type ModifierTag } from './types';
 import { modTemplateList } from './modTemplates';
 import { assertDefined } from 'src/shared/utils/assert';
-import { Modifier } from './Modifier';
+import { Modifier, type ModGroupList } from './Modifier';
 
 
 export function createModTags(statList: readonly ModTemplateStat[]) {
@@ -75,7 +75,6 @@ export function createModTags(statList: readonly ModTemplateStat[]) {
     return [...new Set(generateModTags())];
 }
 
-
 export function sortModifiers(modList: string[] | Modifier[]) {
     const descriptions = modTemplateList.map(x => x.desc);
     modList.sort((a, b) => descriptions.indexOf(typeof a === 'string' ? Modifier.getTemplate(a)?.desc ?? '' : a.template.desc) - descriptions.indexOf(typeof b === 'string' ? Modifier.getTemplate(b)?.desc ?? '' : b.template.desc));
@@ -86,3 +85,14 @@ export function extractModifier<T extends ReadonlyArray<ModTemplate>>(list: T, d
     assertDefined(template);
     return template;
 }
+
+export function getModGroupList(modText: string, modGroupsList: ModGroupList[], filterName?: string): ModGroupList {
+    const modGroup = modGroupsList.find(x => x.some(x => x.text === modText)) ?? [];
+    return modGroup.filter(x => !x.filter || x.filter.length === 0 || x.filter.some(x => x === filterName));
+}
+
+export function calcModTier(modText: string, modGroupList: ModGroupList) {
+    const index = modGroupList.map(x => x.text).indexOf(modText);
+    return Math.abs(index - modGroupList.length);
+}
+

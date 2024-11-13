@@ -260,21 +260,19 @@
                         "name": "Book For Dummies",
                         "probabilities": [ 100, 200, 300, 500, 1000, 2000, 3000, 5000 ],
                         "insight": 100
-                        // "flavourText": "This book contains something profound..."
                     },
                     {
                         "id": "f31249",
                         "name": "Old Scroll",
                         "probabilities": [ 300, 500, 800, 1500, 2000 ],
                         "insight": 200
-                        // "flavourText": "An old scroll containing some hidden knowledge"
                     }
                 ],
                 "passiveSkillList": [
                     {
                         "id": "068015",
                         "name": "Physical Attack Damage",
-                        "insightCost": 0,
+                        "insightCost": 200,
                         "rankList": [
                             {
                                 "exp": 600,
@@ -472,7 +470,7 @@
                 ]
             }
         },
-        "weapon": {
+        "blacksmith": {
             "levelList": [
                 {
                     "upgradeCost": { "name": "Gold", "value": 1000 },
@@ -480,6 +478,18 @@
                 },
                 {
                     "modList": [ "+{4} Additional Weapon Modifiers" ]
+                }
+            ],
+            "itemList": [
+                {
+                    "id": "b12e06",
+                    "name": "Weapon",
+                    "reforgeWeights": [ 10, 30, 20, 10, 5, 2 ]
+                },
+                {
+                    "id": "658b02",
+                    "name": "Armour",
+                    "reforgeWeights": [ 20, 50, 20, 10 ]
                 }
             ],
             "crafting": {

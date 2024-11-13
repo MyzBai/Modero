@@ -7,7 +7,7 @@ import { assertNonNullable } from '../src/shared/utils/assert';
 import { ReferenceNames, ResourceNames, SchemaOverrideSymbolNames, type SchemaOverrideSymbolName } from '../src/game/gameConfig/GameConfig';
 import { isDefined } from '../src/shared/utils/utils';
 import { taskTemplates } from '../src/game/tasks/taskTemplates';
-import { craftTemplates } from '../src/game/components/weapon/craftTemplates';
+import { craftTemplates } from '../src/game/components/blacksmith/craftTemplates';
 import { generalPlayerModTemplateList, persistentPlayerModTemplateList, playerStartModTemplateList } from '../src/game/mods/playerModTemplates';
 import { enemyModTemplateList } from '../src/game/mods/enemyModTemplates';
 import { assertUniqueStringList } from './utils';
@@ -75,19 +75,19 @@ function createSchema() {
 function createSchemaOverrideProperties(generator: JsonSchemaGenerator) {
 
     assertUniqueStringList(modTemplateList.map(x => x.id), 'modTemplates contains duplicate ids');
-    assertUniqueStringList(craftTemplates.map(x => x.id), 'weaponCrafTemplates contains duplicate ids');
+    assertUniqueStringList(craftTemplates.map(x => x.id), 'BlacksmithCrafTemplates contains duplicate ids');
 
 
     //strings which can be referenced throughout the config file
     createStringSchemaOverride(generator, { symbolName: 'PlayerMod', descriptions: generalPlayerModTemplateList.map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'PlayerStartMod', descriptions: playerStartModTemplateList.map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'SkillsUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
-    createStringSchemaOverride(generator, { symbolName: 'WeaponUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'BlacksmithUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'TreasuryUpgradeMod', descriptions: [...generalPlayerModTemplateList, ...persistentPlayerModTemplateList].map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'WorldMod', descriptions: worldModTemplateList.map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'EnemyMod', descriptions: enemyModTemplateList.map(x => x.desc) });
 
-    createStringSchemaOverride(generator, { symbolName: 'WeaponCraftDescription', descriptions: craftTemplates.map(x => x.desc) });
+    createStringSchemaOverride(generator, { symbolName: 'BlacksmithCraftDescription', descriptions: craftTemplates.map(x => x.desc) });
     createStringSchemaOverride(generator, { symbolName: 'AchievementDescription', descriptions: taskTemplates.map(x => x.desc) });
 
     //create snippet for id to automatically generate random base-16 digts
