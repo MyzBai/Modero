@@ -13,7 +13,7 @@
         "build-watch": "run-p \"build:esbuild --watch\" \"build:sass --watch\"",
         "build:esbuild": "tsx scripts/esbuild.ts",
         "build:sass": "tsx scripts/sass.ts",
-        "build:gameConfig": "tsx scripts/generateGameConfigSchemaValidator.ts && tsx scripts/generateGameConfigSchema.ts",
+        "build:gameConfig": "tsx scripts/generateGameConfigSchema.ts && tsx scripts/generateGameConfigSchemaValidator.ts",
         "eslint": "npx eslint --ext ts .",
         "test": "npm run eslint && tsx tests/statMod.test.ts"
     },
