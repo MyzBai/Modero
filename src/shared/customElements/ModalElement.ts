@@ -32,6 +32,11 @@ export class ModalElement extends CustomElement {
         this.appendChild(backdrop);
 
         document.body.appendChild(this);
+
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+            this.focus();
+        }
     }
 
     setTitle(text: string) {
