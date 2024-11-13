@@ -2,7 +2,7 @@ import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { createModListElement } from './dom';
 import { isDefined } from 'src/shared/utils/utils';
-import { TextInputDropdownElement } from '../../shared/customElements/TextInputDropdownElement';
+import type { TextInputDropdownElement } from '../../shared/customElements/TextInputDropdownElement';
 import { createRankDropdown, getRankExpPct, type RankObject } from './rankObjectUtils';
 
 export interface AssignableObject {

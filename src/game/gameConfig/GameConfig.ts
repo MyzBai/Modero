@@ -198,7 +198,7 @@ export interface Guild {
 export interface GuildClass {
     id: Id;
     guildName: GuildName;
-    requirements?: { guildHallLevel: Level; }
+    requirements?: { guildHallLevel: Level; };
     name: Name;
     modList: PlayerModList;
 }

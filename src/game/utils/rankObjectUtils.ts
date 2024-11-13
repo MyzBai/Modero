@@ -39,7 +39,7 @@ export function createRankObject<T extends RankObjectData>(data: RankObjectInitD
             assertDefined(rankData, 'rank is outside the range of rankList');
             return rankData;
         }
-    }
+    };
     return rankObject;
 }
 

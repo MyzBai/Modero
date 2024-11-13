@@ -43,7 +43,7 @@ export interface CraftContext {
 export type CraftActionType = 'Confirm' | 'Cancel' | 'Change';
 
 export class CraftTable {
-    readonly craftAction = new EventEmitter<{ item: BlacksmithItem; type: CraftActionType }>();
+    readonly craftAction = new EventEmitter<{ item: BlacksmithItem; type: CraftActionType; }>();
     readonly element: HTMLElement;
     private readonly craftManager: CraftManager;
     private readonly craftListElement: HTMLElement;

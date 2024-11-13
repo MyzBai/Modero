@@ -3,7 +3,7 @@ import { ModifierInfoPopup } from './ModifierInfoPopup';
 import { calcModTier, getModGroupList, sortModifiers } from './modUtils';
 
 
-export function* generateModListElements(params: { modList: Modifier[], modGroupsList?: ModGroupList[] }): Generator<HTMLElement> {
+export function* generateModListElements(params: { modList: Modifier[]; modGroupsList?: ModGroupList[]; }): Generator<HTMLElement> {
     sortModifiers(params.modList);
     for (const mod of params.modList) {
         const element = document.createElement('li');

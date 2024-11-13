@@ -85,7 +85,7 @@ export class Blacksmith extends Component {
             craftList: data.crafting.craftList,
             modGroupsList: this.modGroupsList,
             candidateModList: () => {
-                return this.candidateModList.filter(x => !x.filter || x.filter.includes(this.craftTable.ctx.item.name))
+                return this.candidateModList.filter(x => !x.filter || x.filter.includes(this.craftTable.ctx.item.name));
             },
         });
         this.page.appendChild(this.craftTable.element);
@@ -118,7 +118,7 @@ export class Blacksmith extends Component {
 
         this.level.addListener('change', this.updateBlacksmithLevel.bind(this));
 
-        this.level.registerTargetValueCallback(data.crafting.advancedReforge.requirements.blacksmithLevel, () => this.craftTable.unlockAdvReforge())
+        this.level.registerTargetValueCallback(data.crafting.advancedReforge.requirements.blacksmithLevel, () => this.craftTable.unlockAdvReforge());
     }
 
     private updateModListElements(item: BlacksmithItem) {
@@ -172,15 +172,15 @@ export class Blacksmith extends Component {
             }
 
             srcItem.modList = Modifier.deserialize(...itemData?.modList?.map(x =>
-            ({
-                text: this.data.modLists.flatMap(y => y).findStrict(y => Modifier.getTemplate(y.mod)?.id === x?.srcId).mod,
-                srcId: x?.srcId, values: x?.values
-            })) ?? []);
+                ({
+                    text: this.data.modLists.flatMap(y => y).findStrict(y => Modifier.getTemplate(y.mod)?.id === x?.srcId).mod,
+                    srcId: x?.srcId, values: x?.values
+                })) ?? []);
             srcItem.modListCrafting = itemData?.modListCrafting ? Modifier.deserialize(...itemData?.modListCrafting?.map(x =>
-            ({
-                text: this.data.modLists.flatMap(y => y).findStrict(y => Modifier.getTemplate(y.mod)?.id === x?.srcId).mod,
-                srcId: x?.srcId, values: x?.values
-            })) ?? []) : undefined;
+                ({
+                    text: this.data.modLists.flatMap(y => y).findStrict(y => Modifier.getTemplate(y.mod)?.id === x?.srcId).mod,
+                    srcId: x?.srcId, values: x?.values
+                })) ?? []) : undefined;
         }
 
         this.itemList.forEach(x => this.applyModifiers(x));

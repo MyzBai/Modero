@@ -1,6 +1,6 @@
 import { combat, player } from 'src/game/game';
 import { Modifier } from 'src/game/mods/Modifier';
-import * as GameConfig from 'src/game/gameConfig/GameConfig';
+import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import type * as GameSerialization from 'src/game/serialization';
 import { assertDefined } from 'src/shared/utils/assert';
 import type { StatModifier } from 'src/game/mods/ModDB';
@@ -76,8 +76,8 @@ export class AttackSkills extends SkillPage {
         const button = document.createElement('button');
         const updateButton = () => {
             let disabled = true;
-            let tag = 'valid';
-            let label = 'Assign';
+            const tag = 'valid';
+            const label = 'Assign';
             if (skill.assigned) {
                 disabled = false;
                 if (skill.selectedRank === skill.curRank) {
