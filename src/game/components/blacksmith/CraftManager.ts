@@ -16,6 +16,7 @@ export interface ModifierCandidate {
     text: string;
     template: ModTemplate;
     weight: number;
+    filter?: string[];
 }
 interface MinMax { min: number; max: number; }
 export interface CraftSuccessRates {

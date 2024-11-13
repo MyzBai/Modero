@@ -495,7 +495,7 @@
             "crafting": {
                 "advancedReforge": {
                     "requirements": {
-                        "world": 2
+                        "blacksmithLevel": 2
                     }
                 },
                 "craftList": [
@@ -532,6 +532,9 @@
                 ]
             },
             "modLists": [
+                [
+                    { "id": "0ea37b", "level": 1, "weight": 10000, "itemFilter": [ "Armour" ], "mod": "Burn Lingers" }
+                ],
                 [
                     { "mod": "{20-35}% Increased Physical Attack Damage", "level": 1, "weight": 300, "id": "6b88cc" },
                     { "mod": "{40-60}% Increased Physical Attack Damage", "level": 3, "weight": 300, "id": "6d589f" },

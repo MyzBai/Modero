@@ -5,10 +5,8 @@ import { createCustomElement } from 'src/shared/customElements/customElements';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { CraftManager, type ModifierCandidate } from './CraftManager';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
-import { evaluateStatRequirements } from 'src/game/statistics/statRequirements';
 import { TextInputDropdownElement } from 'src/shared/customElements/TextInputDropdownElement';
 import { createHelpIcon } from 'src/shared/utils/dom';
-import type { Requirements } from 'src/game/gameConfig/GameConfig';
 import { game, GameInitializationStage, player } from '../../game';
 import { ModDB } from '../../mods/ModDB';
 import { calcPlayerCombatStats, extractStats } from '../../calc/calcStats';
@@ -38,12 +36,8 @@ export interface CraftContext {
     craftList: GameConfig.BlacksmithCraft[];
     element: HTMLElement;
     modGroupsList: ModGroupList[];
-    candidateModList: WeaponModifierCandidate[];
-    advReforgeRequirements?: Requirements;
-}
-
-export interface WeaponModifierCandidate extends ModifierCandidate {
-    weaponTypeNameList?: string[];
+    candidateModList: () => ModifierCandidate[];
+    // candidateModList: () => ModifierCandidate[];
 }
 
 export type CraftActionType = 'Confirm' | 'Cancel' | 'Change';
@@ -96,12 +90,6 @@ export class CraftTable {
         }).observe(this.craftListElement);
     }
 
-    initItem(item: BlacksmithItem) {
-        this.ctx.item = item;
-        this.updateToolbar();
-        this.updateCraftListItemStates();
-    }
-
     private createToolbar() {
         const toolbarElement = document.createElement('div');
         toolbarElement.classList.add('s-toolbar', 'g-toolbar');
@@ -133,16 +121,14 @@ export class CraftTable {
 
         this.element.appendChild(toolbarElement);
 
-        evaluateStatRequirements(this.ctx.advReforgeRequirements, () => {
-            const advReforgeElement = document.createElement('button');
-            advReforgeElement.classList.add('advanced');
-            advReforgeElement.setAttribute('data-advanced-reforge', '');
-            advReforgeElement.textContent = 'Adv. Reforge';
-            advReforgeElement.addEventListener('click', () => {
-                this.openAdvancedReforgeModal();
-            });
-            toolbarElement.appendChild(advReforgeElement);
+        const advReforgeElement = document.createElement('button');
+        advReforgeElement.classList.add('hidden', 'advanced-reforge');
+        advReforgeElement.setAttribute('data-advanced-reforge-button', '');
+        advReforgeElement.textContent = 'Adv. Reforge';
+        advReforgeElement.addEventListener('click', () => {
+            this.openAdvancedReforgeModal();
         });
+        toolbarElement.appendChild(advReforgeElement);
 
     }
 
@@ -164,7 +150,7 @@ export class CraftTable {
                         disabled = false;
                         break;
                     case 'Add':
-                        disabled = this.ctx.item.modListCrafting.length >= this.ctx.item.maxModCount || this.craftManager.generateMods(this.ctx.item.modListCrafting, this.ctx.candidateModList, 1).length === 0;
+                        disabled = this.ctx.item.modListCrafting.length >= this.ctx.item.maxModCount || this.craftManager.generateMods(this.ctx.item.modListCrafting, this.ctx.candidateModList(), 1).length === 0;
                         break;
                     case 'Remove':
                     case 'Upgrade':
@@ -305,7 +291,7 @@ export class CraftTable {
             this.performReforgeCraft();
         } else if (template.type === 'Add') {
             assertDefined(this.ctx.item.modListCrafting);
-            const mod = this.craftManager.addModifier(this.ctx.item.modListCrafting, this.ctx.candidateModList);
+            const mod = this.craftManager.addModifier(this.ctx.item.modListCrafting, this.ctx.candidateModList());
             this.ctx.item.modListCrafting.push(mod);
         } else if (template.type === 'Remove') {
             assertDefined(mod);
@@ -328,7 +314,7 @@ export class CraftTable {
         const reforgeCount = (this.advReforge?.maxReforgeCount ?? 1);
         const useAdvReforge = !!this.advReforge && this.advReforge.maxReforgeCount > 0;
         for (let i = 0; i < reforgeCount; i++) {
-            const newModList = this.craftManager.reforge(this.ctx.candidateModList, this.ctx.item.reforgeWeights);
+            const newModList = this.craftManager.reforge(this.ctx.candidateModList(), this.ctx.item.reforgeWeights);
             this.ctx.item.modListCrafting = newModList;
 
             const evaluateAdvReforge = () => {
@@ -368,7 +354,7 @@ export class CraftTable {
         let lastDps = curDps;
         let modList: Modifier[] = [];
         for (let i = 0; i < 100; i++) {
-            const newModList = this.craftManager.reforge(this.ctx.candidateModList, [0, 0, 0, 0, 0, 1]);
+            const newModList = this.craftManager.reforge(this.ctx.candidateModList(), [0, 0, 0, 0, 0, 1]);
             modDB.replace('ReforgeDevCraft', Modifier.extractStatModifierList(...newModList));
             const dps = calcPlayerCombatStats({ stats, modDB }).dps;
             if (dps > lastDps || modList.length === 0) {
@@ -525,7 +511,7 @@ export class CraftTable {
             const modTextDropdown = createCustomElement(TextInputDropdownElement);
             modTextDropdown.setReadonly();
             modTextDropdown.setInputText(modItem.text);
-            const modListSet = new Set(this.ctx.candidateModList.filter(x => (x.weaponTypeNameList ?? []).length === 0).map(x => x.template.desc));
+            const modListSet = new Set(this.ctx.candidateModList().map(x => x.template.desc));
             const none = 'None';
             modTextDropdown.setDropdownList([none, ...modListSet]);
             modTextDropdown.onInputChange = ({ text }) => {
@@ -538,7 +524,7 @@ export class CraftTable {
 
             const updateTierInput = () => {
                 const modText = modItem.text;
-                const modList = this.ctx.candidateModList.filter(x => x.template.desc === modText).filter(x => (x.weaponTypeNameList ?? []).length === 0);
+                const modList = this.ctx.candidateModList().filter(x => x.template.desc === modText);
                 const modListCount = modList.length;
                 const filterList = [...Array(modListCount)].map((_, i) => `Tier ${i + 1}`);
                 tierDropdown.setDropdownList(filterList);
@@ -584,6 +570,17 @@ export class CraftTable {
 
         modal.addBodyElement(bodyElement);
         this.element.appendChild(modal);
+    }
+
+
+    initItem(item: BlacksmithItem) {
+        this.ctx.item = item;
+        this.updateToolbar();
+        this.updateCraftListItemStates();
+    }
+
+    unlockAdvReforge() {
+        this.element.querySelectorStrict('[data-advanced-reforge-button]').classList.remove('hidden');
     }
 
     addCraft(craftData: GameConfig.BlacksmithCraft) {

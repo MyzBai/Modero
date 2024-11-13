@@ -64,7 +64,7 @@ export interface Blacksmith {
     modLists: BlacksmithMod[][];
     crafting: {
         advancedReforge: {
-            requirements: Requirements;
+            requirements: { blacksmithLevel: Level; };
         };
         craftList: BlacksmithCraft[];
     };

@@ -84,8 +84,9 @@ export class Blacksmith extends Component {
             element: this.page,
             craftList: data.crafting.craftList,
             modGroupsList: this.modGroupsList,
-            candidateModList: this.candidateModList,
-            advReforgeRequirements: this.data.crafting.advancedReforge.requirements,
+            candidateModList: () => {
+                return this.candidateModList.filter(x => !x.filter || x.filter.includes(this.craftTable.ctx.item.name))
+            },
         });
         this.page.appendChild(this.craftTable.element);
 
@@ -93,9 +94,9 @@ export class Blacksmith extends Component {
             const groupList: ModGroupList = [];
             this.modGroupsList.push(groupList);
             for (const modData of modList) {
-                player.stats.level.registerTargetValueCallback(modData.level, () => {
+                this.level.registerTargetValueCallback(modData.level, () => {
                     const template = modTemplateList.findStrict(x => x.desc === Modifier.getTemplate(modData.mod)?.desc);
-                    this.candidateModList.push({ text: modData.mod, template, weight: modData.weight });
+                    this.candidateModList.push({ text: modData.mod, template, weight: modData.weight, filter: modData.itemFilter });
                     groupList.push({ text: modData.mod, filter: modData.itemFilter });
                 });
             }
@@ -116,6 +117,8 @@ export class Blacksmith extends Component {
         });
 
         this.level.addListener('change', this.updateBlacksmithLevel.bind(this));
+
+        this.level.registerTargetValueCallback(data.crafting.advancedReforge.requirements.blacksmithLevel, () => this.craftTable.unlockAdvReforge())
     }
 
     private updateModListElements(item: BlacksmithItem) {

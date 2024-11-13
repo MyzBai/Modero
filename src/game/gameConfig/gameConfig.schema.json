@@ -724,7 +724,18 @@
               "type": "object",
               "properties": {
                 "requirements": {
-                  "$ref": "#/definitions/Requirements"
+                  "type": "object",
+                  "properties": {
+                    "blacksmithLevel": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "default": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "blacksmithLevel"
+                  ]
                 }
               },
               "additionalProperties": false,
