@@ -26,7 +26,7 @@ export function createModListElement(modList: string[] | Modifier[]) {
 export interface LevelModalOptions {
     title: string;
     level: Value;
-    levelData: { upgradeCost?: Cost; modList: string[]; }[];
+    levelData: { upgradeCost?: Cost; modList?: string[]; }[];
 }
 export function createLevelModal(opts: LevelModalOptions) {
     const modal = createCustomElement(ModalElement);
@@ -35,8 +35,10 @@ export function createLevelModal(opts: LevelModalOptions) {
     const levelData = opts.levelData[opts.level.value - 1];
     assertDefined(levelData);
 
-    const modListElement = createModListElement(levelData.modList);
-    modal.body.appendChild(modListElement);
+    if (levelData.modList) {
+        const modListElement = createModListElement(levelData.modList);
+        modal.body.appendChild(modListElement);
+    }
 
     const upgradeCost = levelData.upgradeCost;
     if (upgradeCost) {

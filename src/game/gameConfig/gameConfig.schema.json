@@ -201,10 +201,7 @@
                 "type": "array"
               }
             },
-            "additionalProperties": false,
-            "required": [
-              "modList"
-            ]
+            "additionalProperties": false
           }
         },
         "guildList": {
@@ -345,10 +342,7 @@
                 "type": "array"
               }
             },
-            "additionalProperties": false,
-            "required": [
-              "modList"
-            ]
+            "additionalProperties": false
           }
         },
         "attackSkills": {
@@ -675,10 +669,7 @@
                 "type": "array"
               }
             },
-            "additionalProperties": false,
-            "required": [
-              "modList"
-            ]
+            "additionalProperties": false
           }
         },
         "itemList": {
@@ -1271,10 +1262,7 @@
                 "type": "array"
               }
             },
-            "additionalProperties": false,
-            "required": [
-              "modList"
-            ]
+            "additionalProperties": false
           }
         },
         "artifacts": {

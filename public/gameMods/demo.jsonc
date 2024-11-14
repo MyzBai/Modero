@@ -472,13 +472,10 @@
         },
         "blacksmith": {
             "levelList": [
-                {
-                    "upgradeCost": { "name": "Gold", "value": 1000 },
-                    "modList": [ ]
-                },
-                {
-                    "modList": [ ]
-                }
+                { "upgradeCost": { "name": "Gold", "value": 500 } },
+                { "upgradeCost": { "name": "Gold", "value": 1000 } },
+                { "upgradeCost": { "name": "Gold", "value": 2000 } },
+                { "upgradeCost": { "name": "Gold", "value": 5000 } }
             ],
             "itemList": [
                 {
@@ -533,122 +530,144 @@
             },
             "modLists": [
                 [
-                    { "id": "0ea37b", "level": 1, "weight": 10000, "itemFilter": [ "Armour" ], "mod": "Burn Lingers" }
-                ],
-                [
                     { "mod": "{20-35}% Increased Physical Attack Damage", "level": 1, "weight": 300, "id": "6b88cc" },
-                    { "mod": "{40-60}% Increased Physical Attack Damage", "level": 3, "weight": 300, "id": "6d589f" },
-                    { "mod": "{70-90}% Increased Physical Attack Damage", "level": 5, "weight": 200, "id": "d6bdb5" },
-                    { "mod": "{120-150}% Increased Physical Attack Damage", "level": 7, "weight": 200, "id": "8eb3d1" }
+                    { "mod": "{36-48}% Increased Physical Attack Damage", "level": 2, "weight": 300, "id": "6d589f" },
+                    { "mod": "{49-60}% Increased Physical Attack Damage", "level": 3, "weight": 200, "id": "d6bdb5" },
+                    { "mod": "{61-90}% Increased Physical Attack Damage", "level": 4, "weight": 200, "id": "8eb3d1" },
+                    { "mod": "{91-120}% Increased Physical Attack Damage", "level": 5, "weight": 200, "id": "0307ed" }
                 ],
                 [
                     { "mod": "{20-35}% Increased Elemental Attack Damage", "level": 1, "weight": 300, "id": "8eab4f" },
-                    { "mod": "{36-50}% Increased Elemental Attack Damage", "level": 3, "weight": 300, "id": "685cb5" },
-                    { "mod": "{60-90}% Increased Elemental Attack Damage", "level": 5, "weight": 200, "id": "a2c375" },
-                    { "mod": "{120-150}% Increased Elemental Attack Damage", "level": 7, "weight": 200, "id": "b2ba4c" }
+                    { "mod": "{36-48}% Increased Elemental Attack Damage", "level": 2, "weight": 300, "id": "685cb5" },
+                    { "mod": "{49-60}% Increased Elemental Attack Damage", "level": 3, "weight": 200, "id": "a2c375" },
+                    { "mod": "{61-90}% Increased Elemental Attack Damage", "level": 4, "weight": 200, "id": "b2ba4c" },
+                    { "mod": "{91-120}% Increased Elemental Attack Damage", "level": 5, "weight": 200, "id": "2a1122" }
                 ],
                 [
                     { "mod": "+{10-14}% Hit Chance", "level": 1, "weight": 500, "id": "fe4613" },
-                    { "mod": "+{15-19}% Hit Chance", "level": 3, "weight": 400, "id": "c5da42" },
-                    { "mod": "+{20-24}% Hit Chance", "level": 5, "weight": 300, "id": "e5d0fe" },
-                    { "mod": "+{25-30}% Hit Chance", "level": 7, "weight": 200, "id": "cf8899" }
+                    { "mod": "+{15-19}% Hit Chance", "level": 2, "weight": 400, "id": "c5da42" },
+                    { "mod": "+{20-24}% Hit Chance", "level": 3, "weight": 200, "id": "e5d0fe" },
+                    { "mod": "+{25-30}% Hit Chance", "level": 4, "weight": 100, "id": "cf8899" },
+                    { "mod": "+{31-50}% Hit Chance", "level": 5, "weight": 50, "id": "b7aeea" }
                 ],
                 [
-                    { "mod": "{15-20}% Increased Attack Speed", "level": 1, "weight": 150, "id": "6cb412" },
-                    { "mod": "{21-30}% Increased Attack Speed", "level": 3, "weight": 100, "id": "089dc9" },
-                    { "mod": "{31-40}% Increased Attack Speed", "level": 5, "weight": 100, "id": "a182a8" },
-                    { "mod": "{41-50}% Increased Attack Speed", "level": 7, "weight": 80, "id": "e260ed" }
+                    { "mod": "{14-20}% Increased Attack Speed", "level": 1, "weight": 150, "id": "6cb412" },
+                    { "mod": "{21-30}% Increased Attack Speed", "level": 2, "weight": 100, "id": "089dc9" },
+                    { "mod": "{31-40}% Increased Attack Speed", "level": 3, "weight": 100, "id": "a182a8" },
+                    { "mod": "{41-50}% Increased Attack Speed", "level": 4, "weight": 80, "id": "e260ed" },
+                    { "mod": "{51-75}% Increased Attack Speed", "level": 5, "weight": 40, "id": "e18d84" }
                 ],
                 [
                     { "mod": "{31-42}% Increased Bleed Damage", "level": 1, "weight": 300, "id": "157553" },
-                    { "mod": "{50-75}% Increased Bleed Damage", "level": 3, "weight": 300, "id": "41b7f8" },
-                    { "mod": "{76-90}% Increased Bleed Damage", "level": 5, "weight": 200, "id": "6735e5" },
-                    { "mod": "{76-90}% Increased Bleed Damage", "level": 7, "weight": 200, "id": "a10777" }
+                    { "mod": "{50-75}% Increased Bleed Damage", "level": 2, "weight": 300, "id": "41b7f8" },
+                    { "mod": "{76-90}% Increased Bleed Damage", "level": 3, "weight": 200, "id": "6735e5" },
+                    { "mod": "{76-90}% Increased Bleed Damage", "level": 4, "weight": 200, "id": "a10777" },
+                    { "mod": "{91-120}% Increased Bleed Damage", "level": 5, "weight": 100, "id": "394c43" }
                 ],
                 [
                     { "mod": "{31-42}% Increased Burn Damage", "level": 1, "weight": 300, "id": "43230b" },
-                    { "mod": "{50-75}% Increased Burn Damage", "level": 3, "weight": 300, "id": "c0c17c" },
-                    { "mod": "{76-90}% Increased Burn Damage", "level": 5, "weight": 200, "id": "5e47ab" },
-                    { "mod": "{76-90}% Increased Burn Damage", "level": 7, "weight": 200, "id": "27b717" }
+                    { "mod": "{50-75}% Increased Burn Damage", "level": 2, "weight": 300, "id": "c0c17c" },
+                    { "mod": "{76-90}% Increased Burn Damage", "level": 3, "weight": 200, "id": "5e47ab" },
+                    { "mod": "{76-90}% Increased Burn Damage", "level": 4, "weight": 200, "id": "27b717" },
+                    { "mod": "{91-120}% Increased Burn Damage", "level": 5, "weight": 100, "id": "4ee818" }
                 ],
-
                 [
                     { "mod": "+{30-39}% Bleed Damage Multiplier", "level": 1, "weight": 200, "id": "663aee" },
-                    { "mod": "+{40-55}% Bleed Damage Multiplier", "level": 3, "weight": 200, "id": "bd3464" },
-                    { "mod": "+{56-89}% Bleed Damage Multiplier", "level": 5, "weight": 150, "id": "dd37e2" },
-                    { "mod": "+{90-118}% Bleed Damage Multiplier", "level": 7, "weight": 100, "id": "a22464" }
+                    { "mod": "+{40-55}% Bleed Damage Multiplier", "level": 2, "weight": 200, "id": "bd3464" },
+                    { "mod": "+{56-89}% Bleed Damage Multiplier", "level": 3, "weight": 150, "id": "dd37e2" },
+                    { "mod": "+{90-118}% Bleed Damage Multiplier", "level": 4, "weight": 100, "id": "a22464" },
+                    { "mod": "+{119-140}% Bleed Damage Multiplier", "level": 5, "weight": 100, "id": "d78412" }
                 ],
                 [
                     { "mod": "+{30-39}% Burn Damage Multiplier", "level": 1, "weight": 200, "id": "048906" },
-                    { "mod": "+{40-55}% Burn Damage Multiplier", "level": 3, "weight": 200, "id": "ba0408" },
-                    { "mod": "+{56-89}% Burn Damage Multiplier", "level": 5, "weight": 150, "id": "bed75a" },
-                    { "mod": "+{90-118}% Burn Damage Multiplier", "level": 7, "weight": 100, "id": "b44014" }
+                    { "mod": "+{40-55}% Burn Damage Multiplier", "level": 2, "weight": 200, "id": "ba0408" },
+                    { "mod": "+{56-89}% Burn Damage Multiplier", "level": 3, "weight": 150, "id": "bed75a" },
+                    { "mod": "+{90-118}% Burn Damage Multiplier", "level": 4, "weight": 100, "id": "b44014" },
+                    { "mod": "+{119-140}% Burn Damage Multiplier", "level": 5, "weight": 100, "id": "2aa62c" }
                 ],
                 [
                     { "mod": "+{10-14}% Chance To Bleed", "level": 1, "weight": 300, "id": "74d875" },
-                    { "mod": "+{15-20}% Chance To Bleed", "level": 3, "weight": 300, "id": "1404f7" },
-                    { "mod": "+{21-30}% Chance To Bleed", "level": 5, "weight": 200, "id": "3d34ff" },
-                    { "mod": "+{31-40}% Chance To Bleed", "level": 7, "weight": 200, "id": "66649d" }
+                    { "mod": "+{15-20}% Chance To Bleed", "level": 2, "weight": 300, "id": "1404f7" },
+                    { "mod": "+{21-30}% Chance To Bleed", "level": 3, "weight": 200, "id": "3d34ff" },
+                    { "mod": "+{31-40}% Chance To Bleed", "level": 4, "weight": 200, "id": "66649d" },
+                    { "mod": "+{41-50}% Chance To Bleed", "level": 5, "weight": 100, "id": "404eed" }
                 ],
                 [
                     { "mod": "+{10-14}% Chance To Burn", "level": 1, "weight": 300, "id": "2d54be" },
-                    { "mod": "+{15-20}% Chance To Burn", "level": 3, "weight": 300, "id": "30bbd2" },
-                    { "mod": "+{21-30}% Chance To Burn", "level": 5, "weight": 200, "id": "144af3" },
-                    { "mod": "+{31-40}% Chance To Burn", "level": 7, "weight": 200, "id": "9af90c" }
+                    { "mod": "+{15-20}% Chance To Burn", "level": 2, "weight": 300, "id": "30bbd2" },
+                    { "mod": "+{21-30}% Chance To Burn", "level": 3, "weight": 200, "id": "144af3" },
+                    { "mod": "+{31-40}% Chance To Burn", "level": 4, "weight": 200, "id": "9af90c" },
+                    { "mod": "+{41-50}% Chance To Burn", "level": 5, "weight": 100, "id": "65a9aa" }
                 ],
                 [
                     { "mod": "+{10-15}% Critical Hit Chance", "level": 1, "weight": 200, "id": "2fbe45" },
-                    { "mod": "+{16-20}% Critical Hit Chance", "level": 3, "weight": 200, "id": "c00f75" },
-                    { "mod": "+{21-25}% Critical Hit Chance", "level": 5, "weight": 150, "id": "e69c4f" },
-                    { "mod": "+{26-30}% Critical Hit Chance", "level": 7, "weight": 100, "id": "ed203c" }
+                    { "mod": "+{16-20}% Critical Hit Chance", "level": 2, "weight": 200, "id": "c00f75" },
+                    { "mod": "+{21-25}% Critical Hit Chance", "level": 3, "weight": 150, "id": "e69c4f" },
+                    { "mod": "+{26-30}% Critical Hit Chance", "level": 4, "weight": 100, "id": "ed203c" },
+                    { "mod": "+{31-35}% Critical Hit Chance", "level": 5, "weight": 100, "id": "0f9546" }
                 ],
                 [
                     { "mod": "+{20-30}% Critical Hit Multiplier", "level": 1, "weight": 200, "id": "e8cd6d" },
-                    { "mod": "+{31-40}% Critical Hit Multiplier", "level": 3, "weight": 200, "id": "ce7e75" },
-                    { "mod": "+{41-50}% Critical Hit Multiplier", "level": 5, "weight": 150, "id": "789f7d" },
-                    { "mod": "+{81-120}% Critical Hit Multiplier", "level": 7, "weight": 100, "id": "55030c" }
+                    { "mod": "+{31-50}% Critical Hit Multiplier", "level": 2, "weight": 200, "id": "ce7e75" },
+                    { "mod": "+{51-70}% Critical Hit Multiplier", "level": 3, "weight": 150, "id": "789f7d" },
+                    { "mod": "+{71-90}% Critical Hit Multiplier", "level": 4, "weight": 100, "id": "55030c" },
+                    { "mod": "+{91-120}% Critical Hit Multiplier", "level": 5, "weight": 100, "id": "a7d863" }
                 ],
                 [
                     { "mod": "{30-39}% Increased Maximum Mana", "level": 1, "weight": 200, "id": "96b977" },
-                    { "mod": "{40-48}% Increased Maximum Mana", "level": 3, "weight": 200, "id": "e25f52" },
-                    { "mod": "{49-60}% Increased Maximum Mana", "level": 5, "weight": 150, "id": "ab5f7a" },
-                    { "mod": "{61-80}% Increased Maximum Mana", "level": 7, "weight": 100, "id": "852542" }
+                    { "mod": "{40-48}% Increased Maximum Mana", "level": 2, "weight": 200, "id": "e25f52" },
+                    { "mod": "{49-60}% Increased Maximum Mana", "level": 3, "weight": 150, "id": "ab5f7a" },
+                    { "mod": "{61-80}% Increased Maximum Mana", "level": 4, "weight": 100, "id": "852542", "itemFilter": [ "Armour" ] },
+                    { "mod": "{81-120}% Increased Maximum Mana", "level": 5, "weight": 100, "id": "b0adef", "itemFilter": [ "Armour" ] }
                 ],
                 [
-                    { "mod": "+{20-30} Maximum Mana", "level": 1, "weight": 200, "id": "df7f4b" },
-                    { "mod": "+{31-50} Maximum Mana", "level": 3, "weight": 200, "id": "99eae3" },
-                    { "mod": "+{51-80} Maximum Mana", "level": 5, "weight": 150, "id": "2687fd" },
-                    { "mod": "+{81-100} Maximum Mana", "level": 7, "weight": 100, "id": "28f7b8" }
+                    { "mod": "+{30-40} Maximum Mana", "level": 1, "weight": 200, "id": "df7f4b" },
+                    { "mod": "+{41-60} Maximum Mana", "level": 2, "weight": 200, "id": "99eae3" },
+                    { "mod": "+{61-80} Maximum Mana", "level": 3, "weight": 150, "id": "2687fd" },
+                    { "mod": "+{81-100} Maximum Mana", "level": 4, "weight": 100, "id": "28f7b8", "itemFilter": [ "Armour" ] },
+                    { "mod": "+{101-130} Maximum Mana", "level": 5, "weight": 100, "id": "4d25ff", "itemFilter": [ "Armour" ] }
                 ],
                 [
                     { "mod": "+{1} Mana Regeneration", "level": 1, "weight": 300, "id": "ebd749" },
-                    { "mod": "+{3} Mana Regeneration", "level": 3, "weight": 300, "id": "0ac80a" },
-                    { "mod": "+{5} Mana Regeneration", "level": 5, "weight": 200, "id": "355204" },
-                    { "mod": "+{8} Mana Regeneration", "level": 7, "weight": 100, "id": "f49f5f" }
+                    { "mod": "+{2} Mana Regeneration", "level": 2, "weight": 300, "id": "0ac80a" },
+                    { "mod": "+{3} Mana Regeneration", "level": 3, "weight": 200, "id": "355204" },
+                    { "mod": "+{4} Mana Regeneration", "level": 4, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] },
+                    { "mod": "+{5} Mana Regeneration", "level": 5, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] }
+                ],
+                [
+                    { "mod": "{10-15}% Increased Mana Regeneration", "level": 1, "weight": 200, "id": "ebd749", "itemFilter": [ "Armour" ] },
+                    { "mod": "{16-20}% Increased Mana Regeneration", "level": 2, "weight": 200, "id": "0ac80a", "itemFilter": [ "Armour" ] },
+                    { "mod": "{21-25}% Increased Mana Regeneration", "level": 3, "weight": 200, "id": "355204", "itemFilter": [ "Armour" ] },
+                    { "mod": "{26-30}% Increased Mana Regeneration", "level": 4, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] },
+                    { "mod": "{31-35}% Increased Mana Regeneration", "level": 5, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] }
                 ],
                 [
                     { "mod": "+{20-30} Strength", "level": 1, "weight": 200, "id": "51d741" },
-                    { "mod": "+{31-50} Strength", "level": 3, "weight": 200, "id": "895466" },
-                    { "mod": "+{51-70} Strength", "level": 5, "weight": 150, "id": "7d3b4b" },
-                    { "mod": "+{71-100} Strength", "level": 7, "weight": 100, "id": "bc2675" }
+                    { "mod": "+{31-40} Strength", "level": 2, "weight": 200, "id": "895466" },
+                    { "mod": "+{41-50} Strength", "level": 3, "weight": 150, "id": "7d3b4b" },
+                    { "mod": "+{51-70} Strength", "level": 4, "weight": 100, "id": "bc2675" },
+                    { "mod": "+{71-90} Strength", "level": 5, "weight": 100, "id": "148f55", "itemFilter": [ "Armour" ] }
                 ],
                 [
-                    { "mod": "+{20-30} Dexterity", "level": 1, "weight": 200, "id": "356633" },
-                    { "mod": "+{31-50} Dexterity", "level": 3, "weight": 200, "id": "16b8dd" },
-                    { "mod": "+{51-70} Dexterity", "level": 5, "weight": 150, "id": "c5f4a6" },
-                    { "mod": "+{71-100} Dexterity", "level": 7, "weight": 100, "id": "0a90dc" }
+                    { "mod": "+{20-30} Dexterity", "level": 1, "weight": 200, "id": "102c9b" },
+                    { "mod": "+{31-40} Dexterity", "level": 2, "weight": 200, "id": "ef4675" },
+                    { "mod": "+{41-50} Dexterity", "level": 3, "weight": 150, "id": "260367" },
+                    { "mod": "+{51-70} Dexterity", "level": 4, "weight": 100, "id": "7f83f2" },
+                    { "mod": "+{71-90} Dexterity", "level": 5, "weight": 100, "id": "297c67", "itemFilter": [ "Armour" ] }
                 ],
                 [
-                    { "mod": "+{20-30} Intelligence", "level": 1, "weight": 200, "id": "20534e" },
-                    { "mod": "+{31-50} Intelligence", "level": 3, "weight": 200, "id": "0de92f" },
-                    { "mod": "+{51-70} Intelligence", "level": 5, "weight": 150, "id": "ec7d19" },
-                    { "mod": "+{71-100} Intelligence", "level": 7, "weight": 100, "id": "72a78c" }
+                    { "mod": "+{20-30} Intelligence", "level": 1, "weight": 200, "id": "6eb62d" },
+                    { "mod": "+{31-40} Intelligence", "level": 2, "weight": 200, "id": "60a457" },
+                    { "mod": "+{41-50} Intelligence", "level": 3, "weight": 150, "id": "1d4d56" },
+                    { "mod": "+{51-70} Intelligence", "level": 4, "weight": 100, "id": "71baff" },
+                    { "mod": "+{71-90} Intelligence", "level": 5, "weight": 100, "id": "83f4cf", "itemFilter": [ "Armour" ] }
                 ],
                 [
-                    { "mod": "+{30} To All Attributes", "level": 1, "weight": 150, "id": "adcf09" },
-                    { "mod": "+{50} To All Attributes", "level": 3, "weight": 100, "id": "ce2925" },
-                    { "mod": "+{70} To All Attributes", "level": 5, "weight": 80, "id": "e26f42" },
-                    { "mod": "+{100} To All Attributes", "level": 7, "weight": 50, "id": "80b32e" }
+                    { "mod": "+{20} To All Attributes", "level": 1, "weight": 150, "id": "adcf09" },
+                    { "mod": "+{30} To All Attributes", "level": 2, "weight": 100, "id": "ce2925" },
+                    { "mod": "+{40} To All Attributes", "level": 3, "weight": 100, "id": "e26f42" },
+                    { "mod": "+{50} To All Attributes", "level": 4, "weight": 80, "id": "0a0d23" },
+                    { "mod": "+{70} To All Attributes", "level": 5, "weight": 50, "id": "80b32e", "itemFilter": [ "Armour" ] }
                 ]
             ]
         },

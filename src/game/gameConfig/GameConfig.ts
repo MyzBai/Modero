@@ -53,7 +53,7 @@ export interface Worlds {
 export interface Blacksmith {
     levelList?: {
         upgradeCost?: Cost;
-        modList: BlacksmithUpgradeModList;
+        modList?: BlacksmithUpgradeModList;
     }[];
     /**@TJS-minItems 1 */
     itemList: {
@@ -85,7 +85,7 @@ export interface BlacksmithCraft {
 export interface Character {
     levelList?: {
         upgradeCost?: Cost;
-        modList: SkillsUpgradeModList;
+        modList?: SkillsUpgradeModList;
     }[];
     attackSkills?: {
         /**TJS-minItems 1 */
@@ -158,7 +158,7 @@ export interface Treasury {
     /**@TJS-minItems 1 */
     levelList?: {
         upgradeCost?: Cost;
-        modList: TreasuryUpgradeModList;
+        modList?: TreasuryUpgradeModList;
     }[];
     artifacts?: Artifacts;
 }
@@ -185,7 +185,7 @@ export interface GuildHall {
     requirements?: Requirements;
     levelList?: {
         upgradeCost?: Cost;
-        modList: GuildHallModList;
+        modList?: GuildHallModList;
     }[];
     guildList: Guild[];
     guildClassList: GuildClass[];
