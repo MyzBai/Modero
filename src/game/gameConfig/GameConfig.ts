@@ -101,8 +101,8 @@ export interface Character {
         insightCapacityEnhancerList: {
             id: Id;
             name: Name;
+            probability: Probability;
             insight: UnsignedInteger;
-            probabilities: Probability[];
         }[];
         /**TJS-minItems 1 */
         passiveSkillList: PassiveSkill[];

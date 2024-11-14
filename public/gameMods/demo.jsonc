@@ -28,9 +28,18 @@
                         ]
                     },
                     {
-                        "id": "b6f39f",
+                        "id": "1bb077",
                         "name": "Enemy 2",
-                        "level": 1,
+                        "level": 2,
+                        "weight": 100,
+                        "modList": [
+                            "{100}% Chance To Drop {5-20} @Resource{Gold} On Death"
+                        ]
+                    },
+                    {
+                        "id": "b6f39f",
+                        "name": "Enemy 3",
+                        "level": 3,
                         "weight": 50,
                         "modList": [
                             "{100}% Chance To Drop {1-100} @Resource{Gold} On Death",
@@ -200,7 +209,7 @@
                         "name": "Physical Attack Damage",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 60, "manaCost": 60,
+                                "exp": 600, "baseDuration": 60, "manaCost": 80,
                                 "modList": [ "{20}% More Physical Attack Damage" ]
                             },
                             {
@@ -214,12 +223,12 @@
                         "name": "Elemental Attack Damage",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 60, "manaCost": 150,
-                                "modList": [ "{30}% More Elemental Attack Damage" ]
+                                "exp": 600, "baseDuration": 60, "manaCost": 80,
+                                "modList": [ "{20}% More Elemental Attack Damage" ]
                             },
                             {
-                                "baseDuration": 60, "manaCost": 300,
-                                "modList": [ "{50}% More Elemental Attack Damage" ]
+                                "baseDuration": 60, "manaCost": 200,
+                                "modList": [ "{30}% More Elemental Attack Damage" ]
                             }
                         ]
                     },
@@ -228,11 +237,11 @@
                         "name": "Damage Over Time",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 60, "manaCost": 150,
+                                "exp": 600, "baseDuration": 60, "manaCost": 80,
                                 "modList": [ "{30}% More Damage Over Time" ]
                             },
                             {
-                                "baseDuration": 60, "manaCost": 300,
+                                "baseDuration": 60, "manaCost": 200,
                                 "modList": [ "{50}% More Damage Over Time" ]
                             }
                         ]
@@ -242,12 +251,12 @@
                         "name": "Critical Hit",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 30, "manaCost": 100,
-                                "modList": [ "+{20}% Critical Hit Chance", "+{60}% Critical Hit Multiplier" ]
+                                "exp": 600, "baseDuration": 40, "manaCost": 80,
+                                "modList": [ "+{15}% Critical Hit Chance", "+{50}% Critical Hit Multiplier" ]
                             },
                             {
-                                "baseDuration": 30, "manaCost": 250,
-                                "modList": [ "+{25}% Critical Hit Chance", "+{120}% Critical Hit Multiplier" ]
+                                "baseDuration": 40, "manaCost": 200,
+                                "modList": [ "+{20}% Critical Hit Chance", "+{80}% Critical Hit Multiplier" ]
                             }
                         ]
                     }
@@ -255,18 +264,15 @@
             },
             "passiveSkills": {
                 "insightCapacityEnhancerList": [
-                    {
-                        "id": "f0e6eb",
-                        "name": "Book For Dummies",
-                        "probabilities": [ 100, 200, 300, 500, 1000, 2000, 3000, 5000 ],
-                        "insight": 100
-                    },
-                    {
-                        "id": "f31249",
-                        "name": "Old Scroll",
-                        "probabilities": [ 300, 500, 800, 1500, 2000 ],
-                        "insight": 200
-                    }
+                    { "id": "f0e6eb", "name": "Book For Dummies", "probability": 50, "insight": 100 },
+                    { "id": "794c3c", "name": "Book For Dummies", "probability": 100, "insight": 100 },
+                    { "id": "9d9dd4", "name": "Book For Dummies", "probability": 100, "insight": 100 },
+                    { "id": "3d6107", "name": "Book For Dummies", "probability": 200, "insight": 100 },
+                    { "id": "a46e6f", "name": "Book For Dummies", "probability": 200, "insight": 100 },
+                    { "id": "f31249", "name": "Old Scroll", "probability": 300, "insight": 200 },
+                    { "id": "369f64", "name": "Old Scroll", "probability": 300, "insight": 200 },
+                    { "id": "4de9f1", "name": "Old Scroll", "probability": 400, "insight": 200 },
+                    { "id": "5692fb", "name": "Old Scroll", "probability": 500, "insight": 200 }
                 ],
                 "passiveSkillList": [
                     {
@@ -303,6 +309,28 @@
                             {
                                 "modList": [ "{40}% More Elemental Attack Damage" ]
                             }
+                        ]
+                    },
+                    {
+                        "id": "6ce73f",
+                        "name": "Bleed",
+                        "insightCost": 300,
+                        "rankList": [
+                            { "exp": 1200, "modList": [ "+{10}% Chance To Bleed", "{20}% More Bleed Damage" ] },
+                            { "exp": 4000, "modList": [ "+{15}% Chance To Bleed", "{30}% More Bleed Damage" ] },
+                            { "exp": 8000, "modList": [ "+{20}% Chance To Bleed", "{40}% More Bleed Damage" ] },
+                            { "modList": [ "+{20}% Chance To Bleed", "{40}% More Bleed Damage" ] }
+                        ]
+                    },
+                    {
+                        "id": "95ec33",
+                        "name": "Burn",
+                        "insightCost": 300,
+                        "rankList": [
+                            { "exp": 1200, "modList": [ "+{10}% Chance To Burn", "{20}% More Burn Damage" ] },
+                            { "exp": 4000, "modList": [ "+{15}% Chance To Burn", "{30}% More Burn Damage" ] },
+                            { "exp": 8000, "modList": [ "+{20}% Chance To Burn", "{40}% More Burn Damage" ] },
+                            { "modList": [ "+{20}% Chance To Burn", "{40}% More Burn Damage" ] }
                         ]
                     },
                     {
@@ -481,12 +509,12 @@
                 {
                     "id": "b12e06",
                     "name": "Weapon",
-                    "reforgeWeights": [ 10, 30, 20, 10, 5, 2 ]
+                    "reforgeWeights": [ 5, 30, 20, 10, 5, 2 ]
                 },
                 {
                     "id": "658b02",
                     "name": "Armour",
-                    "reforgeWeights": [ 20, 50, 20, 10 ]
+                    "reforgeWeights": [ 10, 50, 20, 10 ]
                 }
             ],
             "crafting": {

@@ -408,15 +408,15 @@
                     "pattern": "^[A-Za-z 0-9]{3,32}$",
                     "type": "string"
                   },
+                  "probability": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 100,
+                    "description": "Percent = 1/Probability"
+                  },
                   "insight": {
                     "type": "integer",
                     "minimum": 0
-                  },
-                  "probabilities": {
-                    "type": "array",
-                    "items": {
-                      "type": "number"
-                    }
                   }
                 },
                 "additionalProperties": false,
@@ -424,7 +424,7 @@
                   "id",
                   "insight",
                   "name",
-                  "probabilities"
+                  "probability"
                 ]
               }
             },

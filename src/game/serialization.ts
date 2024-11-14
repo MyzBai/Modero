@@ -128,7 +128,7 @@ export interface Character {
         }[];
     };
     passiveSkills?: {
-        insightCapacityEnhancerList: { id: string; count: number; }[];
+        insightCapacityEnhancerList: { id: string; }[];
         passiveList: {
             id: string;
             allocated: boolean;

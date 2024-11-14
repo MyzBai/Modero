@@ -125,9 +125,7 @@ export class Artifacts {
         const updateButton = () => {
             let disabled = true;
             if (artifact.assigned) {
-                if (artifact.selectedRank !== artifact.curRank) {
-                    disabled = false;
-                }
+                disabled = false;
             } else if (this.artifactCount < player.stats.maxArtifacts.value) {
                 disabled = false;
             }

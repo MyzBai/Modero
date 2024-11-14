@@ -58,6 +58,8 @@ export class CraftTable {
         this.element.insertAdjacentHTML('beforeend', '<div class="g-title">Craft Table</div>');
         this.createToolbar();
 
+
+
         this.craftListElement = document.createElement('ul');
         this.craftListElement.classList.add('s-craft-list', 'g-scroll-list-v');
         this.craftListElement.setAttribute('data-craft-list', '');
@@ -179,7 +181,9 @@ export class CraftTable {
 
     private updateSuccessRateAttribute(e: MouseEvent) {
         assertDefined(this.ctx.item.modListCrafting);
-        this.ctx.element.removeAttribute('data-success-rate');
+
+        const craftAreaElement = this.ctx.element.querySelectorStrict('[data-craft-area]');
+        craftAreaElement.removeAttribute('data-success-rate');
         if (!this.selectedCraft) {
             return;
         }
@@ -196,18 +200,17 @@ export class CraftTable {
             modList: this.ctx.item.modListCrafting,
             ...this.ctx
         }, mod);
-        this.ctx.element.setAttribute('data-success-rate', successRate.toFixed());
+        craftAreaElement.setAttribute('data-success-rate', successRate.toFixed());
     }
 
     private selectCraftById(id: string | null) {
         this.selectedCraft = this.craftList.find(x => x.template.id === id) ?? null;
 
-        const modListElement = this.ctx.element.querySelectorStrict<HTMLElement>('[data-mod-list]');
-        modListElement.toggleAttribute('data-craft-area', !!this.selectedCraft);
-
         this.abortController?.abort();
 
-        this.ctx.element.querySelectorAll<HTMLElement>('[data-craft]').forEach(x => {
+        const craftAreaElement = this.ctx.element.querySelectorStrict('[data-craft-area]');
+
+        craftAreaElement.querySelectorAll<HTMLElement>('[data-craft]').forEach(x => {
             x.removeAttribute('data-craft');
         });
 
@@ -222,15 +225,15 @@ export class CraftTable {
 
         switch (this.selectedCraft.template.target) {
             case 'All':
-                modListElement.setAttribute('data-craft', '');
+                craftAreaElement.querySelectorStrict('[data-mod-list]').setAttribute('data-craft', '');
                 break;
             case 'Single':
-                this.ctx.element.querySelectorAll<HTMLElement>('[data-mod]').forEach(x => x.setAttribute('data-craft', ''));
+                craftAreaElement.querySelectorAll<HTMLElement>('[data-mod]').forEach(x => x.setAttribute('data-craft', ''));
                 break;
         }
 
         if (this.selectedCraft.template.type === 'Upgrade') {
-            const modElementList = [...this.ctx.element.querySelectorAll<HTMLElement>('[data-mod]')];
+            const modElementList = [...craftAreaElement.querySelectorAll<HTMLElement>('[data-mod]')];
             for (const modElement of modElementList) {
                 const id = modElement.getAttribute('data-mod');
                 const mod = this.ctx.item.modListCrafting.find(x => x.template.id === id);
@@ -240,7 +243,7 @@ export class CraftTable {
             }
         }
         if (this.selectedCraft.template.type === 'Randomize Numericals') {
-            const modElementList = [...this.ctx.element.querySelectorAll<HTMLElement>('[data-mod]')];
+            const modElementList = [...craftAreaElement.querySelectorAll<HTMLElement>('[data-mod]')];
             for (const modElement of modElementList) {
                 const id = modElement.getAttribute('data-mod');
                 const mod = this.ctx.item.modListCrafting.find(x => x.template.id === id);
@@ -248,7 +251,7 @@ export class CraftTable {
                 modElement.setAttribute('data-craft', String(craftable));
             }
         }
-        this.ctx.element.querySelectorAll<HTMLElement>('[data-craft]').forEach(x => {
+        craftAreaElement.querySelectorAll<HTMLElement>('[data-craft]').forEach(x => {
             assertNonNullable(this.abortController);
             x.addEventListener('mouseover', this.updateSuccessRateAttribute.bind(this), { signal: this.abortController.signal });
             x.addEventListener('click', this.performCraft.bind(this), { capture: true, signal: this.abortController.signal });
@@ -311,7 +314,7 @@ export class CraftTable {
 
     private performReforgeCraft() {
         assertDefined(this.ctx.item.modListCrafting);
-        const reforgeCount = (this.advReforge?.maxReforgeCount ?? 1);
+        const reforgeCount = (this.advReforge?.maxReforgeCount || 1);
         const useAdvReforge = !!this.advReforge && this.advReforge.maxReforgeCount > 0;
         for (let i = 0; i < reforgeCount; i++) {
             const newModList = this.craftManager.reforge(this.ctx.candidateModList(), this.ctx.item.reforgeWeights);
@@ -445,20 +448,18 @@ export class CraftTable {
         const element = document.createElement('div');
         element.classList.add('s-compare');
 
-        {
-            const stats = extractStats(player.stats);
-            const dps1 = calcPlayerCombatStats({ stats, modDB: player.modDB }).dps;
+        const stats = extractStats(player.stats);
+        const dps1 = calcPlayerCombatStats({ stats, modDB: player.modDB }).dps;
 
-            const modDB = new ModDB(player.modDB);
-            modDB.replace('BlackSmithCompare', Modifier.extractStatModifierList(...this.ctx.item.modList));
-            const dps2 = calcPlayerCombatStats({ stats, modDB }).dps;
-            const dpsCompareElement = document.createElement('div');
-            dpsCompareElement.classList.add('dps-compare');
+        const modDB = new ModDB(player.modDB);
+        modDB.replace(`Blacksmith/${this.ctx.item.name}`, Modifier.extractStatModifierList(...this.ctx.item.modListCrafting));
+        const dps2 = calcPlayerCombatStats({ stats, modDB }).dps;
+        const dpsCompareElement = document.createElement('div');
+        dpsCompareElement.classList.add('dps-compare');
 
-            dpsCompareElement.innerHTML = `<span data-tag="${dps2 > dps1 ? 'valid' : dps2 < dps1 ? 'invalid' : ''}">DPS: <var>${dps1.toFixed(0)}</var> → <var>${dps2.toFixed(0)}</var></span>`;
+        dpsCompareElement.innerHTML = `<span data-tag="${dps2 > dps1 ? 'valid' : dps2 < dps1 ? 'invalid' : ''}">DPS: <var>${dps1.toFixed(0)}</var> → <var>${dps2.toFixed(0)}</var></span>`;
 
-            element.appendChild(dpsCompareElement);
-        }
+        element.appendChild(dpsCompareElement);
 
 
         const createModListElement = (modList: Modifier[]) => {
@@ -472,7 +473,7 @@ export class CraftTable {
         const b = createModListElement(this.ctx.item.modListCrafting);
         element.append(a, b);
 
-        const missingModifiers = this.ctx.item.modListCrafting.filter(x => this.ctx.item.modList.some(y => y.template === x.template));
+        const missingModifiers = this.ctx.item.modList.filter(x => !(this.ctx.item.modListCrafting ?? []).some(y => y.template === x.template));
         [...a.querySelectorAll<HTMLElement>('[data-mod]')].filter(x => missingModifiers.find(y => y.desc === x.textContent)).forEach(x => x.setAttribute('data-tag', 'invalid'));
 
         const additions = this.ctx.item.modListCrafting.filter(x => !this.ctx.item.modList.some(y => y.template === x.template));

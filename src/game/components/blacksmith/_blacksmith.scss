@@ -15,38 +15,29 @@
         }
     }
 
-    .s-mod-list {
-        flex: 1;
+    .s-craft-area {
+        display: grid;
+        position: relative;
+        z-index: 3;
+        user-select: none;
 
-        &[data-craft-area] {
-            z-index: 2;
+        &:has([data-craft]) {
+            box-shadow: 0 0 5px 1px $color-title-accent inset;
 
-            outline: 1px solid $color-title-accent;
-            user-select: none;
-
-            &[data-craft] {
-                &:hover {
-                    box-shadow: 0 0 5px 1px $color-title-accent inset;
-                    user-select: none;
+            &:hover {
+                &[data-success-rate]::after {
+                    position: absolute;
+                    content: 'Success Rate: ' attr(data-success-rate) '%';
+                    color: $color-title-accent;
+                    top: 0;
+                    left: 0;
+                    transform: translateY(-100%);
+                    z-index: 3;
                 }
-                * {
-                    pointer-events: none;
-                }
             }
-
-            &[data-success-rate]:has([data-craft]:hover)::after {
-                position: absolute;
-                content: 'Success Rate: ' attr(data-success-rate) '%';
-                color: $color-title-accent;
-                top: 0;
-                transform: translateY(-100%);
-                z-index: 3;
-            }
-
-            [data-craft='false'] {
-                pointer-events: none;
-                opacity: 0.5;
-            }
+        }
+        .s-mod-list[data-craft] [data-mod] {
+            pointer-events: none;
         }
     }
 

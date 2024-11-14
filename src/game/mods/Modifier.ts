@@ -24,7 +24,7 @@ export interface ModValueRange {
 }
 
 export interface SerializedModifier {
-    srcId: string;//template id or id in GameConfig
+    srcId: string;
     values: number[];
 }
 

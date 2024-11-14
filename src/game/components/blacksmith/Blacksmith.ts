@@ -67,7 +67,12 @@ export class Blacksmith extends Component {
         itemListDropdownParent.appendChild(itemListDropdown);
         this.page.appendChild(itemListDropdownParent);
 
-        this.page.insertAdjacentHTML('beforeend', '<ul class="s-mod-list g-mod-list" data-mod-list></ul>');
+        const craftAreaElement = document.createElement('div');
+        craftAreaElement.classList.add('s-craft-area');
+        craftAreaElement.setAttribute('data-craft-area', '');
+        this.page.appendChild(craftAreaElement);
+
+        craftAreaElement.insertAdjacentHTML('beforeend', '<ul class="s-mod-list g-mod-list" data-mod-list></ul>');
 
         this.itemList = this.data.itemList.map(x => ({
             id: x.id,
@@ -149,10 +154,10 @@ export class Blacksmith extends Component {
     serialize(save: Serialization) {
         save.blacksmith = {
             level: this.level.value ?? 0,
-            itemList: this.itemList.map(x => ({
-                id: x.id,
-                modList: Modifier.serialize(...x.modList),
-                modListCrafting: x.modListCrafting ? Modifier.serialize(...x.modListCrafting) : undefined
+            itemList: this.itemList.map(item => ({
+                id: item.id,
+                modList: item.modList.map(mod => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === mod.text).id, values: mod.values })),
+                modListCrafting: item.modListCrafting?.map(mod => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === mod.text).id, values: mod.values })) ?? undefined,
             })),
         };
     }
@@ -172,15 +177,15 @@ export class Blacksmith extends Component {
             }
 
             srcItem.modList = Modifier.deserialize(...itemData?.modList?.map(x =>
-            ({
-                text: this.data.modLists.flatMap(y => y).find(y => Modifier.getTemplate(y.mod)?.id === x?.srcId)?.mod,
-                srcId: x?.srcId, values: x?.values
-            })) ?? []);
+                ({
+                    text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
+                    srcId: x?.srcId, values: x?.values
+                })) ?? []);
             srcItem.modListCrafting = itemData?.modListCrafting ? Modifier.deserialize(...itemData?.modListCrafting?.map(x =>
-            ({
-                text: this.data.modLists.flatMap(y => y).find(y => Modifier.getTemplate(y.mod)?.id === x?.srcId)?.mod,
-                srcId: x?.srcId, values: x?.values
-            })) ?? []) : undefined;
+                ({
+                    text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
+                    srcId: x?.srcId, values: x?.values
+                })) ?? []) : undefined;
         }
 
         this.itemList.forEach(x => this.applyModifiers(x));
