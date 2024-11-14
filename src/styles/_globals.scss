@@ -132,10 +132,11 @@
         grid-template-rows: auto 1fr;
         gap: 1em;
         justify-items: center;
-
         ul {
-            border: $default-border;
             min-width: 30em;
+            &:has(li) {
+                border: $default-border;
+            }
         }
     }
 }
