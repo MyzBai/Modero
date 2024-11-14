@@ -79,7 +79,7 @@ export function createObjectInfoElements<T extends RankObject>(objInfo: ObjectIn
     const modListElement = objInfo.modList ? createModListElement(objInfo.modList) : undefined;
 
     let expBar: ProgressElement | undefined = undefined;
-    if (objInfo.rankObj) {
+    if (objInfo.rankObj && objInfo.rankObj.rankData(objInfo.rankObj.selectedRank).exp) {
         expBar = createCustomElement(ProgressElement);
         expBar.value = getRankExpPct(objInfo.rankObj);
     }
