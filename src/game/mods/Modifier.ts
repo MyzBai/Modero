@@ -178,8 +178,11 @@ export class Modifier {
     static serialize(...modList: Modifier[]): SerializedModifier[] {
         return modList.map(x => ({ srcId: x.template.id, values: x.values }));
     }
-    static deserialize(...modList: ({ text: string; } & DeepPartial<SerializedModifier>)[]): Modifier[] {
+    static deserialize(...modList: (DeepPartial<{ text: string; } & SerializedModifier>)[]): Modifier[] {
         return modList.reduce((a, c) => {
+            if (!c.text) {
+                return a;
+            }
             const mod = Modifier.modFromText(c.text);
             const template = Modifier.getTemplate(c.text);
             if (template) {

@@ -172,15 +172,15 @@ export class Blacksmith extends Component {
             }
 
             srcItem.modList = Modifier.deserialize(...itemData?.modList?.map(x =>
-                ({
-                    text: this.data.modLists.flatMap(y => y).findStrict(y => Modifier.getTemplate(y.mod)?.id === x?.srcId).mod,
-                    srcId: x?.srcId, values: x?.values
-                })) ?? []);
+            ({
+                text: this.data.modLists.flatMap(y => y).find(y => Modifier.getTemplate(y.mod)?.id === x?.srcId)?.mod,
+                srcId: x?.srcId, values: x?.values
+            })) ?? []);
             srcItem.modListCrafting = itemData?.modListCrafting ? Modifier.deserialize(...itemData?.modListCrafting?.map(x =>
-                ({
-                    text: this.data.modLists.flatMap(y => y).findStrict(y => Modifier.getTemplate(y.mod)?.id === x?.srcId).mod,
-                    srcId: x?.srcId, values: x?.values
-                })) ?? []) : undefined;
+            ({
+                text: this.data.modLists.flatMap(y => y).find(y => Modifier.getTemplate(y.mod)?.id === x?.srcId)?.mod,
+                srcId: x?.srcId, values: x?.values
+            })) ?? []) : undefined;
         }
 
         this.itemList.forEach(x => this.applyModifiers(x));
