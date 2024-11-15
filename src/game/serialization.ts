@@ -104,6 +104,7 @@ export interface Blacksmith {
         id: string;
         modList: SerializedModifier[];
         modListCrafting?: SerializedModifier[];
+        advReforge?: { count: number; modItems: { text: string; tier: number; }[]; };
     }[];
 }
 

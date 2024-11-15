@@ -26,43 +26,38 @@ export interface CraftSuccessRates {
     randomizeNumericals: MinMax;
 }
 
-export class CraftManager {
+export abstract class CraftManager {
 
-    reforge(candidateModList: ModifierCandidate[], weights: number[]) {
+    static reforge(candidateModList: ModifierCandidate[], weights: number[]) {
         const reforgeModCount = getRandomWeightedIndex(weights) + 1;
-        const newModList = this.generateMods([], candidateModList, reforgeModCount);
+        const newModList = CraftManager.generateMods([], candidateModList, reforgeModCount);
         return newModList;
     }
 
-    addModifier(modList: Modifier[], candidateModList: ModifierCandidate[]) {
+    static addModifier(modList: Modifier[], candidateModList: ModifierCandidate[]) {
         const mod = this.generateMods(modList, candidateModList, 1)[0];
         assertDefined(mod, 'failed generating modifier');
         return mod;
     }
 
-    upgradeModifier(mod: Modifier, modGroupsList: ModGroupList[]) {
+    static upgradeModifier(mod: Modifier, modGroupsList: ModGroupList[]) {
         const modGroup = getModGroupList(mod.text, modGroupsList);
-        const tier = modGroup.findIndex(x => x.text === mod.text) + 1;
-        const newModText = modGroup[tier]?.text;
-        assertDefined(newModText, 'unexpected out of range');
-        const newMod = Modifier.modFromText(newModText);
+        const index = modGroup.findIndex(x => x.text === mod.text) + 1;
+        const modText = modGroup[index]?.text;
+        assertDefined(modText, 'failed upgrading modifier. index out of range');
+        const newMod = Modifier.modFromText(modText);
         newMod.randomizeValues();
         return newMod;
     }
 
-    calcSuccessRate(craft: Craft, ctx: CraftContext, mod?: Modifier) {
+    static calcSuccessRate(craft: Craft, ctx: CraftContext, mod?: Modifier) {
         const type = craft.template.type;
         if (type === 'Add') {
             return remap(ctx.maxModCount - 1, 1, craft.successRates.min, craft.successRates.max, ctx.modList.length);
         }
         if (type === 'Remove') {
             assertDefined(mod);
-            const v0 = remap(ctx.maxModCount, 1, craft.successRates.min, craft.successRates.max, ctx.modList.length);
-            const modGroup = getModGroupList(mod.text, ctx.modGroupsList, ctx.filterName);
-            const tier = calcModTier(mod.text, modGroup);
-            const v1 = modGroup.length === 1 ? craft.successRates.max : remap(1, modGroup.length, craft.successRates.min, craft.successRates.max, tier);
-            const avg = (v0 + v1) / 2;
-            return avg;
+            return remap(ctx.maxModCount, 1, craft.successRates.min, craft.successRates.max, ctx.modList.length);
         }
         if (type === 'Upgrade') {
             assertDefined(mod);
@@ -87,7 +82,7 @@ export class CraftManager {
         return 100;
     }
 
-    generateMods(itemModList: Modifier[], candidateModList: ModifierCandidate[], count: number) {
+    static generateMods(itemModList: Modifier[], candidateModList: ModifierCandidate[], count: number) {
         const tagWeightMultiplier = 2;
         const tagWeights = ModifierTagList.reduce((a, c) => {
             a[c] = 1;

@@ -11,7 +11,7 @@ import { PlayerUpdateStatsFlag } from '../../Player';
 import { Value } from '../../../shared/utils/Value';
 import { assertDefined } from '../../../shared/utils/assert';
 import type { ModifierCandidate } from './CraftManager';
-import { CraftTable } from './CraftTable';
+import { CraftTable, type AdvancedReforge } from './CraftTable';
 import { createCustomElement } from '../../../shared/customElements/customElements';
 import { TextInputDropdownElement } from '../../../shared/customElements/TextInputDropdownElement';
 import { generateModListElements } from '../../mods/modUtilsDOM';
@@ -23,6 +23,7 @@ export interface BlacksmithItem {
     maxModCount: number;
     modList: Modifier[];
     modListCrafting?: Modifier[];
+    advancedReforge: AdvancedReforge;
 }
 
 export class Blacksmith extends Component {
@@ -79,7 +80,8 @@ export class Blacksmith extends Component {
             name: x.name,
             modList: [],
             reforgeWeights: x.reforgeWeights,
-            maxModCount: x.reforgeWeights.length
+            maxModCount: x.reforgeWeights.length,
+            advancedReforge: { maxReforgeCount: 0, modItems: [] }
         }));
         const firstItem = this.itemList[0];
         assertDefined(firstItem);
@@ -87,6 +89,7 @@ export class Blacksmith extends Component {
         this.craftTable = new CraftTable({
             item: firstItem,
             element: this.page,
+            craft: null,
             craftList: data.crafting.craftList,
             modGroupsList: this.modGroupsList,
             candidateModList: () => {
@@ -158,6 +161,7 @@ export class Blacksmith extends Component {
                 id: item.id,
                 modList: item.modList.map(mod => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === mod.text).id, values: mod.values })),
                 modListCrafting: item.modListCrafting?.map(mod => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === mod.text).id, values: mod.values })) ?? undefined,
+                advReforge: { count: item.advancedReforge.maxReforgeCount, modItems: item.advancedReforge.modItems }
             })),
         };
     }
@@ -177,15 +181,19 @@ export class Blacksmith extends Component {
             }
 
             srcItem.modList = Modifier.deserialize(...itemData?.modList?.map(x =>
-                ({
-                    text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
-                    srcId: x?.srcId, values: x?.values
-                })) ?? []);
+            ({
+                text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
+                srcId: x?.srcId, values: x?.values
+            })) ?? []);
             srcItem.modListCrafting = itemData?.modListCrafting ? Modifier.deserialize(...itemData?.modListCrafting?.map(x =>
-                ({
-                    text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
-                    srcId: x?.srcId, values: x?.values
-                })) ?? []) : undefined;
+            ({
+                text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
+                srcId: x?.srcId, values: x?.values
+            })) ?? []) : undefined;
+
+            if (itemData?.advReforge) {
+                srcItem.advancedReforge = { maxReforgeCount: itemData.advReforge.count ?? 0, modItems: itemData.advReforge.modItems?.map(x => ({ text: x?.text ?? '', tier: x?.tier ?? 0 })) ?? [] };
+            }
         }
 
         this.itemList.forEach(x => this.applyModifiers(x));

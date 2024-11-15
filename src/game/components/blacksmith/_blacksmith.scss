@@ -23,20 +23,20 @@
 
         &:has([data-craft]) {
             box-shadow: 0 0 5px 1px $color-title-accent inset;
-
-            &:hover {
-                &[data-success-rate]::after {
-                    position: absolute;
-                    content: 'Success Rate: ' attr(data-success-rate) '%';
-                    color: $color-title-accent;
-                    top: 0;
-                    left: 0;
-                    transform: translateY(-100%);
-                    z-index: 3;
-                }
-            }
+        }
+        &[data-success-rate]:has([data-craft]:hover)::after {
+            position: absolute;
+            content: 'Success Rate: ' attr(data-success-rate) '%';
+            color: $color-title-accent;
+            top: 0;
+            left: 0;
+            transform: translateY(-100%);
+            z-index: 3;
         }
         .s-mod-list[data-craft] [data-mod] {
+            pointer-events: none;
+        }
+        [data-craft='false'] {
             pointer-events: none;
         }
     }
