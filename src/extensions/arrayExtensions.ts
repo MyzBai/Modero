@@ -10,6 +10,15 @@ Array.prototype.remove = function <T>(this: T[], item: T) {
     return true;
 };
 
+Array.prototype.replace = function <T>(this: T[], oldValue: T, newValue: T) {
+    const index = this.indexOf(oldValue);
+    if (index === -1) {
+        return false;
+    }
+    this[index] = newValue;
+    return true;
+};
+
 Array.prototype.clear = function <T>(this: T[]) {
     this.splice(0);
 };

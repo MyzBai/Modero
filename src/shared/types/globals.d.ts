@@ -8,6 +8,7 @@ interface Element extends Node {
 
 interface Array<T> {
     remove(item: T): boolean;
+    replace(oldValue: T, newValue: T): boolean;
     clear(): void;
     random(): T;
     findStrict(predicate: (value: T, index: number, obj: readonly T[]) => unknown, thisArg?: unknown): T;
