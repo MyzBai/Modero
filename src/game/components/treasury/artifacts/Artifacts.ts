@@ -7,7 +7,7 @@ import { createObjectInfoElements, unlockObject } from 'src/game/utils/objectUti
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ENVIRONMENT } from '../../../../config';
-import { createRankObject, getRankExpPct, setNextRank, tryUnlockNextRank, type RankObject } from '../../../utils/rankObjectUtils';
+import { createRankObject, getRankExpPct, tryUnlockNextRank, updateRankObjectListItemElement, type RankObject } from '../../../utils/rankObjectUtils';
 
 interface Artifact extends RankObject<GameConfig.Artifact['rankList'][number]> {
     id: string;
@@ -98,9 +98,8 @@ export class Artifacts {
 
     private assignArtifact(artifact: Artifact) {
         artifact.assigned = true;
-        artifact.element.setAttribute('data-tag', 'valid');
+        updateRankObjectListItemElement(artifact);
         player.modDB.add(`Artifact/${artifact.name}`, Modifier.extractStatModifierList(...Modifier.modListFromTexts(artifact.rankData(artifact.curRank).modList)));
-
         this.updateArtifactsCounter();
     }
 
@@ -163,12 +162,12 @@ export class Artifacts {
     }
 
     private tryUnlockArtifact() {
-        const candidates = this.artifactList.filter(x => x.probability && x.maxRank !== x.rankList.length);
-        candidates.forEach(x => x.probability = Math.ceil((x.probability || 0) / player.stats.explorationMultiplier.value));
-        const artifact = pickOneFromPickProbability(candidates);
-        if (!artifact) {
+        const candidates = this.artifactList.filter(x => x.probability && x.maxRank !== x.rankList.length).map(x => ({ ...x, probability: x.probability / player.stats.explorationMultiplier.value }));
+        const candidate = pickOneFromPickProbability(candidates);
+        if (!candidate) {
             return;
         }
+        const artifact = this.artifactList.findStrict(x => x.id === candidate.id);
         if (!artifact.unlocked) {
             unlockObject(artifact);
             notifications.addNotification({
@@ -182,11 +181,7 @@ export class Artifacts {
     private artifactAddExp(artifact: Artifact) {
         artifact.curExp++;
         if (artifact.curExp >= artifact.maxExp) {
-            if (tryUnlockNextRank(artifact)) {
-                setNextRank(artifact);
-                this.assignArtifact(artifact);
-                this.updateArtifactInfo();
-            }
+            tryUnlockNextRank(artifact);
         }
     }
 

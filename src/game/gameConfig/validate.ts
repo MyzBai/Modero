@@ -1,12 +1,31 @@
 import { type ErrorObject } from 'ajv';
 import { type Config } from './GameConfig';
 import { ENVIRONMENT, resolveGamePathFromVersion } from 'src/config';
+import { assertDefined } from '../../shared/utils/assert';
 
 type ErrorMessage = string;
 const removeComments = (str: string) => str.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '').trim();
 
 export async function validateGameConfig(gameConfigText: string): Promise<Config | ErrorMessage> {
     gameConfigText = removeComments(gameConfigText);
+
+    {
+        const idMatches = gameConfigText.matchAll(/"id"\s?:\s?"(?<id>[^"]+)/g);
+        const set = new Set();
+        const duplicates = [];
+        for (const match of idMatches) {
+            assertDefined(match.groups);
+            const { id } = match.groups;
+            if (set.has(id)) {
+                duplicates.push(id);
+            }
+            set.add(id);
+        }
+        if (duplicates.length > 0) {
+            console.warn(`identical ids detected: \n${[...new Set(duplicates).values()].join('\n')}`);
+        }
+    }
+
     const gameConfig = JSON.parse(gameConfigText) as DeepPartial<Config>;
 
     let version: string = 'v0';
@@ -14,9 +33,10 @@ export async function validateGameConfig(gameConfigText: string): Promise<Config
         version = gameConfig.version;
     }
 
+
     const path = resolveGamePathFromVersion(version, 'gameConfigSchemaValidator.mjs');
     const url = new URL(path, window.location.href).href;
-    const { validate } = await import(`${url}?t=${Date.now()}`);
+    const { validate } = await import(`${url}`);
 
     if (!validate(gameConfig)) {
         let errors: Partial<ErrorObject>[] = [];

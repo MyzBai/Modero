@@ -26,10 +26,6 @@ export class Player {
         this.manaBar = game.page.querySelectorStrict<ProgressElement>('[data-combat-overview] [data-mana-bar]');
     }
 
-    get level() {
-        return this.stats.level.value;
-    }
-
     init() {
         statistics.createGroup('Player', this.stats);
 

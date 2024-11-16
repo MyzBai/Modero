@@ -25,6 +25,7 @@ export function createModListElement(modList: string[] | Modifier[]) {
 
 export interface LevelModalOptions {
     title: string;
+    info?: string;
     level: Value;
     levelData: { upgradeCost?: Cost; modList?: string[]; }[];
 }
@@ -32,6 +33,10 @@ export function createLevelModal(opts: LevelModalOptions) {
     const modal = createCustomElement(ModalElement);
     modal.classList.add('g-level-modal');
     modal.setTitle(`${opts.title} Lv.${opts.level.value.toFixed()}`);
+
+    if (opts.info) {
+        modal.body.insertAdjacentHTML('beforeend', opts.info);
+    }
     const levelData = opts.levelData[opts.level.value - 1];
     assertDefined(levelData);
 
@@ -101,4 +106,38 @@ export async function fadeIn(): Promise<void> {
             resolve();
         });
     });
+}
+
+
+export interface TitleElementParams {
+    label: string;
+    levelClickCallback?: () => void;
+    helpText?: string | (() => string);
+}
+export function createTitleElement(params: TitleElementParams) {
+    const titleElement = document.createElement('div');
+    titleElement.classList.add('g-title');
+    if (params.levelClickCallback) {
+        const span = document.createElement('span');
+        span.classList.add('g-clickable-text');
+        span.innerHTML = `${params.label} Lv.<var data-level>1</var>`;
+        span.addEventListener('click', params.levelClickCallback);
+        titleElement.appendChild(span);
+    } else {
+        titleElement.textContent = params.label;
+    }
+
+    if (params.helpText) {
+        const helpIcon = document.createElement('div');
+        helpIcon.classList.add('g-help-icon', 'help-icon');
+        helpIcon.textContent = '?';
+        helpIcon.addEventListener('click', () => {
+            const modal = createCustomElement(ModalElement);
+            modal.setTitle(params.label);
+            const text = isString(params.helpText) ? params.helpText : params.helpText?.() ?? '';
+            modal.setBodyText(text);
+        });
+        titleElement.appendChild(helpIcon);
+    }
+    return titleElement;
 }

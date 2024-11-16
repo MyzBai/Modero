@@ -2,7 +2,7 @@ import { type ModReference, type ModTemplate } from './types';
 import { modTemplateList } from './modTemplates';
 import { parseTextReferences as parseTextReference, parseTextValues } from 'src/shared/utils/textParsing';
 import type { StatModifier } from './ModDB';
-import { isNumber, randomRangeInt } from 'src/shared/utils/utils';
+import { clamp, isNumber, randomRangeInt } from 'src/shared/utils/utils';
 import { assertDefined } from '../../shared/utils/assert';
 
 export interface PopupOptions {
@@ -156,7 +156,7 @@ export class Modifier {
         for (let i = 0; i < this.rangeValues.length; i++) {
             const rangeValue = this.rangeValues[i];
             if (rangeValue) {
-                rangeValue.value = values[i] || 0;
+                rangeValue.value = clamp(values[i] ?? rangeValue.min, rangeValue.min, rangeValue.max);
             }
         }
     }

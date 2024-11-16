@@ -2,10 +2,10 @@
     "version": "v0",
     "playerStartModList": [
         "+{3} Maximum Bleed Stack",
-        "{3} Base Bleed Duration",
-        "{50}% Base Bleed Damage Multiplier",
-        "{5} Base Burn Duration",
+        "{2} Base Bleed Duration",
+        "{40}% Base Bleed Damage Multiplier",
         "+{1} Maximum Burn Stack",
+        "{3} Base Burn Duration",
         "{80}% Base Burn Damage Multiplier"
     ],
     "resources": [
@@ -13,88 +13,56 @@
     ],
     "worlds": {
         "enemyBaseLifeList": [ 50, 80, 100, 200, 500, 800, 1000, 1300, 2000 ],
-        "enemyBaseCountList": [ 30, 50, 70, 100, 150, 200, 300, 400, 600 ],
-        "worldList": [
+        "enemyBaseCountList": [ 60, 100, 200, 300, 400, 500, 600, 800, 1000 ],
+        "enemyList": [
             {
-                "id": "eee1c2",
-                "enemyList": [
-                    {
-                        "id": "ef2fe4",
-                        "name": "Enemy 1",
-                        "level": 1,
-                        "weight": 1000,
-                        "modList": [
-                            "{100}% Chance To Drop {1-3} @Resource{Gold} On Death"
-                        ]
-                    },
-                    {
-                        "id": "1bb077",
-                        "name": "Enemy 2",
-                        "level": 2,
-                        "weight": 100,
-                        "modList": [
-                            "{100}% Chance To Drop {5-20} @Resource{Gold} On Death"
-                        ]
-                    },
-                    {
-                        "id": "b6f39f",
-                        "name": "Enemy 3",
-                        "level": 3,
-                        "weight": 50,
-                        "modList": [
-                            "{100}% Chance To Drop {1-100} @Resource{Gold} On Death",
-                            "{1000}% Increased Life"
-                        ]
-                    }
-                ],
-                "modList": [ ]
+                "id": "ef2fe4", "name": "Enemy 1", "level": { "min": 1 }, "weight": 1000,
+                "modList": [
+                    "{100}% Chance To Drop {1-3} @Resource{Gold} On Death"
+                ]
             },
+            {
+                "id": "1bb077", "name": "Enemy 2", "level": { "min": 2 }, "weight": 200,
+                "modList": [
+                    "{50}% More Life",
+                    "{100}% Chance To Drop {2-5} @Resource{Gold} On Death"
+                ]
+            },
+            {
+                "id": "1a5a08", "name": "Enemy 4", "level": { "min": 5 }, "weight": 100,
+                "modList": [
+                    "{50}% More Life",
+                    "{100}% Chance To Drop {3-8} @Resource{Gold} On Death"
+                ]
+            },
+            {
+                "id": "02a11e", "name": "Enemy 5", "level": { "min": 7 }, "weight": 100,
+                "modList": [
+                    "{100}% More Life",
+                    "+{50}% Evade Chance",
+                    "{100}% Chance To Drop {5-12} @Resource{Gold} On Death"
+                ]
+            },
+            {
+                "id": "e53fef", "name": "Enemy 88", "level": { "min": 5 }, "weight": 50,
+                "modList": [
+                    "+{90}% Evade Chance",
+                    "{100}% Chance To Drop {1-100} @Resource{Gold} On Death"
+                ]
+            },
+            {
+                "id": "b6f39f", "name": "Enemy 99", "level": { "min": 5 }, "weight": 50,
+                "modList": [
+                    "{700}% More Life",
+                    "{100}% Chance To Drop {1-100} @Resource{Gold} On Death"
+                ]
+            }
+        ],
+        "worldList": [
+            { "id": "eee1c2", "modList": [ ] },
             {
                 "id": "b0cfcb",
-                "enemyList": [
-                    {
-                        "id": "ef2fe4",
-                        "name": "Enemy 1",
-                        "level": 1,
-                        "weight": 1000,
-                        "modList": [ ]
-                    },
-                    {
-                        "id": "059434",
-                        "name": "Enemy 2",
-                        "level": 2,
-                        "weight": 100,
-                        "modList": [ "+{90}% Evade Chance", "{50}% Reduced Life" ]
-                    }
-                ],
-                "modList": [ "{50}% More Enemies", "{30}% More Enemy Life" ]
-            },
-            {
-                "id": "37d4dd",
-                "enemyList": [
-                    {
-                        "id": "ef2fe4",
-                        "name": "Enemy 1",
-                        "level": 1,
-                        "weight": 1000,
-                        "modList": [ ]
-                    },
-                    {
-                        "id": "086556",
-                        "name": "Enemy 2",
-                        "level": 2,
-                        "weight": 100,
-                        "modList": [ "+{90}% Evade Chance", "{50}% Reduced Life" ]
-                    },
-                    {
-                        "id": "112108",
-                        "name": "Enemy 3",
-                        "level": 2,
-                        "weight": 50,
-                        "modList": [ "{90}% Reduced Damage Taken", "{250}% Increased Life" ]
-                    }
-                ],
-                "modList": [ "{80}% More Enemies", "{50}% More Enemy Life" ]
+                "modList": [ "{100}% More Enemies", "{100}% More Enemy Life" ]
             }
         ]
     },
@@ -102,7 +70,7 @@
         "character": {
             "levelList": [
                 {
-                    "upgradeCost": { "name": "Gold", "value": 1000 },
+                    "upgradeCost": { "name": "Gold", "value": 500 },
                     "modList": [
                         "+{1} Mana Regeneration",
                         "+{100} Maximum Mana",
@@ -114,14 +82,14 @@
                     "modList": [
                         "+{2} Mana Regeneration",
                         "+{150} Maximum Mana",
-                        "+{1} Additional Aura Slots"
+                        "+{2} Additional Aura Slots"
                     ]
                 },
                 {
                     "modList": [
                         "+{3} Mana Regeneration",
                         "+{200} Maximum Mana",
-                        "+{2} Additional Aura Slots"
+                        "+{3} Additional Aura Slots"
                     ]
                 }
             ],
@@ -168,15 +136,15 @@
                         "name": "Bleed Attack",
                         "rankList": [
                             {
-                                "exp": 350, "attackSpeed": 0.6, "attackEffectiveness": 200, "manaCost": 3,
+                                "exp": 350, "attackSpeed": 0.6, "attackEffectiveness": 200, "manaCost": 2,
                                 "modList": [ "+{70}% Hit Chance", "Adds {3} To {7} Physical Damage", "+{20}% Chance To Bleed", "{30}% More Bleed Damage" ]
                             },
                             {
-                                "exp": 2000, "attackSpeed": 0.6, "attackEffectiveness": 230, "manaCost": 7,
+                                "exp": 2000, "attackSpeed": 0.6, "attackEffectiveness": 230, "manaCost": 5,
                                 "modList": [ "+{70}% Hit Chance", "Adds {9} To {13} Physical Damage", "+{25}% Chance To Bleed", "{50}% More Bleed Damage" ]
                             },
                             {
-                                "attackSpeed": 0.6, "attackEffectiveness": 250, "manaCost": 10,
+                                "attackSpeed": 0.6, "attackEffectiveness": 250, "manaCost": 8,
                                 "modList": [ "+{70}% Hit Chance", "Adds {16} To {24} Physical Damage", "+{30}% Chance To Bleed", "{80}% More Bleed Damage" ]
                             }
                         ]
@@ -186,15 +154,15 @@
                         "name": "Burn Attack",
                         "rankList": [
                             {
-                                "exp": 350, "attackSpeed": 0.6, "attackEffectiveness": 200, "manaCost": 3,
+                                "exp": 350, "attackSpeed": 0.6, "attackEffectiveness": 200, "manaCost": 2,
                                 "modList": [ "+{70}% Hit Chance", "Adds {3} To {7} Elemental Damage", "+{20}% Chance To Burn", "{30}% More Burn Damage" ]
                             },
                             {
-                                "exp": 2000, "attackSpeed": 0.6, "attackEffectiveness": 230, "manaCost": 7,
+                                "exp": 2000, "attackSpeed": 0.6, "attackEffectiveness": 230, "manaCost": 5,
                                 "modList": [ "+{70}% Hit Chance", "Adds {9} To {13} Elemental Damage", "+{25}% Chance To Burn", "{50}% More Burn Damage" ]
                             },
                             {
-                                "attackSpeed": 0.6, "attackEffectiveness": 250, "manaCost": 10,
+                                "attackSpeed": 0.6, "attackEffectiveness": 250, "manaCost": 8,
                                 "modList": [ "+{70}% Hit Chance", "Adds {16} To {24} Elemental Damage", "+{30}% Chance To Burn", "{80}% More Burn Damage" ]
                             }
                         ]
@@ -202,14 +170,13 @@
                 ]
             },
             "auraSkills": {
-                "requirements": { "characterLevel": 1 },
                 "auraSkillList": [
                     {
                         "id": "3a3d8a",
                         "name": "Physical Attack Damage",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 60, "manaCost": 80,
+                                "exp": 1200, "baseDuration": 60, "manaCost": 80,
                                 "modList": [ "{20}% More Physical Attack Damage" ]
                             },
                             {
@@ -223,7 +190,7 @@
                         "name": "Elemental Attack Damage",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 60, "manaCost": 80,
+                                "exp": 1200, "baseDuration": 60, "manaCost": 80,
                                 "modList": [ "{20}% More Elemental Attack Damage" ]
                             },
                             {
@@ -237,7 +204,7 @@
                         "name": "Damage Over Time",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 60, "manaCost": 80,
+                                "exp": 1200, "baseDuration": 60, "manaCost": 80,
                                 "modList": [ "{30}% More Damage Over Time" ]
                             },
                             {
@@ -251,7 +218,7 @@
                         "name": "Critical Hit",
                         "rankList": [
                             {
-                                "exp": 600, "baseDuration": 40, "manaCost": 80,
+                                "exp": 1200, "baseDuration": 40, "manaCost": 80,
                                 "modList": [ "+{15}% Critical Hit Chance", "+{50}% Critical Hit Multiplier" ]
                             },
                             {
@@ -280,17 +247,10 @@
                         "name": "Physical Attack Damage",
                         "insightCost": 200,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "{20}% More Physical Attack Damage" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "{30}% More Physical Attack Damage" ]
-                            },
-                            {
-                                "modList": [ "{40}% More Physical Attack Damage" ]
-                            }
+                            { "modList": [ "{20}% More Physical Attack Damage" ], "exp": 1200 },
+                            { "modList": [ "{30}% More Physical Attack Damage" ], "exp": 3600 },
+                            { "modList": [ "{40}% More Physical Attack Damage" ], "exp": 7200 },
+                            { "modList": [ "{50}% More Physical Attack Damage" ] }
                         ]
                     },
                     {
@@ -298,201 +258,228 @@
                         "name": "Elemental Attack Damage",
                         "insightCost": 200,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "{20}% More Elemental Attack Damage" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "{30}% More Elemental Attack Damage" ]
-                            },
-                            {
-                                "modList": [ "{40}% More Elemental Attack Damage" ]
-                            }
+                            { "modList": [ "{20}% More Elemental Attack Damage" ], "exp": 1200 },
+                            { "modList": [ "{30}% More Elemental Attack Damage" ], "exp": 3600 },
+                            { "modList": [ "{40}% More Elemental Attack Damage" ], "exp": 7200 },
+                            { "modList": [ "{50}% More Elemental Attack Damage" ] }
                         ]
                     },
                     {
                         "id": "6ce73f",
-                        "name": "Bleed",
-                        "insightCost": 300,
+                        "name": "Bleed Chance",
+                        "insightCost": 200,
                         "rankList": [
-                            { "exp": 1200, "modList": [ "+{10}% Chance To Bleed", "{20}% More Bleed Damage" ] },
-                            { "exp": 4000, "modList": [ "+{15}% Chance To Bleed", "{30}% More Bleed Damage" ] },
-                            { "exp": 8000, "modList": [ "+{20}% Chance To Bleed", "{40}% More Bleed Damage" ] },
-                            { "modList": [ "+{20}% Chance To Bleed", "{40}% More Bleed Damage" ] }
+                            { "modList": [ "+{10}% Chance To Bleed" ], "exp": 1200 },
+                            { "modList": [ "+{15}% Chance To Bleed" ], "exp": 3600 },
+                            { "modList": [ "+{20}% Chance To Bleed" ], "exp": 7200 },
+                            { "modList": [ "+{25}% Chance To Bleed" ] }
+                        ]
+                    },
+                    {
+                        "id": "c7aca2",
+                        "name": "Bleed Damage",
+                        "requirements": { "characterLevel": 2 },
+                        "insightCost": 200,
+                        "rankList": [
+                            { "modList": [ "{10}% More Bleed Damage" ], "exp": 1200 },
+                            { "modList": [ "{20}% More Bleed Damage" ], "exp": 3600 },
+                            { "modList": [ "{30}% More Bleed Damage" ], "exp": 7200 },
+                            { "modList": [ "{40}% More Bleed Damage" ] }
+                        ]
+                    },
+                    {
+                        "id": "19b843",
+                        "name": "Bleed Duration",
+                        "requirements": { "characterLevel": 3 },
+                        "insightCost": 200,
+                        "rankList": [
+                            { "modList": [ "{35}% Increased Bleed Duration" ], "exp": 1200 },
+                            { "modList": [ "{40}% Increased Bleed Duration" ], "exp": 3600 },
+                            { "modList": [ "{45}% Increased Bleed Duration" ], "exp": 7200 },
+                            { "modList": [ "{50}% Increased Bleed Duration" ] }
                         ]
                     },
                     {
                         "id": "95ec33",
-                        "name": "Burn",
-                        "insightCost": 300,
+                        "name": "Burn Chance",
+                        "insightCost": 200,
                         "rankList": [
-                            { "exp": 1200, "modList": [ "+{10}% Chance To Burn", "{20}% More Burn Damage" ] },
-                            { "exp": 4000, "modList": [ "+{15}% Chance To Burn", "{30}% More Burn Damage" ] },
-                            { "exp": 8000, "modList": [ "+{20}% Chance To Burn", "{40}% More Burn Damage" ] },
-                            { "modList": [ "+{20}% Chance To Burn", "{40}% More Burn Damage" ] }
+                            { "modList": [ "+{10}% Chance To Burn" ], "exp": 1200 },
+                            { "modList": [ "+{15}% Chance To Burn" ], "exp": 3600 },
+                            { "modList": [ "+{20}% Chance To Burn" ], "exp": 7200 },
+                            { "modList": [ "+{25}% Chance To Burn" ] }
                         ]
                     },
                     {
-                        "id": "87bd24",
-                        "name": "Damage Over Time",
-                        "insightCost": 100,
+                        "id": "ae54b2",
+                        "name": "Burn Damage",
+                        "requirements": { "characterLevel": 2 },
+                        "insightCost": 200,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "{20}% More Damage Over Time" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "{30}% More Damage Over Time" ]
-                            },
-                            {
-                                "modList": [ "{40}% More Damage Over Time" ]
-                            }
+                            { "modList": [ "{10}% More Burn Damage" ], "exp": 1200 },
+                            { "modList": [ "{20}% More Burn Damage" ], "exp": 3600 },
+                            { "modList": [ "{30}% More Burn Damage" ], "exp": 7200 },
+                            { "modList": [ "{40}% More Burn Damage" ] }
+                        ]
+                    },
+                    {
+                        "id": "50f1d3",
+                        "name": "Burn Duration",
+                        "requirements": { "characterLevel": 3 },
+                        "insightCost": 200,
+                        "rankList": [
+                            { "modList": [ "{35}% Increased Burn Duration" ], "exp": 1200 },
+                            { "modList": [ "{40}% Increased Burn Duration" ], "exp": 3600 },
+                            { "modList": [ "{45}% Increased Burn Duration" ], "exp": 7200 },
+                            { "modList": [ "{50}% Increased Burn Duration" ] }
                         ]
                     },
                     {
                         "id": "710279",
                         "name": "Attack Speed",
+                        "requirements": { "characterLevel": 2 },
                         "insightCost": 300,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "{10}% More Attack Speed" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "{15}% More Attack Speed" ]
-                            },
-                            {
-                                "modList": [ "{20}% More Attack Speed" ]
-                            }
+                            { "modList": [ "{25}% More Attack Speed" ], "exp": 3600 },
+                            { "modList": [ "{30}% More Attack Speed" ], "exp": 7200 },
+                            { "modList": [ "{35}% More Attack Speed" ], "exp": 14400 },
+                            { "modList": [ "{40}% More Attack Speed" ] }
                         ]
                     },
                     {
                         "id": "2d4245",
                         "name": "Critical Hit Chance",
+                        "requirements": { "characterLevel": 2 },
                         "insightCost": 300,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "+{10}% Critical Hit Chance" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "+{20}% Critical Hit Chance" ]
-                            },
-                            {
-                                "modList": [ "+{30}% Critical Hit Chance" ]
-                            }
+                            { "modList": [ "+{20}% Critical Hit Chance" ], "exp": 3600 },
+                            { "modList": [ "+{25}% Critical Hit Chance" ], "exp": 7200 },
+                            { "modList": [ "+{30}% Critical Hit Chance" ], "exp": 14400 },
+                            { "modList": [ "+{30}% Critical Hit Chance" ] }
                         ]
                     },
                     {
-                        "id": "ae708a",
+                        "id": "767d93",
                         "name": "Critical Hit Multiplier",
+                        "requirements": { "characterLevel": 2 },
                         "insightCost": 300,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "+{30}% Critical Hit Multiplier" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "+{50}% Critical Hit Multiplier" ]
-                            },
-                            {
-                                "modList": [ "+{80}% Critical Hit Multiplier" ]
-                            }
+                            { "modList": [ "+{40}% Critical Hit Multiplier" ], "exp": 3600 },
+                            { "modList": [ "+{60}% Critical Hit Multiplier" ], "exp": 7200 },
+                            { "modList": [ "+{80}% Critical Hit Multiplier" ], "exp": 14400 },
+                            { "modList": [ "+{100}% Critical Hit Multiplier" ] }
                         ]
                     },
                     {
                         "id": "0ca681",
-                        "name": "Maximum Mana",
+                        "name": "Base Maximum Mana",
+                        "requirements": { "characterLevel": 2 },
                         "insightCost": 200,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "+{100} Maximum Mana" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "+{250} Maximum Mana" ]
-                            },
-                            {
-                                "modList": [ "+{500} Maximum Mana" ]
-                            }
+                            { "modList": [ "+{50} Maximum Mana" ], "exp": 1200 },
+                            { "modList": [ "+{100} Maximum Mana" ], "exp": 3600 },
+                            { "modList": [ "+{150} Maximum Mana" ], "exp": 7200 },
+                            { "modList": [ "+{200} Maximum Mana" ] }
                         ]
                     },
                     {
                         "id": "1f81a4",
-                        "name": "Mana Regeneration",
+                        "name": "Base Mana Regeneration",
                         "insightCost": 100,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "+{1} Mana Regeneration" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "+{2} Mana Regeneration" ]
-                            },
-                            {
-                                "modList": [ "+{3} Mana Regeneration" ]
-                            }
+                            { "modList": [ "+{1} Mana Regeneration" ], "exp": 600 },
+                            { "modList": [ "+{2} Mana Regeneration" ], "exp": 1200 },
+                            { "modList": [ "+{3} Mana Regeneration" ], "exp": 3600 },
+                            { "modList": [ "+{4} Mana Regeneration" ], "exp": 7200 },
+                            { "modList": [ "+{5} Mana Regeneration" ] }
+                        ]
+                    },
+                    {
+                        "id": "3935f9",
+                        "name": "Increased Mana Regeneration",
+                        "requirements": { "characterLevel": 2 },
+                        "insightCost": 200,
+                        "rankList": [
+                            { "modList": [ "{10}% Increased Mana Regeneration" ], "exp": 600 },
+                            { "modList": [ "{20}% Increased Mana Regeneration" ], "exp": 1200 },
+                            { "modList": [ "{30}% Increased Mana Regeneration" ], "exp": 3600 },
+                            { "modList": [ "{40}% Increased Mana Regeneration" ], "exp": 7200 },
+                            { "modList": [ "{50}% Increased Mana Regeneration" ] }
                         ]
                     },
                     {
                         "id": "ca2b79",
-                        "name": "Strength",
+                        "name": "Base Strength",
                         "insightCost": 100,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "+{20} Strength" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "+{30} Strength", "{10}% Increased Strength" ]
-                            },
-                            {
-                                "modList": [ "+{40} Strength", "{20}% Increased Strength" ]
-                            }
+                            { "modList": [ "+{20} Strength" ], "exp": 600 },
+                            { "modList": [ "+{30} Strength" ], "exp": 1200 },
+                            { "modList": [ "+{40} Strength" ], "exp": 3600 },
+                            { "modList": [ "+{50} Strength" ], "exp": 7200 },
+                            { "modList": [ "+{60} Strength" ] }
+                        ]
+                    },
+                    {
+                        "id": "e38be4",
+                        "name": "Increased Strength",
+                        "requirements": { "characterLevel": 2 },
+                        "insightCost": 200,
+                        "rankList": [
+                            { "modList": [ "{25}% Increased Strength" ], "exp": 600 },
+                            { "modList": [ "{30}% Increased Strength" ], "exp": 1200 },
+                            { "modList": [ "{35}% Increased Strength" ], "exp": 3600 },
+                            { "modList": [ "{40}% Increased Strength" ], "exp": 7200 },
+                            { "modList": [ "{50}% Increased Strength" ] }
                         ]
                     },
                     {
                         "id": "a274a9",
-                        "name": "Dexterity",
+                        "name": "Base Dexterity",
                         "insightCost": 100,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "+{20} Dexterity" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "+{30} Dexterity", "{10}% Increased Dexterity" ]
-                            },
-                            {
-                                "modList": [ "+{40} Dexterity", "{20}% Increased Dexterity" ]
-                            }
+                            { "modList": [ "+{20} Dexterity" ], "exp": 600 },
+                            { "modList": [ "+{30} Dexterity" ], "exp": 1200 },
+                            { "modList": [ "+{40} Dexterity" ], "exp": 3600 },
+                            { "modList": [ "+{50} Dexterity" ], "exp": 7200 },
+                            { "modList": [ "+{60} Dexterity" ] }
+                        ]
+                    },
+                    {
+                        "id": "8e47c7",
+                        "name": "Increased Dexterity",
+                        "requirements": { "characterLevel": 2 },
+                        "insightCost": 200,
+                        "rankList": [
+                            { "modList": [ "{25}% Increased Dexterity" ], "exp": 600 },
+                            { "modList": [ "{30}% Increased Dexterity" ], "exp": 1200 },
+                            { "modList": [ "{35}% Increased Dexterity" ], "exp": 3600 },
+                            { "modList": [ "{40}% Increased Dexterity" ], "exp": 7200 },
+                            { "modList": [ "{50}% Increased Dexterity" ] }
                         ]
                     },
                     {
                         "id": "530862",
-                        "name": "Intelligence",
+                        "name": "Base Intelligence",
                         "insightCost": 100,
                         "rankList": [
-                            {
-                                "exp": 600,
-                                "modList": [ "+{20} Intelligence" ]
-                            },
-                            {
-                                "exp": 3000,
-                                "modList": [ "+{30} Intelligence", "{10}% Increased Intelligence" ]
-                            },
-                            {
-                                "modList": [ "+{40} Intelligence", "{20}% Increased Intelligence" ]
-                            }
+                            { "modList": [ "+{20} Intelligence" ], "exp": 600 },
+                            { "modList": [ "+{30} Intelligence" ], "exp": 1200 },
+                            { "modList": [ "+{40} Intelligence" ], "exp": 3600 },
+                            { "modList": [ "+{50} Intelligence" ], "exp": 7200 },
+                            { "modList": [ "+{60} Intelligence" ] }
+                        ]
+                    },
+                    {
+                        "id": "e55e3b",
+                        "name": "Increased Intelligence",
+                        "requirements": { "characterLevel": 2 },
+                        "insightCost": 200,
+                        "rankList": [
+                            { "modList": [ "{25}% Increased Intelligence" ], "exp": 600 },
+                            { "modList": [ "{30}% Increased Intelligence" ], "exp": 1200 },
+                            { "modList": [ "{35}% Increased Intelligence" ], "exp": 3600 },
+                            { "modList": [ "{40}% Increased Intelligence" ], "exp": 7200 },
+                            { "modList": [ "{50}% Increased Intelligence" ] }
                         ]
                     }
                 ]
@@ -518,11 +505,11 @@
                 }
             ],
             "crafting": {
-                "advancedReforge": {
-                    "requirements": {
-                        "blacksmithLevel": 2
-                    }
-                },
+                // "advancedReforge": {
+                //     "requirements": {
+                //         "blacksmithLevel": 2
+                //     }
+                // },
                 "craftList": [
                     {
                         "desc": "Reforge item with new random modifiers",
@@ -532,27 +519,27 @@
                     {
                         "desc": "Add new modifier",
                         "cost": { "name": "Gold", "value": 100 },
-                        "successRates": { "min": 75, "max": 95 }
+                        "successRates": { "min": 85, "max": 95 }
                     },
                     {
                         "desc": "Remove modifier",
-                        "cost": { "name": "Gold", "value": 200 },
+                        "cost": { "name": "Gold", "value": 100 },
                         "successRates": { "min": 85, "max": 95 }
                     },
                     {
                         "desc": "Upgrade modifier",
-                        "cost": { "name": "Gold", "value": 500 },
-                        "successRates": { "min": 70, "max": 95 }
+                        "cost": { "name": "Gold", "value": 300 },
+                        "successRates": { "min": 60, "max": 90 }
                     },
                     {
                         "desc": "Randomize all numerical values",
-                        "cost": { "name": "Gold", "value": 800 },
-                        "successRates": { "min": 90, "max": 95 }
+                        "cost": { "name": "Gold", "value": 300 },
+                        "successRates": { "min": 95, "max": 95 }
                     },
                     {
                         "desc": "Randomize numerical values of a modifier",
-                        "cost": { "name": "Gold", "value": 2000 },
-                        "successRates": { "min": 85, "max": 90 }
+                        "cost": { "name": "Gold", "value": 1000 },
+                        "successRates": { "min": 85, "max": 95 }
                     }
                 ]
             },
@@ -660,14 +647,14 @@
                     { "mod": "+{2} Mana Regeneration", "level": 2, "weight": 300, "id": "0ac80a" },
                     { "mod": "+{3} Mana Regeneration", "level": 3, "weight": 200, "id": "355204" },
                     { "mod": "+{4} Mana Regeneration", "level": 4, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] },
-                    { "mod": "+{5} Mana Regeneration", "level": 5, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] }
+                    { "mod": "+{5} Mana Regeneration", "level": 5, "weight": 100, "id": "72d5fd", "itemFilter": [ "Armour" ] }
                 ],
                 [
-                    { "mod": "{10-15}% Increased Mana Regeneration", "level": 1, "weight": 200, "id": "ebd749", "itemFilter": [ "Armour" ] },
-                    { "mod": "{16-20}% Increased Mana Regeneration", "level": 2, "weight": 200, "id": "0ac80a", "itemFilter": [ "Armour" ] },
-                    { "mod": "{21-25}% Increased Mana Regeneration", "level": 3, "weight": 200, "id": "355204", "itemFilter": [ "Armour" ] },
-                    { "mod": "{26-30}% Increased Mana Regeneration", "level": 4, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] },
-                    { "mod": "{31-35}% Increased Mana Regeneration", "level": 5, "weight": 100, "id": "f49f5f", "itemFilter": [ "Armour" ] }
+                    { "mod": "{10-15}% Increased Mana Regeneration", "level": 1, "weight": 200, "id": "fec6fa", "itemFilter": [ "Armour" ] },
+                    { "mod": "{16-20}% Increased Mana Regeneration", "level": 2, "weight": 200, "id": "cd3f51", "itemFilter": [ "Armour" ] },
+                    { "mod": "{21-25}% Increased Mana Regeneration", "level": 3, "weight": 200, "id": "546848", "itemFilter": [ "Armour" ] },
+                    { "mod": "{26-30}% Increased Mana Regeneration", "level": 4, "weight": 100, "id": "6963fb", "itemFilter": [ "Armour" ] },
+                    { "mod": "{31-35}% Increased Mana Regeneration", "level": 5, "weight": 100, "id": "9a365a", "itemFilter": [ "Armour" ] }
                 ],
                 [
                     { "mod": "+{20-30} Strength", "level": 1, "weight": 200, "id": "51d741" },
@@ -709,27 +696,30 @@
                     {
                         "id": "71c815",
                         "name": "Rusted Sword",
-                        "probability": 1000,
+                        "probability": 700,
                         "rankList": [
-                            { "exp": 5, "modList": [ "{50}% More Physical Attack Damage" ] },
-                            { "modList": [ "{80}% More Physical Attack Damage", "+{20}% Hit Chance" ] }
+                            { "exp": 5, "modList": [ "{30}% More Physical Attack Damage", "-{10}% Hit Chance" ] },
+                            { "exp": 20, "modList": [ "{50}% More Physical Attack Damage", "-{10}% Hit Chance" ] },
+                            { "modList": [ "{80}% More Physical Attack Damage", "-{5}% Hit Chance" ] }
                         ]
                     },
                     {
                         "id": "f418e8",
                         "name": "Spell Book",
-                        "probability": 1000,
+                        "probability": 700,
                         "rankList": [
-                            { "exp": 5, "modList": [ "{50}% More Elemental Attack Damage" ] },
-                            { "modList": [ "{80}% More Elemental Attack Damage", "+{20}% Hit Chance" ] }
+                            { "exp": 5, "modList": [ "{30}% More Elemental Attack Damage", "-{10}% Hit Chance" ] },
+                            { "exp": 20, "modList": [ "{50}% More Elemental Attack Damage", "-{10}% Hit Chance" ] },
+                            { "modList": [ "{80}% More Elemental Attack Damage", "-{5}% Hit Chance" ] }
                         ]
                     },
                     {
                         "id": "d991a6",
                         "name": "Sacrifical Dagger",
-                        "probability": 1000,
+                        "probability": 700,
                         "rankList": [
-                            { "exp": 5, "modList": [ "{50}% More Bleed Damage", "{30}% Increased Bleed Duration" ] },
+                            { "exp": 5, "modList": [ "{30}% More Bleed Damage", "{20}% Increased Bleed Duration" ] },
+                            { "exp": 20, "modList": [ "{50}% More Bleed Damage", "+{30}% Bleed Damage Multiplier", "{30}% Increased Bleed Duration" ] },
                             { "modList": [ "{80}% More Bleed Damage", "{30}% Increased Bleed Duration", "+{30}% Bleed Damage Multiplier" ] }
                         ]
                     },
@@ -773,8 +763,8 @@
                         "+{80} Strength",
                         "+{30} Dexterity",
                         "+{20} Intelligence",
-                        "{1}% More Attack Damage Per {5} Strength",
-                        "{1}% More Attack Speed Per {8} Dexterity",
+                        "{1}% Increased Attack Damage Per {5} Strength",
+                        "{1}% Increased Attack Speed Per {8} Dexterity",
                         "+{1} Maximum Mana Per {4} Intelligence"
                     ]
                 },
@@ -785,8 +775,8 @@
                         "+{40} Strength",
                         "+{80} Dexterity",
                         "+{20} Intelligence",
-                        "{1}% More Attack Damage Per {8} Strength",
-                        "{1}% More Attack Speed Per {5} Dexterity",
+                        "{1}% Increased Attack Damage Per {8} Strength",
+                        "{1}% Increased Attack Speed Per {5} Dexterity",
                         "+{1} Maximum Mana Per {3} Intelligence"
                     ]
                 },
@@ -796,8 +786,8 @@
                         "{40}% More Elemental Damage",
                         "+{1} Mana Regeneration",
                         "+{80} Intelligence",
-                        "{1}% More Attack Damage Per {6} Strength",
-                        "{1}% More Attack Speed Per {5} Dexterity",
+                        "{1}% Increased Attack Damage Per {6} Strength",
+                        "{1}% Increased Attack Speed Per {5} Dexterity",
                         "+{1} Maximum Mana Per {2} Intelligence"
                     ]
                 }

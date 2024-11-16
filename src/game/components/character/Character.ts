@@ -2,14 +2,13 @@ import { Component } from '../Component';
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import { AttackSkills } from './attackSkills/AttackSkills';
 import { AuraSkills } from './auraSkills/AuraSkills';
-import { Passives } from './passiveSkills/Passives';
+import { Passives } from './passiveSkills/PassiveSkills';
 import { TabMenuElement } from 'src/shared/customElements/TabMenuElement';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { player } from 'src/game/game';
-import { createHelpIcon } from 'src/shared/utils/dom';
 import { Modifier } from '../../mods/Modifier';
-import { createLevelModal } from '../../utils/dom';
+import { createLevelModal, createTitleElement } from '../../utils/dom';
 import { PlayerUpdateStatsFlag } from '../../Player';
 import { Value } from '../../../shared/utils/Value';
 import { isNumber } from '../../../shared/utils/utils';
@@ -24,34 +23,17 @@ export class Character extends Component {
     constructor(readonly data: GameConfig.Character) {
         super('character');
 
-        const titleElement = document.createElement('div');
-        titleElement.classList.add('g-title');
-        titleElement.textContent = 'Character';
-        if (data.levelList) {
-            titleElement.innerHTML = `<span class="g-clickable-text">Character Lv.<var data-level>1</var></span>`;
-            titleElement.addEventListener('click', this.openCharacterLevelModal.bind(this));
-            this.page.appendChild(titleElement);
-            this.updateCharacterLevel();
-        }
+        const titleElement = createTitleElement({
+            label: 'Character',
+            levelClickCallback: data.levelList ? this.openCharacterLevelModal.bind(this) : undefined,
+            helpText: this.getHelpText.bind(this)
+        });
         this.page.appendChild(titleElement);
+
         const menu = createCustomElement(TabMenuElement);
         menu.classList.add('s-menu');
         menu.setDirection('horizontal');
         this.page.appendChild(menu);
-
-        const helpIconElement = createHelpIcon('Character', () => `
-            [Attacks]
-            Attack skills contains two base stats, attack speed and attack effectiveness.
-            Attack speed is your base attack rate and can be further scaled with stat modifiers.
-            Both attack damage and damage over time (DOT) are scaled by attack effectiveness when performing a hit.
-
-            Mana cost is the cost for each attack. You must have enough mana to perform an attack.
-            ${this.auraSkills ? `
-            Aura skills are temporary buffs. They cost mana and they last for a duration.
-            ` : ''}
-            Passives requires insight. You can gain insight by killing enemies.
-        `.trim());
-        this.page.appendChild(helpIconElement);
 
         if (data.attackSkills) {
             this.attackSkills = new AttackSkills(this.level, data.attackSkills);
@@ -61,7 +43,7 @@ export class Character extends Component {
         }
         const auraSkillsData = data.auraSkills;
         if (auraSkillsData) {
-            this.level.registerTargetValueCallback(auraSkillsData.requirements.characterLevel ?? 1, () => {
+            this.level.registerTargetValueCallback(auraSkillsData.requirements?.characterLevel ?? 1, () => {
                 this.auraSkills = new AuraSkills(this.level, auraSkillsData);
                 menu.addMenuItem('Aura', 'aura', 1);
                 menu.registerPageElement(this.auraSkills.page, 'aura');
@@ -71,12 +53,27 @@ export class Character extends Component {
         }
         if (data.passiveSkills) {
             this.passiveSkills = new Passives(this.level, data.passiveSkills);
-            menu.addMenuItem('Passives', 'passives', 2);
-            menu.registerPageElement(this.passiveSkills.page, 'passives');
+            menu.addMenuItem('Passive', 'passive', 2);
+            menu.registerPageElement(this.passiveSkills.page, 'passive');
             this.page.appendChild(this.passiveSkills.page);
         }
 
-        this.level.addListener('add', this.updateCharacterLevel.bind(this));
+        this.updateCharacterLevel();
+        this.level.addListener('change', this.updateCharacterLevel.bind(this));
+    }
+
+    private getHelpText() {
+        return `
+        [Attack]
+        Attack skills contains two base stats not available anywhere else, Attack speed and Attack effectiveness.
+        Attack speed determines your base attack speed.
+        Attack Effectiveness determines the base damage of both attacks and damage over time.
+        ${this.auraSkills ? `
+        [Aura]
+        Aura skills are temporary buffs. They cost mana and they last for a duration.
+        ` : ''}
+        [Passive]
+        Passives requires insight. You gain insight by killing enemies and collecting insight capacity items.`;
     }
 
     private openCharacterLevelModal() {
@@ -89,8 +86,11 @@ export class Character extends Component {
     }
 
     private updateCharacterLevel() {
+        if (!this.data.levelList) {
+            return;
+        }
         this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
-        const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
+        const modList = this.data.levelList[this.level.value - 1]?.modList ?? [];
         player.modDB.replace('Character', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
         player.updateStatsDirect(PlayerUpdateStatsFlag.Persistent);
     }

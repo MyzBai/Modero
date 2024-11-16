@@ -179,7 +179,7 @@ export class Game {
 
         this._initializationStage = GameInitializationStage.Init;
 
-        player.stats.maxLevel.set(gameConfig.worlds.enemyBaseLifeList.length + 1);
+        combat.stats.maxLevel.set(gameConfig.worlds.enemyBaseLifeList.length + 1);
 
         //Init
         statistics.init();

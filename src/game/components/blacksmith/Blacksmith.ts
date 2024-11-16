@@ -5,8 +5,7 @@ import type * as GameConfig from 'src/game/gameConfig/GameConfig';
 import type { Serialization, UnsafeSerialization } from 'src/game/serialization';
 import { modTemplateList } from 'src/game/mods/modTemplates';
 import { isNumber } from 'src/shared/utils/utils';
-import { createHelpIcon } from 'src/shared/utils/dom';
-import { createLevelModal } from '../../utils/dom';
+import { createLevelModal, createTitleElement } from '../../utils/dom';
 import { PlayerUpdateStatsFlag } from '../../Player';
 import { Value } from '../../../shared/utils/Value';
 import { assertDefined } from '../../../shared/utils/assert';
@@ -23,7 +22,7 @@ export interface BlacksmithItem {
     maxModCount: number;
     modList: Modifier[];
     modListCrafting?: Modifier[];
-    advancedReforge: AdvancedReforge;
+    advancedReforge?: AdvancedReforge;
 }
 
 export class Blacksmith extends Component {
@@ -35,24 +34,12 @@ export class Blacksmith extends Component {
     constructor(readonly data: GameConfig.Blacksmith) {
         super('blacksmith');
 
-        const titleElement = document.createElement('div');
-        titleElement.classList.add('g-title');
-        titleElement.textContent = 'Blacksmith';
+        const titleElement = createTitleElement({
+            label: 'Blacksmith',
+            levelClickCallback: data.levelList ? this.openBlacksmithLevelModal.bind(this) : undefined,
+            helpText: this.getHelpText(),
+        });
         this.page.appendChild(titleElement);
-        if (data.levelList) {
-            titleElement.innerHTML = `<span class="g-clickable-text">Blacksmith Lv.<var data-level>1</var></span>`;
-            titleElement.addEventListener('click', this.openBlacksmithLevelModal.bind(this));
-            this.page.appendChild(titleElement);
-            this.updateBlacksmithLevel();
-        }
-        this.page.appendChild(titleElement);
-
-        const helpIconElement = createHelpIcon('Blacksmith Help', `
-            Craft your items using the craft table.
-            New and better modifiers become available as you level up the blacksmith.
-            You can click modifiers to see more information about them.
-        `.trim());
-        this.page.appendChild(helpIconElement);
 
         const itemListDropdownParent = document.createElement('div');
         itemListDropdownParent.classList.add('s-item-dropdown');
@@ -81,14 +68,14 @@ export class Blacksmith extends Component {
             modList: [],
             reforgeWeights: x.reforgeWeights,
             maxModCount: x.reforgeWeights.length,
-            advancedReforge: { maxReforgeCount: 0, modItems: [] }
+            advancedReforge: data.crafting.advancedReforge ? { maxReforgeCount: 0, modItems: [] } : undefined
         }));
         const firstItem = this.itemList[0];
         assertDefined(firstItem);
 
         this.craftTable = new CraftTable({
             item: firstItem,
-            element: this.page,
+            craftAreaElement: this.page,
             craft: null,
             craftList: data.crafting.craftList,
             modGroupsList: this.modGroupsList,
@@ -124,9 +111,17 @@ export class Blacksmith extends Component {
             this.updateModListElements(item);
         });
 
+        this.updateBlacksmithLevel();
         this.level.addListener('change', this.updateBlacksmithLevel.bind(this));
 
-        this.level.registerTargetValueCallback(data.crafting.advancedReforge.requirements.blacksmithLevel, () => this.craftTable.unlockAdvReforge());
+        if (data.crafting.advancedReforge) {
+            this.level.registerTargetValueCallback(data.crafting.advancedReforge.requirements.blacksmithLevel, this.craftTable.unlockAdvReforge.bind(this.craftTable));
+        }
+    }
+
+    private getHelpText() {
+        return `Craft your items using the craft table.
+        New and better modifiers become available as you level up the blacksmith.`;
     }
 
     private updateModListElements(item: BlacksmithItem) {
@@ -144,6 +139,9 @@ export class Blacksmith extends Component {
     }
 
     private updateBlacksmithLevel() {
+        if (!this.data.levelList) {
+            return;
+        }
         this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
         const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
         player.modDB.replace('BlacksmithUpgrade', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));
@@ -161,7 +159,7 @@ export class Blacksmith extends Component {
                 id: item.id,
                 modList: item.modList.map(mod => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === mod.text).id, values: mod.values })),
                 modListCrafting: item.modListCrafting?.map(mod => ({ srcId: this.data.modLists.flatMap(x => x).findStrict(y => y.mod === mod.text).id, values: mod.values })) ?? undefined,
-                advReforge: { count: item.advancedReforge.maxReforgeCount, modItems: item.advancedReforge.modItems }
+                advReforge: item.advancedReforge ? { count: item.advancedReforge.maxReforgeCount, modItems: item.advancedReforge.modItems } : undefined
             })),
         };
     }
@@ -191,7 +189,7 @@ export class Blacksmith extends Component {
                 srcId: x?.srcId, values: x?.values
             })) ?? []) : undefined;
 
-            if (itemData?.advReforge) {
+            if (srcItem.advancedReforge && itemData?.advReforge) {
                 srcItem.advancedReforge = { maxReforgeCount: itemData.advReforge.count ?? 0, modItems: itemData.advReforge.modItems?.map(x => ({ text: x?.text ?? '', tier: x?.tier ?? 0 })) ?? [] };
             }
         }

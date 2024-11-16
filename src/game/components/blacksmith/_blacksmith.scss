@@ -1,6 +1,5 @@
 @use 'variables' as *;
 .p-blacksmith {
-    position: relative;
     display: grid;
     grid-template-rows: auto auto 0.6fr 1fr;
     gap: $default-gap;

@@ -3,7 +3,7 @@ import { TabMenuElement } from '../../../shared/customElements/TabMenuElement';
 import { player } from '../../game';
 import type * as GameConfig from '../../gameConfig/GameConfig';
 import { Modifier } from '../../mods/Modifier';
-import { createLevelModal } from '../../utils/dom';
+import { createLevelModal, createTitleElement } from '../../utils/dom';
 import { Artifacts } from './artifacts/Artifacts';
 import { Component } from '../Component';
 import type { Serialization, UnsafeSerialization } from '../../serialization';
@@ -18,15 +18,12 @@ export class Treasury extends Component {
     constructor(private readonly data: GameConfig.Treasury) {
         super('treasury');
 
-        const titleElement = document.createElement('div');
-        titleElement.classList.add('g-title');
-        titleElement.textContent = 'Treasury';
+        const titleElement = createTitleElement({
+            label: 'Treasury',
+            levelClickCallback: data.levelList ? this.openTreasuryLevelModal.bind(this) : undefined
+        });
         this.page.appendChild(titleElement);
-        if (data.levelList) {
-            titleElement.innerHTML = `<span class="g-clickable-text">Treasury Lv.<var data-level>1</var></span>`;
-            titleElement.addEventListener('click', this.openTreasuryLevelModal.bind(this));
-            this.updateTreasuryLevel();
-        }
+
         const menu = createCustomElement(TabMenuElement);
         menu.classList.add('s-menu');
         menu.setDirection('horizontal');
@@ -39,6 +36,7 @@ export class Treasury extends Component {
             this.page.append(this.artifacts.page);
         }
 
+        this.updateTreasuryLevel();
         this.level.addListener('change', this.updateTreasuryLevel.bind(this));
     }
 
@@ -52,6 +50,9 @@ export class Treasury extends Component {
     }
 
     private updateTreasuryLevel() {
+        if (!this.data.levelList) {
+            return;
+        }
         this.page.querySelectorStrict('[data-level]').textContent = this.level.value.toFixed();
         const modList = this.data.levelList?.[this.level.value - 1]?.modList ?? [];
         player.modDB.replace('Treasury', Modifier.extractStatModifierList(...Modifier.modListFromTexts(modList)));

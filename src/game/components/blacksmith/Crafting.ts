@@ -117,10 +117,11 @@ export class Crafting {
 
     private performReforgeCraft() {
         assertDefined(this.ctx.item.modListCrafting);
-        const useAdvReforge = this.ctx.item.advancedReforge.maxReforgeCount > 0;
+        const advancedReforge = this.ctx.item.advancedReforge;
+        const useAdvReforge = (advancedReforge?.maxReforgeCount ?? 0) > 0;
         let reforgeCount = 1;
-        if (useAdvReforge) {
-            reforgeCount = this.ctx.item.advancedReforge.maxReforgeCount;
+        if (advancedReforge && useAdvReforge) {
+            reforgeCount = advancedReforge.maxReforgeCount;
         }
         let success = false;
         for (let i = 0; i < reforgeCount; i++) {
@@ -133,7 +134,7 @@ export class Crafting {
             const newModList = CraftManager.reforge(this.ctx.candidateModList(), this.ctx.item.reforgeWeights);
             this.ctx.item.modListCrafting = newModList;
 
-            const evaluateAdvReforge = () => {
+            if (advancedReforge && useAdvReforge) {
                 const evaluateModItem = (modItem: AdvancedReforge['modItems'][number]) => {
                     const mod = newModList.find(x => x.template.desc === modItem.text);
                     if (!mod) {
@@ -145,11 +146,7 @@ export class Crafting {
                     }
                     return true;
                 };
-                return this.ctx.item.advancedReforge.modItems.filter(x => x.text.length > 0 && x.tier > 0).every(evaluateModItem);
-            };
-
-            if (useAdvReforge) {
-                success = evaluateAdvReforge();
+                success = advancedReforge.modItems.filter(x => x.text.length > 0 && x.tier > 0).every(evaluateModItem);
                 if (success) {
                     break;
                 }
@@ -165,8 +162,8 @@ export class Crafting {
     //#region Other
 
     private async triggerItemDestroyAnim() {
-        const craftAreaElement = this.ctx.element.querySelectorStrict<HTMLElement>('[data-craft-area]');
-        const animations: Promise<void>[] = [...this.ctx.element.querySelectorAll('[data-mod]')].map(x => {
+        const craftAreaElement = this.ctx.craftAreaElement.querySelectorStrict<HTMLElement>('[data-craft-area]');
+        const animations: Promise<void>[] = [...this.ctx.craftAreaElement.querySelectorAll('[data-mod]')].map(x => {
             return new Promise(resolve => {
                 x.animate([
                     { offset: 0, opacity: 1, filter: 'blur(0px)' },
@@ -182,7 +179,7 @@ export class Crafting {
         }));
         document.body.style.pointerEvents = 'none';
         await Promise.allSettled(animations);
-        this.ctx.element.querySelectorStrict<HTMLLegendElement>('[data-craft-backdrop]').click();
+        this.ctx.craftAreaElement.querySelectorStrict<HTMLLegendElement>('[data-craft-backdrop]').click();
         craftAreaElement.style.opacity = '1';
         document.body.style.pointerEvents = 'all';
 
@@ -192,7 +189,7 @@ export class Crafting {
     private async triggerAdvReforgeOutcomeAnim(success: boolean) {
         const animate: Promise<void> = new Promise(resolve => {
             const outline = '1px solid rgba(255, 255, 255, 0)';
-            const anim = this.ctx.element.querySelectorStrict('[data-craft-area]').animate([
+            const anim = this.ctx.craftAreaElement.querySelectorStrict('[data-craft-area]').animate([
                 { outline },
                 { offset: 0.8, outlineColor: success ? 'green' : 'red' },
                 { offset: 1, outline }

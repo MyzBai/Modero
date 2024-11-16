@@ -33,7 +33,8 @@ export interface Resource {
 export interface Enemy {
     id: Id;
     name: Name;
-    level?: Level;
+    level?: LevelRange;
+    world?: LevelRange;
     weight?: Weight;
     modList?: EnemyModList;
 }
@@ -42,11 +43,15 @@ export interface Worlds {
     enemyBaseLifeList: EnemyBaseLifeList;
     enemyBaseCountList: EnemyBaseCountList;
     /**@TJS-minItems 1 */
+    enemyList: Enemy[];
+    /**
+     * @TJS-minItems 1
+     * @description Each world is completly independent of one another
+     */
     worldList: {
         id: Id;
+        /**@description Each world can have global Area Modifiers applied */
         modList: WorldModList;
-        /**@TJS-minItems 1 */
-        enemyList: Enemy[];
     }[];
 }
 
@@ -63,13 +68,14 @@ export interface Blacksmith {
     }[];
     modLists: BlacksmithMod[][];
     crafting: {
-        advancedReforge: {
+        advancedReforge?: {
             requirements: { blacksmithLevel: Level; };
         };
         craftList: BlacksmithCraft[];
     };
 }
-export interface BlacksmithMod {
+
+interface BlacksmithMod {
     id: Id;
     level: Level;
     weight: Weight;
@@ -92,7 +98,7 @@ export interface Character {
         attackSkillList: AttackSkill[];
     };
     auraSkills?: {
-        requirements: { characterLevel: Level; };
+        requirements?: { characterLevel: Level; };
         /**TJS-minItems 1 */
         auraSkillList: AuraSkill[];
     };
@@ -238,6 +244,11 @@ type UnsignedInteger = number;
  * @default 1
  */
 type Level = number;
+
+interface LevelRange {
+    min: Level;
+    max?: Level;
+}
 
 /**@$ref #/definitions/Id */
 type Id = string;

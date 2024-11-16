@@ -1,6 +1,6 @@
 import 'src/extensions/arrayExtensions';
 import { modTemplateList, worldModTemplateList } from '../src/game/mods/modTemplates';
-import { integerRangeRegex, numberRangeRegex, symbolsRegex } from '../src/shared/utils/textParsing';
+import { integerRangeRegex, numberRangeRegex } from '../src/shared/utils/textParsing';
 import { generateSchema, buildGenerator, type PartialArgs, type Definition, type JsonSchemaGenerator, getProgramFromFiles } from 'typescript-json-schema';
 import { writeFile } from 'fs/promises';
 import { assertNonNullable } from '../src/shared/utils/assert';
@@ -47,7 +47,8 @@ function createSchema() {
         required: true,
         noExtraProps: true,
         ignoreErrors: true,
-        ref: true
+        ref: true,
+        validationKeywords: ['uniqueItemProperties']
     };
 
     try {
@@ -122,7 +123,14 @@ function createStringSchemaOverride(generator: JsonSchemaGenerator, opts: String
 }
 
 function createDefinitions(opts: StringSchemaOverrideOptions) {
-    return opts.descriptions.map(x => createDefinition(x, opts));
+    const patternSet = new Set();
+    return opts.descriptions.map(x => createDefinition(x, opts)).filter(x => {
+        if (patternSet.has(x.pattern)) {
+            return false;
+        }
+        patternSet.add(x.pattern);
+        return true;
+    });
 }
 
 function createDefinition(desc: string, _opts: StringSchemaOverrideOptions) {
@@ -146,7 +154,8 @@ function removeGroupNames(text: string) {
 }
 
 function replaceSymbol(text: string) {
-    return text.replace(new RegExp(symbolsRegex, 'g'), symbolsRegex.source);
+    return text.replace(/([+-])/g, '([$1])');
+    // return text.replace(new RegExp(symbolsRegex, 'g'), symbolsRegex.source);
 }
 
 function replaceHash(text: string, valueOpts?: ValueOptions) {

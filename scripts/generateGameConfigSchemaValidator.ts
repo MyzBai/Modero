@@ -1,11 +1,10 @@
 import ajvStandaloneCode from 'ajv/dist/standalone';
 import { mkdir, writeFile } from 'fs/promises';
 import * as path from 'path';
-import Ajv, { type Vocabulary } from 'ajv';
+import Ajv from 'ajv';
 import { resolveGamePathFromVersion } from '../src/config';
 import { GAME_CONFIG_VERSION } from '../src/game/gameConfig/GameConfig';
-import ajvKeywords from 'ajv-keywords';
-
+import { _Code } from 'ajv/dist/compile/codegen/code';
 
 void (async () => {
     console.time('build schema validator');
@@ -22,13 +21,12 @@ void (async () => {
 
 
 function createAjvSchemaStandalone(schema: string) {
-    const keywords: Vocabulary = [];
+    const ajv = new Ajv({ code: { es5: false, source: true, esm: true }, removeAdditional: 'all', allErrors: true });
     if (process.env.NODE_ENV !== 'production') {
-        keywords.push({ keyword: 'defaultSnippets' });
+        ajv.addKeyword('defaultSnippets');
     }
-    const ajv = new Ajv({ code: { es5: false, source: true, esm: true }, keywords });
-    ajvKeywords(ajv);
     const schemaObj = JSON.parse(schema);
     const validate = ajv.compile(schemaObj);
-    return ajvStandaloneCode(ajv, validate);
+    const code = ajvStandaloneCode(ajv, validate);
+    return code;
 }

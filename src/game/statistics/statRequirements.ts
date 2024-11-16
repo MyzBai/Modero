@@ -1,11 +1,11 @@
-import { game, player } from '../game';
+import { combat, game } from '../game';
 import type { Requirements } from '../gameConfig/GameConfig';
 
 
 export function evaluateStatRequirements(requirement: Requirements | undefined, callback: () => void) {
     const requirements = [];
     if (requirement?.curLevel) {
-        requirements.push({ stat: player.stats.level, value: requirement.curLevel });
+        requirements.push({ stat: combat.stats.level, value: requirement.curLevel });
     }
     // if (requirement?.maxLevel) {
     //     requirements.push({ stat: game.stats.maxLevel, value: requirement.maxLevel });

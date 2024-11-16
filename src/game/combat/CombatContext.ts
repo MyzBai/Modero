@@ -12,7 +12,6 @@ import { combatCtxModTemplateList } from '../mods/combatCtxModTemplates';
 export interface EnemyCandidate {
     id: string;
     name: string;
-    level?: number;
     weight?: number;
     modList?: string[];
 }
@@ -98,7 +97,7 @@ export class CombatContext {
     }
 
     private createEnemyCandidate() {
-        const candidates = this.data.candidates.filter(x => (x.level ?? 1) <= player.level) || [];
+        const candidates = this.data.candidates;
         let candidate: EnemyCandidate | undefined;
         if (candidates.length === 1) {
             candidate = candidates[0];

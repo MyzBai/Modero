@@ -83,7 +83,7 @@ export class AuraSkills extends SkillPage {
     }
 
     get selectedSkill() {
-        return this.skillList.findStrict(x => x.selected);
+        return this.skillList.find(x => x.selected);
     }
 
     private updateSkillSlots() {
@@ -128,12 +128,10 @@ export class AuraSkills extends SkillPage {
     }
 
     private selectSkillSlot(skillSlot?: SkillSlot) {
-        if (skillSlot?.skill) {
+        if (skillSlot?.skill && skillSlot.selected) {
             skillSlot.skill.element.click();
         }
-        if (skillSlot) {
-            skillSlot.selected = true;
-        }
+        this.skillSlotList.forEach(x => x.selected = x === skillSlot);
         this.skillSlotList.forEach(x => x.element.classList.toggle('selected', x === skillSlot));
         if (this.selectedSkill) {
             this.showSkill(this.selectedSkill);

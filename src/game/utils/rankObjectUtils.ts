@@ -40,6 +40,7 @@ export function createRankObject<T extends RankObjectData>(data: RankObjectInitD
             return rankData;
         }
     };
+    updateRankObjectListItemElement(rankObject);
     return rankObject;
 }
 
@@ -69,7 +70,20 @@ export function tryUnlockNextRank(rankObj: RankObject) {
     assertDefined(data, 'maxRank outside the bounds of rankList');
     rankObj.curExp = 0;
     rankObj.maxExp = data.exp ?? 0;
+    updateRankObjectListItemElement(rankObj);
     return true;
+}
+
+export function updateRankObjectListItemElement(rankObj: RankObject) {
+    const nameText = rankObj.name;
+    const rankText = rankObj.rankList.length > 1 ? ` ${ROMAN_NUMERALS[rankObj.curRank - 1]}` : undefined;
+    const rankIndicator = rankText && rankObj.assigned ? `${rankObj.curRank !== rankObj.maxRank ? '^' : ''}` : '';
+    rankObj.element.textContent = `${nameText}${rankText}${rankIndicator}`;
+    if (rankObj.assigned) {
+        rankObj.element.setAttribute('data-tag', 'valid');
+    } else {
+        rankObj.element.removeAttribute('data-tag');
+    }
 }
 
 export function setNextRank(rankObj: RankObject) {

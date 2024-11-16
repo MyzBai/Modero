@@ -1,6 +1,5 @@
 import type * as GameConfig from 'src/game/gameConfig/GameConfig';
-import { type RankObject, type RankObjectData } from '../../utils/rankObjectUtils';
-import { ROMAN_NUMERALS } from '../../../shared/utils/constants';
+import { updateRankObjectListItemElement, type RankObject, type RankObjectData } from '../../utils/rankObjectUtils';
 
 export type AttackSkill = { type: 'Attack'; } & BaseSkill<GameConfig.AttackSkill['rankList'][number]>;
 export type AuraSkill = { type: 'Aura'; } & BaseSkill<GameConfig.AuraSkill['rankList'][number]>;
@@ -36,16 +35,14 @@ export abstract class SkillPage {
             return;
         }
         skill.curRank = skill.selectedRank;
-        skill.element.textContent = `${skill.name} ${ROMAN_NUMERALS[skill.curRank - 1]}`;
-        skill.element.setAttribute('data-tag', 'valid');
         skill.assigned = true;
+        updateRankObjectListItemElement(skill);
     }
 
     protected unassignSkill(skill: Skill) {
-        skill.element.textContent = skill.name;
-        skill.element.removeAttribute('data-tag');
         skill.assigned = false;
         skill.curRank = 1;
+        updateRankObjectListItemElement(skill);
     }
 
     protected abstract showSkill(skill: Skill): void;

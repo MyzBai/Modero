@@ -5,7 +5,6 @@ import { createCustomElement } from 'src/shared/customElements/customElements';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { loadGame, saveGame } from 'src/shared/utils/saveManager';
 import { createModEntryInfoElement } from './dom';
-import { createHelpIcon } from 'src/shared/utils/dom';
 
 export type GameModEntryData = typeof gameModRegistry.list[number];
 
@@ -24,15 +23,17 @@ export class NewGame extends GameInitializer {
 
         const titleElement = document.createElement('div');
         titleElement.classList.add('g-title', 'title');
-        titleElement.textContent = 'Mod List';
+        titleElement.insertAdjacentHTML('beforeend', '<span class="g-clickable-text">Mod List</span>');
+        titleElement.addEventListener('click', () => {
+            const modal = createCustomElement(ModalElement);
+            modal.setTitle('Game Mod');
+            modal.body.insertAdjacentHTML('beforeend', `
+            This game is designed around user-made mods written in data-driven files.
+            If you're interesting in contributing or developing your own mod,
+            check out the Github link in the footer.
+        `);
+        })
         this.page.appendChild(titleElement);
-
-        const helpIcon = createHelpIcon('Game Mod', `
-        This game is designed around user-made mods. Pure data driven files with no scripting involved.
-        A mod contains almost all of the game's data. Therefore a mod must be selected before playing.
-        `.trim());
-
-        titleElement.appendChild(helpIcon);
 
         this.page.insertAdjacentHTML('beforeend', '<ul class="entry-list g-scroll-list-v" data-entry-list></ul>');
         this.page.insertAdjacentHTML('beforeend', '<div data-mod-entry-info></div>');

@@ -1,4 +1,4 @@
-import { combat, game, player } from 'src/game/game';
+import { combat, game } from 'src/game/game';
 import { createModListElement, fadeIn, fadeOut } from '../utils/dom';
 import { Modifier } from '../mods/Modifier';
 import { CombatContext } from '../combat/CombatContext';
@@ -34,12 +34,12 @@ export class Worlds {
     }
 
     get enemyBaseCount() {
-        return game.gameConfig.worlds.enemyBaseCountList[player.level - 1] ?? Infinity;
+        return game.gameConfig.worlds.enemyBaseCountList[combat.stats.level.value - 1] ?? Infinity;
     }
 
     get enemyBaseLife() {
         const enemyBaseLifeList = game.gameConfig.worlds.enemyBaseLifeList;
-        const index = clamp(player.level - 1, 0, enemyBaseLifeList.length - 1);
+        const index = clamp(combat.stats.level.value - 1, 0, enemyBaseLifeList.length - 1);
         const baseLife = enemyBaseLifeList[index];
         assertDefined(baseLife);
         return baseLife;
@@ -50,14 +50,14 @@ export class Worlds {
             name: 'World',
             enemyBaseCount: this.enemyBaseCount,
             enemyBaseLife: this.enemyBaseLife,
-            candidates: this.data.enemyList,
+            candidates: [...this.generateEnemyCandidates()],
             combatModList: this.data.modList,
             interruptable: true
         });
 
         combatContext.onComplete.listen(() => {
-            if (player.level < player.stats.maxLevel.value) {
-                player.stats.level.add(1);
+            if (combat.stats.level.value < combat.stats.maxLevel.value) {
+                combat.stats.level.add(1);
             }
             this.combatCtx = this.createCombatContext();
             combat.startCombat(this.combatCtx);
@@ -65,9 +65,31 @@ export class Worlds {
         return combatContext;
     }
 
+    private *generateEnemyCandidates() {
+        for (const enemyData of game.gameConfig.worlds.enemyList) {
+            if (enemyData.level) {
+                if (enemyData.level.min > combat.stats.level.value) {
+                    continue;
+                }
+                if (enemyData.level.max && enemyData.level.max < combat.stats.level.value) {
+                    continue;
+                }
+            }
+            if (enemyData.world) {
+                if (enemyData.world.min > game.stats.world.value) {
+                    continue;
+                }
+                if (enemyData.world.max && enemyData.world.max < game.stats.world.value) {
+                    continue;
+                }
+            }
+            yield enemyData;
+        }
+    }
+
     init() {
-        player.stats.level.addListener('change', ({ curValue }) => {
-            if (curValue === player.stats.maxLevel.value) {
+        combat.stats.level.addListener('change', ({ curValue }) => {
+            if (curValue === combat.stats.maxLevel.value) {
                 if (game.stats.world.value !== game.gameConfig.worlds.worldList.length) {
                     this.page.querySelectorStrict<HTMLElement>('[data-next-world-button]').style.visibility = 'visible';
                     if (!this.combatCtx?.completed) {

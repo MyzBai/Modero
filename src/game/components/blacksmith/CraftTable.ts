@@ -6,7 +6,6 @@ import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { CraftManager, type ModifierCandidate } from './CraftManager';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { TextInputDropdownElement } from 'src/shared/customElements/TextInputDropdownElement';
-import { createHelpIcon } from 'src/shared/utils/dom';
 import { game, GameInitializationStage, player } from '../../game';
 import { ModDB } from '../../mods/ModDB';
 import { calcPlayerCombatStats, extractStats } from '../../calc/calcStats';
@@ -35,7 +34,7 @@ export interface CraftContext {
     item: BlacksmithItem;
     craftList: GameConfig.BlacksmithCraft[];
     craft: Craft | null;
-    element: HTMLElement;
+    craftAreaElement: HTMLElement;
     modGroupsList: ModGroupList[];
     candidateModList: () => ModifierCandidate[];
 }
@@ -146,26 +145,7 @@ export class CraftTable {
     private updateCraftListItemStates() {
         for (const craft of this.craftList) {
             craft.element.classList.toggle('selected', craft === this.ctx.craft);
-            let disabled = true;
-
-            if (this.ctx.item.modListCrafting) {
-                switch (craft.template.type) {
-                    case 'Reforge':
-                        disabled = false;
-                        break;
-                    case 'Add':
-                        disabled = this.ctx.item.modListCrafting.length >= this.ctx.item.maxModCount || CraftManager.generateMods(this.ctx.item.modListCrafting, this.ctx.candidateModList(), 1).length === 0;
-                        break;
-                    case 'Remove':
-                    case 'Upgrade':
-                    case 'Randomize Numericals':
-                        disabled = this.ctx.item.modListCrafting.length === 0;
-                        break;
-                }
-            }
-            if (craft.cost && !evalCost(craft.cost)) {
-                disabled = true;
-            }
+            const disabled = !this.evalCraft(craft);
             craft.element.toggleAttribute('disabled', disabled);
         }
     }
@@ -178,13 +158,17 @@ export class CraftTable {
             element.remove();
             this.clearCraftSelection();
         });
-        this.ctx.element.append(element);
+        this.ctx.craftAreaElement.append(element);
+    }
+
+    private removeBackdrop() {
+        this.ctx.craftAreaElement.querySelector<HTMLElement>('[data-craft-backdrop]')?.click();
     }
 
     private updateSuccessRateAttribute(e: MouseEvent) {
         assertDefined(this.ctx.item.modListCrafting);
 
-        const craftAreaElement = this.ctx.element.querySelectorStrict('[data-craft-area]');
+        const craftAreaElement = this.ctx.craftAreaElement.querySelectorStrict('[data-craft-area]');
         craftAreaElement.removeAttribute('data-success-rate');
         if (!this.ctx.craft) {
             return;
@@ -211,7 +195,7 @@ export class CraftTable {
 
         this.abortController?.abort();
 
-        const craftAreaElement = this.ctx.element.querySelectorStrict('[data-craft-area]');
+        const craftAreaElement = this.ctx.craftAreaElement.querySelectorStrict('[data-craft-area]');
 
         craftAreaElement.querySelectorAll<HTMLElement>('[data-craft]').forEach(x => {
             x.removeAttribute('data-craft');
@@ -278,9 +262,38 @@ export class CraftTable {
 
         await this.crafting.processCraft(mod);
 
-        this.ctx.element.querySelector<HTMLElement>('[data-craft-backdrop]')?.click();
-
         this.craftAction.invoke({ item: this.ctx.item, type: 'Change' });
+
+        const craft = this.ctx.craft;
+        if (craft) {
+            this.removeBackdrop();
+            if (this.evalCraft(craft)) {
+                this.selectCraftById(craft.template.id);
+            }
+        }
+    }
+
+    private evalCraft(craft: Craft) {
+        let valid = false;
+        if (this.ctx.item.modListCrafting) {
+            switch (craft.template.type) {
+                case 'Reforge':
+                    valid = true;
+                    break;
+                case 'Add':
+                    valid = this.ctx.item.modListCrafting.length < this.ctx.item.maxModCount && CraftManager.generateMods(this.ctx.item.modListCrafting, this.ctx.candidateModList(), 1).length !== 0;
+                    break;
+                case 'Remove':
+                case 'Upgrade':
+                case 'Randomize Numericals':
+                    valid = this.ctx.item.modListCrafting.length !== 0;
+                    break;
+            }
+        }
+        if (craft.cost && !evalCost(craft.cost)) {
+            valid = false;
+        }
+        return valid;
     }
 
     private confirm() {
@@ -361,11 +374,14 @@ export class CraftTable {
             input.classList.add('max-reforge-count-input');
             label.setAttribute('data-max-reforge-count-input', '');
             input.setAttribute('type', 'number');
+
+            const advancedReforge = this.ctx.item.advancedReforge;
+            assertDefined(advancedReforge);
             input.addEventListener('change', () => {
                 const value = parseInt(input.value || '0');
-                this.ctx.item.advancedReforge.maxReforgeCount = value;
+                advancedReforge.maxReforgeCount = value;
             });
-            input.value = this.ctx.item.advancedReforge.maxReforgeCount.toFixed();
+            input.value = advancedReforge.maxReforgeCount.toFixed();
             bodyElement.append(label, input);
         };
 
@@ -414,6 +430,7 @@ export class CraftTable {
         conditionsElement.classList.add('s-conditions');
         conditionsElement.insertAdjacentHTML('beforeend', '<div>Conditions</div>');
         for (let i = 0; i < this.ctx.item.maxModCount; i++) {
+            assertDefined(this.ctx.item.advancedReforge);
             const modItem: AdvancedReforge['modItems'][number] = this.ctx.item.advancedReforge.modItems[i] ?? { text: '', tier: 0 };
             assertDefined(modItem);
             this.ctx.item.advancedReforge.modItems[i] = modItem;
@@ -421,15 +438,6 @@ export class CraftTable {
             conditionsElement.appendChild(rowElement);
         }
         bodyElement.appendChild(conditionsElement);
-
-        const helpIcon = createHelpIcon('', `
-        Specify how many times to reforge with a single action. (set to 0 to disable)
-        Each reforge will evaluate the conditions.
-        When all conditions are met or reaching max reforge count, the reforging will stop.
-
-        The modifier tier determines the minimum required tier. E.g. Tier 2 will match Tier 2 and Tier 1.
-        `.trim());
-        bodyElement.appendChild(helpIcon);
 
         modal.addBodyElement(bodyElement);
         this.element.appendChild(modal);
