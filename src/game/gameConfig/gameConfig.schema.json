@@ -17,8 +17,8 @@
         "$ref": "#/definitions/Resource"
       }
     },
-    "worlds": {
-      "$ref": "#/definitions/Worlds"
+    "world": {
+      "$ref": "#/definitions/World"
     },
     "components": {
       "type": "object",
@@ -47,7 +47,7 @@
     "playerStartModList",
     "resources",
     "version",
-    "worlds"
+    "world"
   ],
   "definitions": {
     "Resource": {
@@ -91,7 +91,7 @@
       ],
       "type": "string"
     },
-    "Worlds": {
+    "World": {
       "type": "object",
       "properties": {
         "enemyBaseLifeList": {

@@ -24,6 +24,7 @@ export function initDevTools() {
         printSave: () => game.gameConfigId && loadGame(game.gameConfigId),
         game,
         player,
+        combat,
         getEnemy: () => combat.enemy,
         setLevel: (level: number) => combat.stats.level.set(level),
         addResource: (name: string, amount: number) => {

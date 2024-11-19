@@ -8,7 +8,7 @@ export interface Serialization {
     meta: Meta;
     game?: Game;
     player?: Player;
-    worlds?: Worlds;
+    world?: World;
     statistics?: Statistics;
     effects?: Effects;
     notifications?: Notifications;
@@ -39,7 +39,7 @@ export interface World {
     combatCtx?: CombatContext;
 }
 
-export interface Worlds {
+export interface World {
     combatCtx?: CombatContext;
 }
 

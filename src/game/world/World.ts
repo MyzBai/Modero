@@ -6,15 +6,20 @@ import type { Serialization, UnsafeSerialization } from '../serialization';
 import { clamp } from '../../shared/utils/utils';
 import { assertDefined } from '../../shared/utils/assert';
 
-export class Worlds {
+export class World {
     private page: HTMLElement;
     private combatCtx: CombatContext | null = null;
     constructor() {
         this.page = document.createElement('div');
-        this.page.classList.add('p-worlds', 'hidden');
-        game.addPage(this.page, 'Worlds', 'worlds');
+        this.page.classList.add('p-world', 'hidden');
+        const { menuItem } = game.addPage(this.page, 'World', 'world');
+        menuItem.classList.add('hidden');
 
-        this.page.insertAdjacentHTML('beforeend', '<div class="g-title" data-row="1">Worlds</div>');
+        combat.stats.level.addListener('change', ({ curValue }) => {
+            menuItem.classList.toggle('hidden', game.stats.world.value === 1 && curValue < combat.stats.maxLevel.value);
+        });
+
+        this.page.insertAdjacentHTML('beforeend', '<div class="g-title" data-row="1">World</div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="label" data-label data-row="2"></div>');
         this.page.insertAdjacentHTML('beforeend', '<button style="visibility: hidden;" data-next-world-button>Next World</button>');
         this.page.insertAdjacentElement('beforeend', createModListElement([]));
@@ -28,17 +33,17 @@ export class Worlds {
     }
 
     get data() {
-        const data = game.gameConfig.worlds.worldList[game.stats.world.value - 1];
+        const data = game.gameConfig.world.worldList[game.stats.world.value - 1];
         assertDefined(data);
         return data;
     }
 
     get enemyBaseCount() {
-        return game.gameConfig.worlds.enemyBaseCountList[combat.stats.level.value - 1] ?? Infinity;
+        return game.gameConfig.world.enemyBaseCountList[combat.stats.level.value - 1] ?? Infinity;
     }
 
     get enemyBaseLife() {
-        const enemyBaseLifeList = game.gameConfig.worlds.enemyBaseLifeList;
+        const enemyBaseLifeList = game.gameConfig.world.enemyBaseLifeList;
         const index = clamp(combat.stats.level.value - 1, 0, enemyBaseLifeList.length - 1);
         const baseLife = enemyBaseLifeList[index];
         assertDefined(baseLife);
@@ -66,7 +71,7 @@ export class Worlds {
     }
 
     private *generateEnemyCandidates() {
-        for (const enemyData of game.gameConfig.worlds.enemyList) {
+        for (const enemyData of game.gameConfig.world.enemyList) {
             if (enemyData.level) {
                 if (enemyData.level.min > combat.stats.level.value) {
                     continue;
@@ -90,7 +95,7 @@ export class Worlds {
     init() {
         combat.stats.level.addListener('change', ({ curValue }) => {
             if (curValue === combat.stats.maxLevel.value) {
-                if (game.stats.world.value !== game.gameConfig.worlds.worldList.length) {
+                if (game.stats.world.value !== game.gameConfig.world.worldList.length) {
                     this.page.querySelectorStrict<HTMLElement>('[data-next-world-button]').style.visibility = 'visible';
                     if (!this.combatCtx?.completed) {
                         this.combatCtx = this.createCombatContext();
@@ -128,12 +133,12 @@ export class Worlds {
     }
 
     serialize(save: Serialization) {
-        save.worlds = {
+        save.world = {
             combatCtx: this.combatCtx?.serialize()
         };
     }
 
-    deserialize({ worlds: save }: UnsafeSerialization) {
+    deserialize({ world: save }: UnsafeSerialization) {
         if (save?.combatCtx && this.combatCtx) {
             this.combatCtx = this.createCombatContext();
             this.combatCtx.deserialize(save.combatCtx);

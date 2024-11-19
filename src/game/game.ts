@@ -18,7 +18,7 @@ import { createCustomElement } from 'src/shared/customElements/customElements';
 import { initDevTools } from 'src/game/dev';
 import { loadGame, saveGame } from 'src/shared/utils/saveManager';
 import { Notifications } from './Notifications';
-import { Worlds } from './worlds/Worlds';
+import { World } from './world/World';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
 import { createModEntryInfoElement } from 'src/home/dom';
@@ -31,7 +31,7 @@ export const mainMenuNames = [
     'blacksmith',
     'treasury',
     'guildHall',
-    'worlds',
+    'world',
     'achievements',
     'statistics',
     'notifications'
@@ -179,13 +179,13 @@ export class Game {
 
         this._initializationStage = GameInitializationStage.Init;
 
-        combat.stats.maxLevel.set(gameConfig.worlds.enemyBaseLifeList.length + 1);
+        combat.stats.maxLevel.set(gameConfig.world.enemyBaseLifeList.length + 1);
 
         //Init
         statistics.init();
         combat.init();
         player.init();
-        worlds.init();
+        world.init();
         this.components.init();
 
         //UI
@@ -199,10 +199,10 @@ export class Game {
 
         this._initializationStage = GameInitializationStage.Setup;
 
-        worlds.setup();
+        world.setup();
         //Setup
         player.setup();
-        worlds.setup();
+        world.setup();
         combat.effectHandler.setup();
         this.components.setup();
 
@@ -259,7 +259,7 @@ export class Game {
         gameLoop.reset();
         gameLoopAnim.reset();
         Object.values(this.stats).forEach(x => x.reset());
-        worlds.reset();
+        world.reset();
         combat.reset();
         player.reset();
         statistics.reset();
@@ -366,10 +366,10 @@ export class Game {
             stats: serializeStats(this.stats),
             resources: serializeStats(this.resources)
         };
-        worlds.serialize(save);
+        world.serialize(save);
         statistics.serialize(save);
         player.serialize(save);
-        worlds.serialize(save);
+        world.serialize(save);
         combat.effectHandler.serialize(save);
         notifications.serialize(save);
         this.components.serialize(save);
@@ -391,10 +391,10 @@ export class Game {
         deserializeStats(game.resources, save.game?.resources || {});
         statistics.deserialize(save);
         player.deserialize(save);
-        worlds.deserialize(save);
+        world.deserialize(save);
         this.components.deserialize(save);
 
-        worlds.deserialize(save);
+        world.deserialize(save);
 
         combat.effectHandler.deserialize(save);
         notifications.deserialize(save);
@@ -411,7 +411,7 @@ export const statistics = new Statistics();
 export const combat = new Combat();
 export const player = new Player();
 export const notifications = new Notifications();
-export const worlds = new Worlds();
+export const world = new World();
 
 export async function init(args: [...Parameters<typeof game['init']>]) {
     try {

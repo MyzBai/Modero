@@ -7,7 +7,7 @@ export interface Config {
     version: typeof GAME_CONFIG_VERSION;
     playerStartModList: PlayerStartModList;
     resources: Resource[];
-    worlds: Worlds;
+    world: World;
     components?: {
         guildHall?: GuildHall;
         character?: Character;
@@ -39,7 +39,7 @@ export interface Enemy {
     modList?: EnemyModList;
 }
 
-export interface Worlds {
+export interface World {
     enemyBaseLifeList: EnemyBaseLifeList;
     enemyBaseCountList: EnemyBaseCountList;
     /**@TJS-minItems 1 */

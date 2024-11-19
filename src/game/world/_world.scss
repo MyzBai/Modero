@@ -1,5 +1,5 @@
 @use 'variables' as *;
-.p-worlds {
+.p-world {
     display: grid;
     grid-template-rows: auto auto auto 1fr;
     gap: $default-gap;
