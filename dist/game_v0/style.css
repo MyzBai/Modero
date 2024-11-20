@@ -1,0 +1,1019 @@
+.g-scroll-list-v {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+.g-scroll-list-v li {
+  position: relative;
+  border-bottom: 1px solid #1b1c1d;
+}
+
+.g-list-item {
+  padding: 0.3em;
+  user-select: none;
+  list-style-type: none;
+  background-color: #0d1117;
+}
+.g-list-item.selected {
+  filter: brightness(70%) !important;
+}
+.g-list-item:hover {
+  filter: brightness(120%);
+}
+
+.g-field {
+  display: flex;
+  padding: 0 0.3em;
+  padding-top: 1px;
+}
+.g-field > :nth-child(1) {
+  flex: 1;
+  word-wrap: break-word;
+}
+.g-field > :last-child {
+  padding-left: 1em;
+}
+
+.g-mod-list {
+  text-align: center;
+  padding: 0.3em;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+.g-mod-list li {
+  position: relative;
+  border-bottom: 1px solid #1b1c1d;
+}
+.g-mod-list li {
+  color: #8392bd;
+  cursor: default;
+  border: 0;
+}
+.g-mod-list li[data-info]:hover {
+  filter: brightness(120%);
+}
+
+.g-mod-desc {
+  color: #8392bd;
+  cursor: default;
+}
+.g-mod-desc[data-info]:hover {
+  filter: brightness(120%);
+}
+
+.g-text-small {
+  font-size: 0.8em;
+}
+
+.g-text-mute {
+  color: #8b949e;
+}
+
+.g-title {
+  position: relative;
+  background-color: #0d1117;
+  padding: 0.3em;
+  text-align: center;
+  color: white;
+  border: 1px solid #1b1c1d;
+}
+
+.g-toolbar {
+  background-color: #0d1117;
+  border: 1px solid #1b1c1d;
+  padding: 0.3em;
+  display: flex;
+  gap: 2px;
+}
+
+[data-highlight] {
+  color: #d6a02c;
+  box-shadow: 0 0 0 1px #d6a02c inset;
+}
+
+.g-help-icon {
+  position: absolute;
+  top: calc(0.3em + 1px);
+  right: calc(0.3em + 1px);
+  cursor: default;
+  outline: 1px solid #1b1c1d;
+  width: 1.3em;
+  text-align: center;
+  font-weight: 600;
+  z-index: 1;
+}
+.g-help-icon:hover {
+  filter: brightness(130%);
+}
+
+.g-clickable-text {
+  cursor: default;
+}
+.g-clickable-text:hover {
+  filter: brightness(120%);
+  text-decoration: underline;
+}
+
+.g-item-info {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 2px;
+}
+.g-item-info .s-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border: 1px solid #1b1c1d;
+  padding: 0.3em;
+  gap: 2px;
+}
+
+.g-level-modal .s-body {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1em;
+  justify-items: center;
+}
+.g-level-modal .s-body ul {
+  min-width: 30em;
+}
+.g-level-modal .s-body ul:has(li) {
+  border: 1px solid #1b1c1d;
+}
+
+[data-tag=life] {
+  color: #a12525 !important;
+}
+
+[data-tag=mana] {
+  color: #3364ad !important;
+}
+
+[data-tag=valid] {
+  color: #54d354 !important;
+}
+
+[data-tag=invalid] {
+  color: #d86666 !important;
+}
+
+[data-tag=link] {
+  color: #58a6ff !important;
+}
+
+[data-tag=mute] {
+  color: #8b949e !important;
+}
+
+[data-tag=modifier] {
+  color: #8392bd !important;
+}
+
+[data-tag=attack] {
+  color: #be9898 !important;
+}
+
+[data-tag=physical] {
+  color: #a8a8a8 !important;
+}
+
+[data-tag=elemental] {
+  color: #72cac6 !important;
+}
+
+[data-tag=chaos] {
+  color: #9b72ca !important;
+}
+
+[data-tag=bleed] {
+  color: #d64c42 !important;
+}
+
+[data-tag=burn] {
+  color: #d67142 !important;
+}
+
+[data-tag=speed] {
+  color: #a5c748 !important;
+}
+
+[data-tag=critical] {
+  color: #63e757 !important;
+}
+
+.m-text-green {
+  color: #54d354;
+}
+
+.m-text-red {
+  color: #d86666;
+}
+
+.m-text-yellow {
+  color: #f1da58;
+}
+
+div,
+ul {
+  min-height: 0;
+}
+
+i,
+var {
+  font-style: normal;
+  cursor: default;
+}
+
+a {
+  text-decoration: none;
+  color: #58a6ff;
+  font-family: "Times New Roman", monospace;
+  cursor: pointer !important;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0;
+  width: 100%;
+}
+
+[disabled] {
+  pointer-events: none;
+  filter: brightness(50%) !important;
+}
+
+button {
+  all: unset;
+  position: relative;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  border: 1px solid #1b1c1d;
+  padding: calc(0.3em - 1px) 1em;
+  cursor: default;
+  outline: none;
+  text-align: center;
+  cursor: default;
+}
+button:hover {
+  filter: brightness(120%);
+}
+button[data-role=confirm] {
+  color: #54d354;
+}
+button[data-role=cancel] {
+  color: #d86666;
+}
+
+*.hidden {
+  display: none !important;
+}
+
+*.selected {
+  pointer-events: none;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+input {
+  font-size: 1em;
+  font-family: inherit;
+  background-color: #010409;
+  border-bottom: 1px solid #1b1c1d !important;
+  width: 100%;
+  outline: 0;
+  border: 0;
+  padding: 0.2em;
+  color: inherit;
+}
+input[type=submit] {
+  border: 0;
+}
+input[type=checkbox] {
+  position: relative;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #010409;
+  margin: 0;
+  font: inherit;
+  color: currentColor;
+  width: 1.15em;
+  height: 1.15em;
+  border: 0.1em solid #545e6e;
+  display: grid;
+}
+input[type=checkbox]::before {
+  content: "";
+  position: absolute;
+  display: none;
+  inset: 20%;
+  background-color: #c9d1d9;
+}
+input[type=checkbox]:checked::before {
+  display: block;
+}
+
+::-webkit-scrollbar {
+  width: 0.6em;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(58, 65, 75, 0.662745098);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(120%);
+}
+
+accordion-element {
+  margin-bottom: 2px;
+}
+accordion-element .header {
+  display: flex;
+  position: relative;
+  background-color: #0d1117;
+  padding: 0.3em;
+  user-select: none;
+  align-items: center;
+}
+accordion-element .header.has-content:hover {
+  filter: brightness(110%);
+}
+accordion-element .content-parent {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms ease-out;
+}
+accordion-element .content-parent > .s-content {
+  overflow: hidden;
+  grid-row: 1/span 2;
+}
+accordion-element .header.open + .content-parent {
+  grid-template-rows: 1fr;
+}
+
+modal-element {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  inset: 10%;
+  z-index: 100;
+}
+modal-element > .s-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #0d1117;
+  white-space-collapse: break-spaces;
+  border: 1px solid #1b1c1d;
+  padding: 1em;
+}
+modal-element > .s-content .title {
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 1.2em;
+  border-bottom: 1px solid #1b1c1d;
+  padding-bottom: 0.5em;
+}
+modal-element > .s-content .s-body {
+  overflow-y: auto;
+  min-height: 0;
+  flex-grow: 1;
+  margin: 0.5em;
+  white-space-collapse: preserve-breaks;
+}
+modal-element > .s-content .s-buttons {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+modal-element > .s-content .s-buttons button {
+  width: 10em;
+}
+modal-element .backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  backdrop-filter: blur(1px);
+  background-color: rgba(0, 0, 0, 0.589);
+}
+
+craft-table-element {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 2px;
+  min-height: 0;
+}
+craft-table-element .s-toolbar {
+  display: flex;
+  padding: 0.3em;
+  border-bottom: 1px solid #1b1c1d;
+}
+craft-table-element .s-craft-container {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}
+craft-table-element .s-craft-container .craft-button {
+  justify-self: center;
+  width: 7em;
+}
+craft-table-element .s-craft-container .craft-msg {
+  padding: 0.3em 0;
+  text-align: center;
+}
+craft-table-element .s-craft-container .s-craft-list {
+  flex: 1;
+}
+craft-table-element .s-craft-container .s-craft-list li {
+  padding: 0.3em;
+}
+craft-table-element .s-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5em;
+}
+
+tab-menu-element {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #1b1c1d;
+  text-align: center;
+  background-color: #0d1117;
+}
+tab-menu-element li {
+  min-width: 4em;
+  position: relative;
+}
+tab-menu-element[data-direction=vertical] {
+  flex-direction: column;
+}
+tab-menu-element[data-direction=vertical] li {
+  border: 0;
+  border-bottom: 1px solid #1b1c1d;
+}
+tab-menu-element[data-direction=horizontal] {
+  flex-direction: row;
+}
+tab-menu-element[data-direction=horizontal] li {
+  border: 0;
+  border-right: 1px solid #1b1c1d;
+}
+
+text-input-dropdown-element {
+  display: flex;
+  border: 1px solid #1b1c1d;
+}
+text-input-dropdown-element input[readonly] {
+  cursor: default;
+}
+text-input-dropdown-element input[readonly]:hover {
+  background-color: #141920;
+}
+text-input-dropdown-element[data-state=invalid] input {
+  background-color: #722c2c;
+}
+text-input-dropdown-element .s-dropdown-content {
+  position: fixed;
+  z-index: 100;
+  overflow-y: auto;
+  max-height: 50em;
+  border: 1px solid #1b1c1d;
+  background-color: #0d1117;
+}
+text-input-dropdown-element .s-dropdown-content li {
+  padding-right: 3em;
+}
+text-input-dropdown-element .s-dropdown-content li:not(:last-child) {
+  border-bottom: 1px solid #1b1c1d;
+}
+
+progress-element {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 0.6em;
+}
+progress-element .inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: inherit;
+  filter: brightness(50%);
+}
+progress-element .value {
+  height: 100%;
+  background-color: rgb(57, 168, 57);
+  transition: 250ms linear;
+}
+
+level-element {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+  border: 1px solid #1b1c1d;
+  padding: 0.2em;
+}
+level-element .level {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-row: span 2;
+  text-align: center;
+  background-color: rgb(57, 168, 57);
+  aspect-ratio: 1/1;
+  border-radius: 10%;
+  margin-right: 0.2em;
+  cursor: default;
+}
+level-element .level:hover {
+  background-color: rgb(45, 136, 45);
+}
+level-element .action {
+  cursor: default;
+  text-decoration: underline;
+}
+level-element .action:hover {
+  filter: brightness(80%);
+}
+level-element progress-element {
+  justify-content: center;
+  height: 1.2em;
+  margin: auto 0;
+  position: relative;
+}
+level-element progress-element:hover::after {
+  content: attr(data-exp);
+  position: absolute;
+  inset: 0;
+  text-align: center;
+}
+
+.p-combat {
+  overflow-y: auto;
+}
+.p-combat .s-effects {
+  min-height: 10em;
+}
+.p-combat .s-effects .s-effect {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: 0.3em;
+}
+.p-combat .s-effects .s-effect .progress-bar {
+  height: 5px;
+}
+.p-combat .s-area-mod-list {
+  min-height: 10em;
+  text-align: center;
+}
+
+.p-statistics {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 2px;
+}
+.p-statistics ul {
+  overflow-y: auto;
+  border-bottom: 1px solid #1b1c1d;
+}
+.p-statistics ul accordion-element ul li {
+  display: flex;
+  padding: 0.05em 0.3em;
+  cursor: default;
+  color: rgba(201, 209, 217, 0.5);
+  user-select: text;
+  padding-top: 1px;
+  user-select: none;
+}
+.p-statistics ul accordion-element ul li.sticky {
+  color: #c9d1d9;
+}
+.p-statistics ul accordion-element ul li:hover {
+  filter: brightness(120%);
+}
+.p-statistics ul accordion-element ul li :first-child {
+  flex: 1;
+}
+
+.p-notifications {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 2px;
+}
+.p-notifications .s-toolbar {
+  background-color: #0d1117;
+}
+.p-notifications .s-notifications-list li {
+  white-space-collapse: break-spaces;
+  border: 1px solid #1b1c1d;
+  padding: 0.3em;
+  margin: 1px;
+}
+.p-notifications .s-notifications-list li .title {
+  display: flex;
+  justify-content: space-between;
+}
+.p-notifications .s-notifications-list li .time {
+  align-self: center;
+}
+.p-notifications .s-notifications-list li.outline {
+  outline: 1px solid #d6a02c;
+  animation: seen 8s forwards;
+}
+
+@keyframes seen {
+  from {
+    outline-color: #d6a02c;
+  }
+  to {
+    outline-color: rgba(214, 160, 44, 0);
+  }
+}
+.p-world {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 2px;
+}
+.p-world .label {
+  text-align: center;
+  padding: 0.3em;
+}
+.p-world ul {
+  border: 1px solid #1b1c1d;
+}
+
+.p-guildHall {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto 1fr;
+  gap: 2px;
+}
+.p-guildHall > :first-child {
+  grid-column: 1/-1;
+}
+.p-guildHall .s-toolbar {
+  grid-column: 1/-1;
+}
+.p-guildHall level-element {
+  grid-column: span 2;
+}
+.p-guildHall .guild-class-list {
+  border: 1px solid #1b1c1d;
+}
+.p-guildHall .guild-class-info {
+  grid-column: 2;
+  grid-row: 3/-1;
+}
+
+.p-attack-skills {
+  grid-column: span 2;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.p-aura-skills {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 40% auto 1fr;
+  grid-auto-flow: column;
+  gap: 2px;
+}
+.p-aura-skills .s-skill-slot-list {
+  overflow-y: auto;
+  border: 1px solid #1b1c1d;
+}
+.p-aura-skills .s-skill-slot-list .skill-slot {
+  position: relative;
+  display: block;
+  cursor: default;
+  padding: 0.3em;
+  border: 1px solid #1b1c1d;
+}
+.p-aura-skills .s-skill-slot-list .skill-slot:hover {
+  filter: brightness(120%);
+}
+.p-aura-skills .s-skill-slot-list .skill-slot:not(:first-child) {
+  margin-top: 0.1em;
+}
+.p-aura-skills .s-skill-slot-list .skill-slot .s-title {
+  display: flex;
+  align-items: center;
+}
+.p-aura-skills .s-skill-slot-list .skill-slot .s-title .rank {
+  opacity: 0.6;
+  margin-left: auto;
+  display: block;
+}
+.p-aura-skills .s-skill-slot-list .skill-slot .progress-bar {
+  height: 5px;
+}
+.p-aura-skills .s-skill-slot-list .skill-slot.selected {
+  border: 1px solid #d6a02c;
+  pointer-events: all;
+}
+.p-aura-skills .s-skill-list {
+  border: 1px solid #1b1c1d;
+  overflow-y: auto;
+}
+.p-aura-skills .s-skill-list .equipped {
+  color: #3983f3;
+}
+
+.p-passive-skills {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto 1fr;
+  grid-auto-flow: column;
+  gap: 2px;
+}
+.p-passive-skills .s-toolbar {
+  justify-content: space-between;
+}
+.p-passive-skills .s-toolbar .s-insight-counter {
+  padding-left: 0.3em;
+  align-self: center;
+}
+.p-passive-skills .s-skill-list li {
+  position: relative;
+}
+.p-passive-skills .s-skill-info {
+  grid-row-start: 1;
+}
+.p-passive-skills modal-element.insight-capacity-enhancer .s-body {
+  min-width: 15em;
+}
+.p-passive-skills modal-element.insight-capacity-enhancer table tr:not(:last-child) {
+  border-bottom: 1px solid #1b1c1d;
+}
+.p-passive-skills modal-element.insight-capacity-enhancer table td:first-child {
+  padding-right: 1em;
+}
+
+.p-character {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto 1fr;
+  gap: 2px;
+}
+.p-character > :first-child {
+  grid-column: span 2;
+}
+.p-character level-element {
+  grid-column: span 2;
+}
+.p-character > .s-menu {
+  position: relative;
+  grid-column: span 2;
+}
+.p-character .s-skill-list {
+  border: 1px solid #1b1c1d;
+}
+.p-character [data-item-info] {
+  grid-column: 2;
+  grid-row: 1/-1;
+}
+.p-character [data-item-info] progress-element {
+  mask: linear-gradient(90deg, #000 98%, rgba(0, 0, 0, 0) 0) 0/10%;
+}
+
+.p-blacksmith {
+  display: grid;
+  grid-template-rows: auto auto 0.6fr 1fr;
+  gap: 2px;
+  z-index: 1;
+}
+.p-blacksmith .s-item-dropdown {
+  display: flex;
+  border: 1px solid #1b1c1d;
+}
+.p-blacksmith .s-item-dropdown > :first-child {
+  flex-grow: 0;
+  min-width: 10em;
+}
+.p-blacksmith .s-craft-area {
+  display: grid;
+  position: relative;
+  z-index: 3;
+  user-select: none;
+}
+.p-blacksmith .s-craft-area:has([data-craft]) {
+  box-shadow: 0 0 5px 1px #d6a02c inset;
+}
+.p-blacksmith .s-craft-area[data-success-rate]:has([data-craft]:hover)::after {
+  position: absolute;
+  content: "Success Rate: " attr(data-success-rate) "%";
+  color: #d6a02c;
+  top: 0;
+  left: 0;
+  transform: translateY(-100%);
+  z-index: 3;
+}
+.p-blacksmith .s-craft-area .s-mod-list[data-craft] [data-mod] {
+  pointer-events: none;
+}
+.p-blacksmith .s-craft-area [data-craft=false] {
+  pointer-events: none;
+}
+.p-blacksmith .craft-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  backdrop-filter: blur(1px) !important;
+  background-color: rgba(0, 0, 0, 0.589);
+}
+.p-blacksmith .craft-table {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 2px;
+}
+.p-blacksmith .craft-table .s-toolbar {
+  background-color: #0d1117;
+  padding: 0;
+}
+.p-blacksmith .craft-table .s-toolbar .advanced-reforge {
+  margin-left: auto;
+}
+.p-blacksmith .craft-table .s-craft-list > :first-child {
+  border: 1px solid #1b1c1d;
+  background-color: #0d1117;
+  margin-bottom: 0.2em;
+  text-align: center;
+}
+.p-blacksmith .craft-table .s-craft-list li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  padding: 0.3em;
+}
+.p-blacksmith .craft-table .s-craft-list li :nth-child(2),
+.p-blacksmith .craft-table .s-craft-list li :nth-child(3) {
+  box-sizing: border-box;
+  text-align: center;
+}
+.p-blacksmith .craft-table .s-craft-list li :nth-child(2) {
+  border-left: 1px solid #1b1c1d;
+  border-right: 1px solid #1b1c1d;
+}
+.p-blacksmith .craft-table .s-craft-list li :nth-child(2),
+.p-blacksmith .craft-table .s-craft-list li :nth-child(3) {
+  padding: 0 1em;
+}
+.p-blacksmith .craft-table .s-craft-list li.selected {
+  z-index: 2;
+}
+.p-blacksmith .craft-table .adv-reforge-modal .s-adv-reforge {
+  min-width: 30em;
+  overflow-x: hidden;
+}
+.p-blacksmith .craft-table .adv-reforge-modal .s-adv-reforge .max-reforge-count-input {
+  max-width: 3em;
+}
+.p-blacksmith .craft-table .adv-reforge-modal .s-adv-reforge .max-reforge-count-input::-webkit-inner-spin-button {
+  appearance: none;
+}
+.p-blacksmith .craft-table .adv-reforge-modal .s-adv-reforge .max-reforge-count-label {
+  display: inline-block;
+  padding-right: 1em;
+}
+.p-blacksmith .craft-table .adv-reforge-modal .s-adv-reforge .s-conditions {
+  padding-top: 0.5em;
+}
+.p-blacksmith .craft-table .adv-reforge-modal .s-adv-reforge .s-conditions .s-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+.p-blacksmith .craft-table .adv-reforge-modal .s-adv-reforge .s-conditions .s-row text-input-dropdown-element:last-child {
+  max-width: 4em;
+}
+.p-blacksmith .craft-table .s-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 5em;
+  row-gap: 0.5em;
+}
+.p-blacksmith .craft-table .s-compare .dps-compare {
+  margin: 0 auto;
+  grid-column: 1/3;
+}
+
+.p-artifacts {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+.p-artifacts > :first-child {
+  grid-column: 1/-1;
+}
+.p-artifacts .artifact-list {
+  grid-column: 1;
+  border: 1px solid #1b1c1d;
+}
+.p-artifacts [data-item-info] {
+  grid-column: 2;
+  grid-row: 2/-1;
+}
+.p-artifacts [data-item-info] .s-content {
+  border: 1px solid #1b1c1d;
+}
+.p-artifacts [data-item-info] progress-element {
+  mask: linear-gradient(90deg, #000 98%, rgba(0, 0, 0, 0) 0) 0/10%;
+}
+
+.p-treasury {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 2px;
+}
+
+.p-achievements {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 2px;
+}
+.p-achievements ul {
+  overflow-y: auto;
+}
+.p-achievements ul .s-achievement {
+  background-color: #0d1117;
+  padding: 0.3em;
+  border-bottom: 1px solid #1b1c1d;
+}
+.p-achievements ul .s-achievement var {
+  color: #d86666;
+}
+.p-achievements ul .s-achievement var[data-valid] {
+  color: #54d354;
+}
+
+.p-game {
+  display: grid;
+  grid-template-columns: minmax(10em, min-content) 1fr minmax(15em, min-content);
+  grid-template-rows: auto 1fr;
+  gap: 2px;
+  min-height: 0;
+  padding-bottom: 2px;
+}
+.p-game .s-combat-overview {
+  border: 1px solid #1b1c1d;
+  padding: 0.3em;
+  display: flex;
+  column-gap: 0.5em;
+  height: 2em;
+}
+.p-game .s-combat-overview .s-player-bar {
+  flex: 1;
+}
+.p-game .s-combat-overview .s-player-bar .s-mana-bar .value {
+  background-color: #307da1;
+}
+.p-game .s-combat-overview .s-enemy-bar {
+  flex: 1;
+}
+.p-game .s-combat-overview .s-enemy-bar .enemy-name {
+  cursor: default;
+}
+.p-game .s-combat-overview .s-enemy-bar .enemy-name:hover {
+  filter: brightness(120%);
+}
+.p-game .s-combat-overview .s-enemy-bar .s-life-bar .value {
+  background-color: #a12525;
+}
+.p-game > .title {
+  display: flex;
+  color: #d6a02c;
+  background-color: #0d1117;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #1b1c1d;
+  text-align: center;
+  cursor: pointer;
+}
+.p-game .sticky-stat-group-list {
+  border: 1px solid #1b1c1d;
+  white-space: nowrap;
+  padding: 0.1em;
+}

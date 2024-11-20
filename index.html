@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="./dist/style.css" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicons/favicon_io/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicons/favicon_io/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicons/favicon_io/favicon-16x16.png" />
+    <link rel="manifest" href="./favicons/favicon_io/site.webmanifest" />
+    <title>Modero</title>
+</head>
+
+<body class="dark hidden">
+    <footer>
+        <span class="copyright">© 2024 Modero</span>
+        <div class="s-links">
+            <a href="https://github.com/MyzBai/Modero" target="_blank">Github</a>
+        </div>
+    </footer>
+    <script data-live-server-proxy>
+        const tempWebSocket = window.WebSocket;
+        window.WebSocket = function (url, protocols) {
+            const socket = new tempWebSocket(url, protocols);
+            return new Proxy(socket, {
+                set(target, property, value) {
+                    if (property !== 'onmessage') {
+                        return Reflect.set(target, property, value);
+                    }
+                    return Reflect.set(target, property, function (event) {
+                        if (event.data === 'refreshcss') {
+                            const link = document.querySelector('[data-game-page-shadow-host]').shadowRoot?.querySelector('link[rel="stylesheet"]');
+                            const href = link.getAttribute('href')?.split('?')[0];
+                            link?.setAttribute('href', `${href}?${Date.now()}`);
+                        }
+                        if (typeof value === 'function') {
+                            value.call(target, event);
+                        }
+                    });
+                }
+            })
+        };
+    </script>
+    <script type="module" src="./dist/main.js"></script>
+</body>
+
+</html>
