@@ -153,7 +153,7 @@ export class Artifacts {
     }
 
     private tryUnlockArtifact() {
-        const candidates = this.artifactList.filter(x => x.curRank !== x.maxRank);
+        const candidates = this.artifactList.filter(x => x.curRank !== x.rankList.length);
         const candidate = pickOneFromPickProbability(candidates);
         if (!candidate) {
             return;
