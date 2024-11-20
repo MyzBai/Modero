@@ -176,12 +176,20 @@
                         "name": "Physical Attack Damage",
                         "rankList": [
                             {
-                                "exp": 1200, "baseDuration": 60, "manaCost": 80,
+                                "exp": 1200, "baseDuration": 60, "manaCost": 100,
                                 "modList": [ "{20}% More Physical Attack Damage" ]
                             },
                             {
-                                "baseDuration": 60, "manaCost": 200,
+                                "exp": 1200, "baseDuration": 60, "manaCost": 200,
                                 "modList": [ "{30}% More Physical Attack Damage" ]
+                            },
+                            {
+                                "exp": 1200, "baseDuration": 60, "manaCost": 300,
+                                "modList": [ "{40}% More Physical Attack Damage" ]
+                            },
+                            {
+                                "baseDuration": 60, "manaCost": 500,
+                                "modList": [ "{50}% More Physical Attack Damage" ]
                             }
                         ]
                     },
@@ -190,12 +198,20 @@
                         "name": "Elemental Attack Damage",
                         "rankList": [
                             {
-                                "exp": 1200, "baseDuration": 60, "manaCost": 80,
+                                "exp": 1200, "baseDuration": 60, "manaCost": 100,
                                 "modList": [ "{20}% More Elemental Attack Damage" ]
                             },
                             {
-                                "baseDuration": 60, "manaCost": 200,
+                                "exp": 1200, "baseDuration": 60, "manaCost": 200,
                                 "modList": [ "{30}% More Elemental Attack Damage" ]
+                            },
+                            {
+                                "exp": 1200, "baseDuration": 60, "manaCost": 300,
+                                "modList": [ "{40}% More Elemental Attack Damage" ]
+                            },
+                            {
+                                "baseDuration": 60, "manaCost": 500,
+                                "modList": [ "{50}% More Elemental Attack Damage" ]
                             }
                         ]
                     },
@@ -204,12 +220,42 @@
                         "name": "Damage Over Time",
                         "rankList": [
                             {
-                                "exp": 1200, "baseDuration": 60, "manaCost": 80,
+                                "exp": 600, "baseDuration": 60, "manaCost": 100,
+                                "modList": [ "{20}% More Damage Over Time" ]
+                            },
+                            {
+                                "exp": 1200, "baseDuration": 60, "manaCost": 200,
                                 "modList": [ "{30}% More Damage Over Time" ]
                             },
                             {
-                                "baseDuration": 60, "manaCost": 200,
+                                "exp": 3600, "baseDuration": 60, "manaCost": 300,
+                                "modList": [ "{40}% More Damage Over Time" ]
+                            },
+                            {
+                                "baseDuration": 60, "manaCost": 500,
                                 "modList": [ "{50}% More Damage Over Time" ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "6bd763",
+                        "name": "Ailment Duration",
+                        "rankList": [
+                            {
+                                "exp": 600, "baseDuration": 60, "manaCost": 100,
+                                "modList": [ "{30}% Increased Ailment Duration" ]
+                            },
+                            {
+                                "exp": 1200, "baseDuration": 60, "manaCost": 200,
+                                "modList": [ "{40}% Increased Ailment Duration" ]
+                            },
+                            {
+                                "exp": 3600, "baseDuration": 60, "manaCost": 300,
+                                "modList": [ "{50}% Increased Ailment Duration" ]
+                            },
+                            {
+                                "baseDuration": 60, "manaCost": 500,
+                                "modList": [ "{80}% Increased Ailment Duration" ]
                             }
                         ]
                     },
@@ -218,12 +264,20 @@
                         "name": "Critical Hit",
                         "rankList": [
                             {
-                                "exp": 1200, "baseDuration": 40, "manaCost": 80,
+                                "exp": 600, "baseDuration": 40, "manaCost": 100,
+                                "modList": [ "+{10}% Critical Hit Chance", "+{30}% Critical Hit Multiplier" ]
+                            },
+                            {
+                                "exp": 1200, "baseDuration": 40, "manaCost": 200,
                                 "modList": [ "+{15}% Critical Hit Chance", "+{50}% Critical Hit Multiplier" ]
                             },
                             {
-                                "baseDuration": 40, "manaCost": 200,
-                                "modList": [ "+{20}% Critical Hit Chance", "+{80}% Critical Hit Multiplier" ]
+                                "exp": 3600, "baseDuration": 40, "manaCost": 300,
+                                "modList": [ "+{20}% Critical Hit Chance", "+{70}% Critical Hit Multiplier" ]
+                            },
+                            {
+                                "baseDuration": 40, "manaCost": 500,
+                                "modList": [ "+{25}% Critical Hit Chance", "+{120}% Critical Hit Multiplier" ]
                             }
                         ]
                     }
@@ -232,10 +286,10 @@
             "passiveSkills": {
                 "insightCapacityEnhancerList": [
                     { "id": "f0e6eb", "name": "Book For Dummies", "probability": 50, "insight": 100 },
-                    { "id": "794c3c", "name": "Book For Dummies", "probability": 100, "insight": 100 },
-                    { "id": "9d9dd4", "name": "Book For Dummies", "probability": 100, "insight": 100 },
-                    { "id": "3d6107", "name": "Book For Dummies", "probability": 200, "insight": 100 },
-                    { "id": "a46e6f", "name": "Book For Dummies", "probability": 200, "insight": 100 },
+                    { "id": "794c3c", "name": "Book For Dummies", "probability": 200, "insight": 100 },
+                    { "id": "9d9dd4", "name": "Book For Dummies", "probability": 200, "insight": 100 },
+                    { "id": "3d6107", "name": "Book For Dummies", "probability": 300, "insight": 100 },
+                    { "id": "a46e6f", "name": "Book For Dummies", "probability": 400, "insight": 100 },
                     { "id": "f31249", "name": "Old Scroll", "probability": 300, "insight": 200 },
                     { "id": "369f64", "name": "Old Scroll", "probability": 300, "insight": 200 },
                     { "id": "4de9f1", "name": "Old Scroll", "probability": 400, "insight": 200 },
@@ -726,16 +780,17 @@
                     {
                         "id": "70ef5b",
                         "name": "Burned Robe",
-                        "probability": 1000,
+                        "probability": 700,
                         "rankList": [
-                            { "exp": 5, "modList": [ "{50}% More Burn Damage", "{30}% Increased Burn Duration" ] },
+                            { "exp": 5, "modList": [ "{30}% More Burn Damage", "{20}% Increased Burn Duration" ] },
+                            { "exp": 20, "modList": [ "{50}% More Burn Damage", "+{30}% Burn Damage Multiplier", "{30}% Increased Burn Duration" ] },
                             { "modList": [ "{80}% More Burn Damage", "{30}% Increased Burn Duration", "+{30}% Burn Damage Multiplier" ] }
                         ]
                     },
                     {
                         "id": "9d918d",
                         "name": "Amulet Of Pryhz",
-                        "probability": 1000,
+                        "probability": 700,
                         "rankList": [
                             { "exp": 5, "modList": [ "+{20}% Critical Hit Chance", "+{50}% Critical Hit Multiplier" ] },
                             { "modList": [ "+{25}% Critical Hit Chance", "+{120}% Critical Hit Multiplier" ] }
@@ -744,7 +799,7 @@
                     {
                         "id": "998209",
                         "name": "Eternal Crystal",
-                        "probability": 1000,
+                        "probability": 700,
                         "rankList": [
                             { "exp": 5, "modList": [ "{30}% Increased Mana Regeneration", "+{100} Maximum Mana" ] },
                             { "modList": [ "{50}% Increased Mana Regeneration", "+{200} Maximum Mana" ] }
@@ -775,7 +830,7 @@
                         "+{40} Strength",
                         "+{80} Dexterity",
                         "+{20} Intelligence",
-                        "{1}% Increased Attack Damage Per {8} Strength",
+                        "{1}% Increased Attack Damage Per {6} Strength",
                         "{1}% Increased Attack Speed Per {5} Dexterity",
                         "+{1} Maximum Mana Per {3} Intelligence"
                     ]
@@ -785,18 +840,18 @@
                     "modList": [
                         "{40}% More Elemental Damage",
                         "+{1} Mana Regeneration",
+                        "+{20} Strength",
+                        "+{30} Dexterity",
                         "+{80} Intelligence",
-                        "{1}% Increased Attack Damage Per {6} Strength",
-                        "{1}% Increased Attack Speed Per {5} Dexterity",
+                        "{1}% Increased Attack Damage Per {8} Strength",
+                        "{1}% Increased Attack Speed Per {6} Dexterity",
                         "+{1} Maximum Mana Per {2} Intelligence"
                     ]
                 }
             ],
             "guildClassList": [
                 {
-                    "id": "17cdea",
-                    "guildName": "Vanguard",
-                    "name": "Warrior",
+                    "id": "17cdea", "guildName": "Vanguard", "name": "Warrior",
                     "modList": [
                         "{30}% More Physical Attack Damage",
                         "+{50} Strength",
@@ -804,9 +859,7 @@
                     ]
                 },
                 {
-                    "id": "9f13e4",
-                    "guildName": "Vanguard",
-                    "name": "Berserker",
+                    "id": "9f13e4", "guildName": "Vanguard", "name": "Berserker",
                     "modList": [
                         "{30}% More Attack Damage",
                         "+{50} Dexterity",
@@ -814,9 +867,7 @@
                     ]
                 },
                 {
-                    "id": "b190fe",
-                    "guildName": "Vanguard",
-                    "name": "Templar",
+                    "id": "b190fe", "guildName": "Vanguard", "name": "Templar",
                     "modList": [
                         "{30}% More Elemental Attack Damage",
                         "+{50} Intelligence",
@@ -824,9 +875,7 @@
                     ]
                 },
                 {
-                    "id": "a67775",
-                    "guildName": "Wanderer",
-                    "name": "Hunter",
+                    "id": "a67775", "guildName": "Wanderer", "name": "Hunter",
                     "modList": [
                         "+{30} Dexterity",
                         "{30}% More Damage Over Time",
@@ -834,9 +883,7 @@
                     ]
                 },
                 {
-                    "id": "a6a62d",
-                    "guildName": "Wanderer",
-                    "name": "Assassin",
+                    "id": "a6a62d", "guildName": "Wanderer", "name": "Assassin",
                     "modList": [
                         "+{50} Dexterity",
                         "{20}% Increased Dexterity",
@@ -845,44 +892,31 @@
                     ]
                 },
                 {
-                    "id": "93f88a",
-                    "guildName": "Wanderer",
-                    "name": "Cutthroat",
+                    "id": "93f88a", "guildName": "Wanderer", "name": "Cutthroat",
                     "modList": [
                         "+{20}% Chance To Bleed",
                         "{30}% More Bleed Damage"
                     ]
                 },
                 {
-                    "id": "1db3a5",
-                    "name": "Wizard",
-                    "guildName": "Arcane",
+                    "id": "1db3a5", "name": "Wizard", "guildName": "Arcane",
                     "modList": [
-                        "+{50} Intelligence",
+                        "{20}% Increased Intelligence",
                         "{30}% Increased Maximum Mana",
                         "{20}% More Elemental Damage"
                     ]
                 },
                 {
-                    "id": "0f7f1a",
-                    "name": "Monk",
-                    "guildName": "Arcane",
+                    "id": "0f7f1a", "name": "Monk", "guildName": "Arcane",
                     "modList": [
                         "+{30} Dexterity",
                         "+{1} Mana Regeneration",
-                        "{20}% Increased Mana Regeneration",
-                        "{20}% Increased Aura Duration"
+                        "{20}% Increased Mana Regeneration"
                     ]
                 },
                 {
-                    "id": "481c27",
-                    "name": "Pyromancer",
-                    "guildName": "Arcane",
-                    "modList": [
-                        "Burn Lingers",
-                        "{30}% More Burn Damage",
-                        "{20}% Increased Burn Duration"
-                    ]
+                    "id": "481c27", "name": "Pyromancer", "guildName": "Arcane",
+                    "modList": [ "Burn Lingers" ]
                 }
             ]
         },
