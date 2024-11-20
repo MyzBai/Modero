@@ -179,15 +179,15 @@ export class Blacksmith extends Component {
             }
 
             srcItem.modList = Modifier.deserialize(...itemData?.modList?.map(x =>
-            ({
-                text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
-                srcId: x?.srcId, values: x?.values
-            })) ?? []);
+                ({
+                    text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
+                    srcId: x?.srcId, values: x?.values
+                })) ?? []);
             srcItem.modListCrafting = itemData?.modListCrafting ? Modifier.deserialize(...itemData?.modListCrafting?.map(x =>
-            ({
-                text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
-                srcId: x?.srcId, values: x?.values
-            })) ?? []) : undefined;
+                ({
+                    text: this.data.modLists.flatMap(y => y).find(y => y.id === x?.srcId)?.mod,
+                    srcId: x?.srcId, values: x?.values
+                })) ?? []) : undefined;
 
             if (srcItem.advancedReforge && itemData?.advReforge) {
                 srcItem.advancedReforge = { maxReforgeCount: itemData.advReforge.count ?? 0, modItems: itemData.advReforge.modItems?.map(x => ({ text: x?.text ?? '', tier: x?.tier ?? 0 })) ?? [] };

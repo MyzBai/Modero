@@ -89,7 +89,6 @@ export class World {
     }
 
     private updateMainMenuItem() {
-        console.log(game.stats.world.value)
         game.page.querySelectorStrict('[data-main-menu] [data-page-target="world"]').classList.toggle('hidden', game.stats.world.value === 1 && game.stats.level.value !== game.stats.maxLevel.value);
     }
 
