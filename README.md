@@ -1,6 +1,6 @@
-# Idle Ascension - An Idle RPG Game
+# Modero - An Idle RPG Game
 
-## Play: [Idle Ascension](https://myzbai.github.io/IdleAscension)
+## Play: [Modero](https://myzbai.github.io/Modero)
 
 ### Create Your Own Game Module
 

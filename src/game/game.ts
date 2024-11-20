@@ -68,7 +68,7 @@ export class Game {
         shadowRoot.appendChild(this.page);
         document.body.appendChild(this.pageShadowHost);
 
-        this.page.insertAdjacentHTML('beforeend', '<span class="title" onclick="location.hash = \'home\'">Idle Ascension</span>');
+        this.page.insertAdjacentHTML('beforeend', '<span class="title" onclick="location.hash = \'home\'">Modero</span>');
 
         //combat overview
         const combatOverview = document.createElement('div');
@@ -423,7 +423,7 @@ export async function init(args: [...Parameters<typeof game['init']>]) {
     document.addEventListener('visibilitychange', toggleLoopType);
 
     if (ENVIRONMENT === 'development') {
-        window.idleAscension = { ...window.idleAscension, ...initDevTools() };
+        window.modero = { ...window.modero, ...initDevTools() };
     } else {
         document.querySelector('[data-live-server-proxy]')?.remove();
     }
@@ -432,7 +432,7 @@ export async function init(args: [...Parameters<typeof game['init']>]) {
 export function dispose() {
     game.dispose();
     if (ENVIRONMENT === 'development') {
-        window.idleAscension?.dispose();
+        window.modero?.dispose();
     }
 }
 

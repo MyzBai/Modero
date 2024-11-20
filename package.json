@@ -1,7 +1,7 @@
 {
-    "name": "idleascension",
+    "name": "modero",
     "version": "1.0.0",
-    "description": "Idle Ascension repository",
+    "description": "Modero repository",
     "main": "main.js",
     "type": "module",
     "engines": {
@@ -19,15 +19,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/MyzBai/IdleAscension.git"
+        "url": "https://github.com/MyzBai/Modero.git"
     },
-    "homepage": "https://github.com/MyzBai/IdleAscension#readme",
+    "homepage": "https://github.com/MyzBai/Modero#readme",
     "author": {
         "name": "MyzBai"
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/MyzBai/IdleAscension/issues"
+        "url": "https://github.com/MyzBai/Modero/issues"
     },
     "dependencies": {
         "ajv": "^8.17.1",

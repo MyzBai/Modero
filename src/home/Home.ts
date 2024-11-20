@@ -12,7 +12,7 @@ export class Home {
         this.page.classList.add('p-home');
         this.page.setAttribute('data-page-content', 'home');
 
-        this.page.insertAdjacentHTML('beforeend', '<span class="title" data-game-title>Idle Ascension</span>');
+        this.page.insertAdjacentHTML('beforeend', '<span class="title" data-game-title>Modero</span>');
 
         const menu = createCustomElement(TabMenuElement);
 

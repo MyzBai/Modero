@@ -3,7 +3,7 @@ import { loadGame } from '../shared/utils/saveManager';
 
 declare global {
     interface Window {
-        idleAscension?: ReturnType<typeof initDevTools>;
+        modero?: ReturnType<typeof initDevTools>;
     }
     interface GlobalEventHandlersEventMap {
         'Dev:AddArtifact': CustomEvent<string>;
@@ -13,7 +13,7 @@ declare global {
 
 export function initDevTools() {
     console.groupCollapsed('Dev tools enabled');
-    console.log('Dev tools: window.idleAscension');
+    console.log('Dev tools: window.modero');
     console.log('Press Space to toggle Game Loop', '(state indicated by * in tab title)');
     console.groupEnd();
 
