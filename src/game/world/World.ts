@@ -15,10 +15,6 @@ export class World {
         const { menuItem } = game.addPage(this.page, 'World', 'world');
         menuItem.classList.add('hidden');
 
-        combat.stats.level.addListener('change', ({ curValue }) => {
-            menuItem.classList.toggle('hidden', game.stats.world.value === 1 && curValue < combat.stats.maxLevel.value);
-        });
-
         this.page.insertAdjacentHTML('beforeend', '<div class="g-title" data-row="1">World</div>');
         this.page.insertAdjacentHTML('beforeend', '<div class="label" data-label data-row="2"></div>');
         this.page.insertAdjacentHTML('beforeend', '<button style="visibility: hidden;" data-next-world-button>Next World</button>');
@@ -39,12 +35,12 @@ export class World {
     }
 
     get enemyBaseCount() {
-        return game.gameConfig.world.enemyBaseCountList[combat.stats.level.value - 1] ?? Infinity;
+        return game.gameConfig.world.enemyBaseCountList[game.stats.level.value - 1] ?? Infinity;
     }
 
     get enemyBaseLife() {
         const enemyBaseLifeList = game.gameConfig.world.enemyBaseLifeList;
-        const index = clamp(combat.stats.level.value - 1, 0, enemyBaseLifeList.length - 1);
+        const index = clamp(game.stats.level.value - 1, 0, enemyBaseLifeList.length - 1);
         const baseLife = enemyBaseLifeList[index];
         assertDefined(baseLife);
         return baseLife;
@@ -61,8 +57,8 @@ export class World {
         });
 
         combatContext.onComplete.listen(() => {
-            if (combat.stats.level.value < combat.stats.maxLevel.value) {
-                combat.stats.level.add(1);
+            if (game.stats.level.value < game.stats.maxLevel.value) {
+                game.stats.level.add(1);
             }
             this.combatCtx = this.createCombatContext();
             combat.startCombat(this.combatCtx);
@@ -73,10 +69,10 @@ export class World {
     private *generateEnemyCandidates() {
         for (const enemyData of game.gameConfig.world.enemyList) {
             if (enemyData.level) {
-                if (enemyData.level.min > combat.stats.level.value) {
+                if (enemyData.level.min > game.stats.level.value) {
                     continue;
                 }
-                if (enemyData.level.max && enemyData.level.max < combat.stats.level.value) {
+                if (enemyData.level.max && enemyData.level.max < game.stats.level.value) {
                     continue;
                 }
             }
@@ -92,18 +88,24 @@ export class World {
         }
     }
 
+    private updateMainMenuItem() {
+        console.log(game.stats.world.value)
+        game.page.querySelectorStrict('[data-main-menu] [data-page-target="world"]').classList.toggle('hidden', game.stats.world.value === 1 && game.stats.level.value !== game.stats.maxLevel.value);
+    }
+
     init() {
-        combat.stats.level.addListener('change', ({ curValue }) => {
-            if (curValue === combat.stats.maxLevel.value) {
-                if (game.stats.world.value !== game.gameConfig.world.worldList.length) {
-                    this.page.querySelectorStrict<HTMLElement>('[data-next-world-button]').style.visibility = 'visible';
-                    if (!this.combatCtx?.completed) {
-                        this.combatCtx = this.createCombatContext();
-                        combat.startCombat(this.combatCtx);
-                    }
-                    return;
-                }
+        game.stats.level.addListener('change', this.updateMainMenuItem.bind(this));
+
+        game.stats.level.addListener('change', ({ curValue }) => {
+            if (curValue !== game.stats.maxLevel.value) {
+                return;
             }
+            this.combatCtx = this.createCombatContext();
+            combat.startCombat(this.combatCtx);
+            if (game.stats.world.value === game.gameConfig.world.worldList.length) {
+                return;
+            }
+            this.page.querySelectorStrict<HTMLElement>('[data-next-world-button]').style.visibility = 'visible';
         });
 
         combat.events.contextChanged.listen(({ oldCtx, newCtx }) => {
@@ -115,8 +117,7 @@ export class World {
             }
         });
 
-        this.combatCtx = this.createCombatContext();
-        combat.startCombat(this.combatCtx);
+        game.stats.level.set(1);
     }
 
     setup() {
@@ -124,6 +125,15 @@ export class World {
 
         const modList = Modifier.modListFromTexts(this.data.modList ?? []);
         this.page.querySelectorStrict('[data-mod-list]').replaceWith(createModListElement(modList));
+
+        this.combatCtx?.updateModList(this.data.modList);
+
+        if (!this.combatCtx) {
+            this.combatCtx = this.createCombatContext();
+        }
+        combat.startCombat(this.combatCtx);
+
+        this.updateMainMenuItem();
     }
 
     reset() {
@@ -139,10 +149,9 @@ export class World {
     }
 
     deserialize({ world: save }: UnsafeSerialization) {
-        if (save?.combatCtx && this.combatCtx) {
+        if (save?.combatCtx) {
             this.combatCtx = this.createCombatContext();
             this.combatCtx.deserialize(save.combatCtx);
-            combat.startCombat(this.combatCtx);
         }
     }
 }

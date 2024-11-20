@@ -8,8 +8,6 @@ import { createCombatStats } from '../statistics/stats';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
-import { Modifier } from '../mods/Modifier';
-import { playerModTemplateList } from '../mods/playerModTemplates';
 import type { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { calcEnemyResourceDrop } from '../calc/calcStats';
 import { createModListElement } from '../utils/dom';
@@ -191,8 +189,6 @@ export class Combat {
         this._ctx = ctx;
         this._ctx.active = true;
 
-        player.modDB.replace('Combat', Modifier.extractStatModifierList(...ctx.modList.filter(x => playerModTemplateList.some(y => y.id === x.template.id))));
-
         this.stats.maxEnemyCount.set(ctx.maxEnemyCount);
         this.stats.enemyCount.set(ctx.enemyCount);
         statistics.updateStats('Combat');
@@ -235,10 +231,9 @@ export class Combat {
     }
 
     reset() {
-        if (this._ctx) {
-            this.stopCombat(this._ctx);
-        }
+        this._ctx = null;
         this.effectHandler.reset();
         Object.values(this.events).forEach(x => x.removeAllListeners());
+        Object.values(this.stats).forEach(x => x.reset());
     }
 }

@@ -12,8 +12,11 @@ export type EnemyStatCollection = ReturnType<typeof createEnemyStats>;
 
 
 export function createGameStats(parent?: StatCollection) {
+    const maxLevel = new Statistic();
     const statList = {
         timePlayed: new Statistic({ label: 'Time Played', isTime: true }),
+        maxLevel,
+        level: new Statistic({ sticky: true, label: 'Level', defaultValue: 1, statFormat: self => [self, '/', maxLevel] }),
         world: new Statistic({ defaultValue: 1 }),
         totalDamage: new Statistic(),
         totalAttackDamage: new Statistic(),
@@ -55,10 +58,7 @@ export function createCombatStats() {
     // const area = new Statistic({ label: 'Area', sticky: true, computed: true, type: 'text' });
     const maxEnemyCount = new Statistic({ computed: true });
     const enemyCount = new Statistic({ label: 'Enemies', sticky: true, computed: true, statFormat: (self) => [self, '/', maxEnemyCount] });
-    const maxLevel = new Statistic();
     return {
-        maxLevel,
-        level: new Statistic({ sticky: true, label: 'Level', defaultValue: 1, statFormat: self => [self, '/', maxLevel] }),
         maxEnemyCount,
         enemyCount
     };

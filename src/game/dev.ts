@@ -26,7 +26,7 @@ export function initDevTools() {
         player,
         combat,
         getEnemy: () => combat.enemy,
-        setLevel: (level: number) => combat.stats.level.set(level),
+        setLevel: (level: number) => game.stats.level.set(level),
         addResource: (name: string, amount: number) => {
             Object.values(game.resources).find(x => x.options.label?.toLowerCase() === name.toLowerCase())?.add(amount);
             statistics.updateStats('Resources');

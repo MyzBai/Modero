@@ -30,7 +30,6 @@ export class CombatContext {
     readonly name: string;
     readonly modDB: ModDB;
     readonly onComplete: EventEmitter<CombatContext>;
-    readonly modList: Modifier[];
     private _modList: Modifier[] = [];
     private _completed = false;
     private _enemy: Enemy;
@@ -42,14 +41,12 @@ export class CombatContext {
         this.modDB = new ModDB();
         this.onComplete = new EventEmitter<CombatContext>();
 
-        this.modList = Modifier.modListFromTexts(data.combatModList ?? []);
-
         this._enemyCount = 1;
         this._maxEnemyCount = 0;
 
         this._enemy = this.generateEnemy();
 
-        this.updateModifiers();
+        this.updateModList(data.combatModList ?? []);
     }
 
     get completed() {
@@ -74,6 +71,12 @@ export class CombatContext {
 
     get interruptable() {
         return this.data.interruptable ?? false;
+    }
+
+    updateModList(modList: string[]) {
+        this._modList = Modifier.modListFromTexts(modList);
+        this.updateModifiers();
+        this._enemy.updateStats();
     }
 
     private updateModifiers() {

@@ -116,8 +116,6 @@ export class Game {
 
         //stats
         this.page.insertAdjacentHTML('beforeend', '<ul class="sticky-stat-group-list g-scroll-list-v" data-sticky-stat-group-list></ul>');
-
-
     }
 
     get menu() {
@@ -179,7 +177,7 @@ export class Game {
 
         this._initializationStage = GameInitializationStage.Init;
 
-        combat.stats.maxLevel.set(gameConfig.world.enemyBaseLifeList.length + 1);
+        this.stats.maxLevel.set(gameConfig.world.enemyBaseLifeList.length + 1);
 
         //Init
         statistics.init();
@@ -199,7 +197,6 @@ export class Game {
 
         this._initializationStage = GameInitializationStage.Setup;
 
-        world.setup();
         //Setup
         player.setup();
         world.setup();
@@ -235,7 +232,9 @@ export class Game {
         this._initializationStage = GameInitializationStage.Done;
 
         window.addEventListener('beforeunload', () => {
-            this.saveGame();
+            if (this.page.checkVisibility()) {
+                this.saveGame();
+            }
         }, { signal: this._abortController.signal });
     }
 
@@ -270,6 +269,7 @@ export class Game {
         assertNonNullable(game.gameConfig);
         assertDefined(game.gameConfigId);
 
+        this.stats.level.set(1, true);
         this.saveGame();
 
         const save = loadGame(game.gameConfigId) as UnsafeSerialization;
@@ -277,7 +277,6 @@ export class Game {
 
         const newSave: UnsafeSerialization = {
             ...save.meta,
-            guildHall: { ...save.guildHall, classId: undefined },
             game: { stats: save.game?.stats }
         };
 

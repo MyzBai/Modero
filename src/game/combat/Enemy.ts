@@ -42,14 +42,14 @@ export class Enemy {
         return this.stats.maxLife.value;
     }
 
-    get lifeRatio() {
+    get lifeFac() {
         return clamp(this.life / this.maxLife, 0, 1);
     }
 
     updateStats() {
-        const lifeFrac = this.lifeRatio;
+        const lifeFac = this.lifeFac;
         calcEnemyStats(this);
-        this.life = this.maxLife * lifeFrac;
+        this.life = this.maxLife * lifeFac;
     }
 
     getConditionFlags(): number {
@@ -66,7 +66,7 @@ export class Enemy {
 
     serialize(): GameSerialization.EnemyInstance {
         return {
-            lifeRatio: this.lifeRatio,
+            lifeRatio: this.lifeFac,
             modList: this.modList.map(x => ({ srcId: x.template.id, values: x.values }))
         };
     }
