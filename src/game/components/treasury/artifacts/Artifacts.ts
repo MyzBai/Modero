@@ -7,7 +7,7 @@ import { createObjectInfoElements, unlockObject } from 'src/game/utils/objectUti
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
 import { ProgressElement } from 'src/shared/customElements/ProgressElement';
 import { ENVIRONMENT } from '../../../../config';
-import { createRankObject, getRankExpPct, tryUnlockNextRank, updateRankObjectListItemElement, type RankObject } from '../../../utils/rankObjectUtils';
+import { addRankExp, createRankObject, getRankExpPct, tryUnlockNextRank, updateRankObjectListItemElement, type RankObject } from '../../../utils/rankObjectUtils';
 
 interface Artifact extends RankObject<GameConfig.Artifact['rankList'][number]> {
     id: string;
@@ -46,7 +46,7 @@ export class Artifacts {
 
         player.stats.maxArtifacts.addListener('change', this.updateArtifactsCounter.bind(this));
 
-        this.onArtifactFound.listen(artifact => this.artifactAddExp.bind(this, artifact));
+        this.onArtifactFound.listen(this.artifactAddExp.bind(this));
 
         if (ENVIRONMENT === 'development') {
             window.addEventListener('Dev:AddArtifact', e => {
@@ -56,15 +56,6 @@ export class Artifacts {
                     return;
                 }
                 unlockObject(artifact);
-                this.onArtifactFound.invoke(artifact);
-                console.log(`You unlocked: ${artifact.name}`);
-            }, { signal: game.abortSignal });
-            window.addEventListener('Dev:IncreaseArtifactRank', e => {
-                const artifact = this.artifactList.find(x => x.name.toLowerCase() === e.detail.toLowerCase());
-                if (!artifact) {
-                    console.log(`${e.detail} does not exist`);
-                    return;
-                }
                 this.onArtifactFound.invoke(artifact);
             }, { signal: game.abortSignal });
         }
@@ -162,26 +153,28 @@ export class Artifacts {
     }
 
     private tryUnlockArtifact() {
-        const candidates = this.artifactList.filter(x => x.probability && x.maxRank !== x.rankList.length).map(x => ({ ...x, probability: x.probability / player.stats.explorationMultiplier.value }));
+        const candidates = this.artifactList.filter(x => x.curRank !== x.maxRank);
         const candidate = pickOneFromPickProbability(candidates);
         if (!candidate) {
             return;
         }
-        const artifact = this.artifactList.findStrict(x => x.id === candidate.id);
-        if (!artifact.unlocked) {
-            unlockObject(artifact);
+        if (!candidate.unlocked) {
+            unlockObject(candidate);
             notifications.addNotification({
-                title: `New Artifact: ${artifact.name}`,
-                elementId: artifact.id
+                title: `New Artifact: ${candidate.name}`,
+                elementId: candidate.id
             });
         }
-        this.onArtifactFound.invoke(artifact);
+        this.onArtifactFound.invoke(candidate);
     }
 
     private artifactAddExp(artifact: Artifact) {
-        artifact.curExp++;
-        if (artifact.curExp >= artifact.maxExp) {
+        addRankExp(artifact, 1);
+        if (artifact.curExp === artifact.maxExp) {
             tryUnlockNextRank(artifact);
+        }
+        if (artifact.selected) {
+            this.updateArtifactInfo();
         }
     }
 

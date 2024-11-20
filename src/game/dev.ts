@@ -32,7 +32,6 @@ export function initDevTools() {
             statistics.updateStats('Resources');
         },
         addArtifact: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:AddArtifact', { detail: baseName })),
-        increaseArtifactRank: (baseName: string) => window.dispatchEvent(new CustomEvent('Dev:IncreaseArtifactRank', { detail: baseName })),
         setLoopSpeed: (speed: number) => {
             gameLoop.setSpeed(speed);
         },

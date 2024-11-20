@@ -301,6 +301,9 @@ export class AuraSkills extends SkillPage {
     }
 
     private auraSkillExpCallback(auraSkill: AuraSkill) {
+        if (auraSkill.curRank !== auraSkill.maxRank) {
+            return;
+        }
         addRankExp(auraSkill, player.stats.trainingMultiplier.value + player.stats.meditationMultiplier.value);
         if (auraSkill.curExp === auraSkill.maxExp) {
             tryUnlockNextRank(auraSkill);

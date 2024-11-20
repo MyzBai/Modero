@@ -99,10 +99,8 @@ export function getRankExpPct(rankObj: RankObject) {
 
 
 export function addRankExp(rankObj: RankObject, multiplier: number) {
-    if (rankObj.curRank !== rankObj.maxRank) {
-        return;
-    }
     if (rankObj.curExp >= rankObj.maxExp) {
+        rankObj.curExp = rankObj.maxExp;
         return;
     }
     rankObj.curExp += 1 * multiplier;

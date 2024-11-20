@@ -122,6 +122,9 @@ export class AttackSkills extends SkillPage {
     }
 
     private attackSkillExpCallback() {
+        if (this.activeSkill.curRank !== this.activeSkill.maxRank) {
+            return;
+        }
         addRankExp(this.activeSkill, player.stats.trainingMultiplier.value);
         if (this.activeSkill.curExp === this.activeSkill.maxExp) {
             tryUnlockNextRank(this.activeSkill);
