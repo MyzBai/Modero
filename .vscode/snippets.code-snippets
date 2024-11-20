@@ -1,6 +1,6 @@
 {
 	"Random_Hex": {
-		"scope": "typescript",
+		"scope": "typescript,json",
 		"prefix": "random_hex",
 		"body": "${RANDOM_HEX}",
 		"description": "Generates 6 random Base-16 digits"

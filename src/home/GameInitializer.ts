@@ -1,4 +1,4 @@
-import gameModRegistry from '../game/gameConfig/gameModRegistry.json';
+import gameModRegistry from '../game/gameConfig/gameModRegister.json';
 import { isString } from 'src/shared/utils/utils';
 import type * as GameSerialization from 'src/game/serialization';
 import { assertDefined, assertNonNullable } from 'src/shared/utils/assert';

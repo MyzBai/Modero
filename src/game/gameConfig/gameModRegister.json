@@ -1,5 +1,5 @@
 {
-    "$schema": "gameModRegistry.schema.json",
+    "$schema": "gameModRegister.schema.json",
     "list": [
         {
             "id": "1ea84a",

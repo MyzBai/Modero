@@ -1,7 +1,7 @@
 import '../extensions/arrayExtensions';
 import '../extensions/DOMExtensions';
 import { EventEmitter } from 'src/shared/utils/EventEmitter';
-import gameModRegistry from './gameConfig/gameModRegistry.json';
+import gameModRegistry from './gameConfig/gameModRegister.json';
 import { Combat } from './combat/Combat';
 import { Components } from './components/Components';
 import { Player } from './Player';

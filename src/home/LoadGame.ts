@@ -1,6 +1,6 @@
 import { GameInitializer } from './GameInitializer';
 import type { Meta, UnsafeSerialization } from 'src/game/serialization';
-import gameModRegistry from '../game/gameConfig/gameModRegistry.json';
+import gameModRegistry from '../game/gameConfig/gameModRegister.json';
 import { assertDefined } from 'src/shared/utils/assert';
 import { loadGame } from 'src/shared/utils/saveManager';
 import { getFormattedTimeSince } from 'src/shared/utils/date';

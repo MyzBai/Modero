@@ -1,5 +1,5 @@
 import { assertDefined } from 'src/shared/utils/assert';
-import gameModRegistry from '../game/gameConfig/gameModRegistry.json';
+import gameModRegistry from '../game/gameConfig/gameModRegister.json';
 import { GameInitializer } from './GameInitializer';
 import { createCustomElement } from 'src/shared/customElements/customElements';
 import { ModalElement } from 'src/shared/customElements/ModalElement';
@@ -32,7 +32,7 @@ export class NewGame extends GameInitializer {
             If you're interesting in contributing or developing your own mod,
             check out the Github link in the footer.
         `);
-        })
+        });
         this.page.appendChild(titleElement);
 
         this.page.insertAdjacentHTML('beforeend', '<ul class="entry-list g-scroll-list-v" data-entry-list></ul>');
